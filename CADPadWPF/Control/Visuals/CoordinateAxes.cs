@@ -1,9 +1,9 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 using CADPadServices.Interfaces;
 
-namespace CADPadWPF.Control
+namespace CADPadWPF.Control.Visuals
 {
     internal class CoordinateAxes : DrawingVisual, ICoordinateAxes
     {

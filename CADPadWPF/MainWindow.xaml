@@ -5,48 +5,57 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADPadWPF"
         xmlns:control="clr-namespace:CADPadWPF.Control"
+        xmlns:canvas="clr-namespace:CADPadWPF.Control.Canvas"
         mc:Ignorable="d"
-      
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow"
+        Height="450"
+        Width="800">
 
     <Window.Resources>
         <local:PointToStringConverter x:Key="PointToStringConverter" />
 
     </Window.Resources>
-            <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-            <Menu>
-                <MenuItem Header="Draw">
-                    <MenuItem Header="Line" Click="MenuItem_OnClick">
+        <Menu  >
+            <MenuItem Header="Draw">
+                <MenuItem Header="Line"
+                          Click="MenuItem_OnClick">
+               </MenuItem>
+            </MenuItem>
+        </Menu>
 
-                    </MenuItem>
-                </MenuItem>
-            </Menu>
 
-        <control:CADPadCanvas x:Name="sCAD"
-                              Grid.Row="1"
-                              Background="Transparent"
-                              Drawing="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing}"
-                              VerticalAlignment="Stretch"
-                              HorizontalAlignment="Stretch">
-        </control:CADPadCanvas>
 
-        <!--1 STATUS BAR-->
-            <Grid Grid.Row="2">
-                <Border Padding="8, 3, 8, 3"
-                        BorderThickness="0, 1, 0, 0"
-                        BorderBrush="Black">
+        <!-- NOTES : ZIndex is set to -1 to avoid canvas drawing visuals overlapping the other window controls when panning/zooming. 
+        Also the other window controls' background must not be null or transparent -->
+        <canvas:CADPadCanvas x:Name="sCAD"
+                             Grid.ZIndex="-1"
+                             Grid.Row="1"
+                             Background="Transparent"
+                             Drawing="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing}"
+                             VerticalAlignment="Stretch"
+                             HorizontalAlignment="Stretch">
+        </canvas:CADPadCanvas>
+        <!--  -->
 
-                    <!-- COORDINATES-->
-                    <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
+        <Border Padding="8, 3, 8, 3"
+                BorderThickness="0, 1, 0, 0"
+                Grid.Row="2"
+                Background="White"
+                BorderBrush="Black">
 
-                </Border>
-            </Grid>
+            <!-- COORDINATES-->
+            <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
+
+        </Border>
+
     </Grid>
-   
+
 </Window>
+

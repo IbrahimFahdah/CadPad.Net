@@ -7,6 +7,7 @@ using CADPadDB.TableRecord;
 using CADPadServices.ApplicationServices;
 using CADPadServices.Commands;
 using CADPadServices.Commands.Draw;
+using CADPadServices.Controllers;
 using CADPadServices.ESelection;
 using CADPadServices.Interfaces;
 
@@ -36,9 +37,9 @@ namespace CADPadServices
         public Block CurrentBlock => Document.database.blockTable[Document.currentBlockName] as Block;
 
         public IPointerContoller Pointer { get; set; }
-        public SelectRectangleBase CreateSelectRectangle()
+        public SelectRectangle CreateSelectRectangle()
         {
-            return new SelectRectangleBase(this);
+            return new SelectRectangle(this);
         }
 
         public IPanContoller PanContoller { get; set; }
@@ -93,6 +94,12 @@ namespace CADPadServices
             return value / Scale;
         }
 
+        public double ModelToCanvas(double value)
+        {
+
+            return value * Scale;
+        }
+
         public CADPoint ModelToCanvas(CADPoint globalPnt, bool bWithScale = true)
         {
             CADPoint tempPnt = globalPnt;
@@ -131,12 +138,18 @@ namespace CADPadServices
         public IEventResult OnMouseDown(IMouseButtonEventArgs e)
         {
             PanContoller.OnMouseDown(e);
-            Pointer.OnMouseDown(e);
+            var res=Pointer.OnMouseDown(e);
             if (_cmdsMgr.CurrentCmd != null)
             {
                 _cmdsMgr.OnMouseDown(e);
             }
-
+            else
+            {
+                if (res.data is Command cmd )
+                {
+                    _cmdsMgr.DoCommand(cmd);
+                }
+            }
             return null;// _cmdsMgr.CurrentCmd;
         }
 
@@ -191,6 +204,37 @@ namespace CADPadServices
             {
                 _cmdsMgr.OnKeyDown(e);
             }
+            else
+            {
+                if (e.IsEscape)
+                {
+                    Document.selections.Clear();
+                    foreach (var g in Canvas.Geometries)
+                    {
+                       if(g.Selected)
+                       {
+                            g.Selected = false;
+                            g.Draw();
+                       }
+                    }
+                    Canvas.ResetGrips();
+                }
+                //if (_dynamicInputer.StartCmd(e))
+                //{
+                //}
+                //else if (e.IsEscape)
+                //{
+                //    _document.selections.Clear();
+                //}
+                //else if (e.IsDelete)
+                //{
+                //    if ((document as Document).selections.Count > 0)
+                //    {
+                //        DeleteCmd cmd = new DeleteCmd();
+                //        this.OnCommand(cmd);
+                //    }
+                //}
+            }
 
             return null;
         }
@@ -213,8 +257,8 @@ namespace CADPadServices
             entity.State = state;
             modelSpace.AppendEntity(entity);
 
-            var drawingVisual = Canvas.CreateGeometryWraper();
-            Canvas.AddGeometry(drawingVisual);
+            var drawingVisual = Canvas.CreateCADEnitiyVisual();
+            Canvas.AddVisual(drawingVisual);
             drawingVisual.Entity = entity;
             entity.DrawingVisual = drawingVisual;
 
@@ -224,7 +268,7 @@ namespace CADPadServices
 
         public void RemoveEntity<T>(T entity) where T : Entity
         {
-            Canvas.RemoveGeometry(entity.DrawingVisual);
+            Canvas.RemoveVisual(entity.DrawingVisual);
             entity.Erase();
         }
 
@@ -251,7 +295,36 @@ namespace CADPadServices
         public void OnSelectionChanged()
         {
             Pointer.OnSelectionChanged();
-            
+     
+            //Canvas.ResetGrips();
+        }
+
+        public void ResetGrips()
+        {
+          
+            Canvas.ResetGrips();
+        }
+
+        public IDrawingVisual CreateTempVisual()
+        {
+            var drawingVisual = Canvas.CreateVisual();
+            Canvas.AddVisual(drawingVisual);
+            return drawingVisual;
+        }
+
+        public ICursorVisual GetCursorVisual()
+        {
+            return Canvas.CursorVisual;
+        }
+
+        public ISelectionBoxVisual GetSelectionBoxVisual()
+        {
+            return Canvas.SelectionBoxVisual;
+        }
+
+        public void RemoveTempVisual(IDrawingVisual v)
+        {
+            Canvas.RemoveVisual(v);
         }
     }
 }

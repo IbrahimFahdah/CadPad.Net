@@ -3,14 +3,14 @@ using System.Windows.Media;
 using CADPadServices.Interfaces;
 using Drawing = CADPadServices.Drawing;
 
-namespace CADPadWPF.Control
+namespace CADPadWPF.Control.Canvas
 {
     public partial class CADPadCanvas
     {
         public static readonly DependencyProperty DrawingProperty = DependencyProperty.Register(
             "Drawing",
             typeof(IDrawing),
-            typeof(CADPadCanvas),
+            typeof(Canvas.CADPadCanvas),
             new FrameworkPropertyMetadata(null));
         public IDrawing Drawing
         {
@@ -25,7 +25,7 @@ namespace CADPadWPF.Control
         public static readonly DependencyProperty AxesColorProperty = DependencyProperty.Register(
             "AxesColor",
             typeof(Color),
-            typeof(CADPadCanvas),
+            typeof(Canvas.CADPadCanvas),
             new FrameworkPropertyMetadata(Colors.Black, On_AxesColor_Changed));
         public Color AxesColor
         {
@@ -38,7 +38,7 @@ namespace CADPadWPF.Control
         }
         private static void On_AxesColor_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is CADPadCanvas dh)
+            if (d is Canvas.CADPadCanvas dh)
             {
                 dh.RedrawCoordinateAxes();
             }
@@ -47,7 +47,7 @@ namespace CADPadWPF.Control
         public static readonly DependencyProperty AxesThicknessProperty = DependencyProperty.Register(
             "AxesThickness",
             typeof(double),
-            typeof(CADPadCanvas),
+            typeof(Canvas.CADPadCanvas),
             new FrameworkPropertyMetadata(2.0, On_AxesThickness_Changed));
         public double AxesThickness
         {
@@ -60,7 +60,7 @@ namespace CADPadWPF.Control
         }
         private static void On_AxesThickness_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is CADPadCanvas dh)
+            if (d is Canvas.CADPadCanvas dh)
             {
                 dh.RedrawCoordinateAxes();
             }
@@ -69,7 +69,7 @@ namespace CADPadWPF.Control
         public static readonly DependencyProperty AxesLengthProperty = DependencyProperty.Register(
             "AxesLength",
             typeof(double),
-            typeof(CADPadCanvas),
+            typeof(Canvas.CADPadCanvas),
             new FrameworkPropertyMetadata(50.0, On_AxesLength_Changed));
         public double AxesLength
         {
@@ -83,7 +83,7 @@ namespace CADPadWPF.Control
 
         private static void On_AxesLength_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is CADPadCanvas dh)
+            if (d is Canvas.CADPadCanvas dh)
             {
                 dh.RedrawCoordinateAxes();
             }
@@ -93,7 +93,7 @@ namespace CADPadWPF.Control
         public static readonly DependencyProperty AxesTextSizeProperty = DependencyProperty.Register(
             "AxesTextSize",
             typeof(double),
-            typeof(CADPadCanvas),
+            typeof(Canvas.CADPadCanvas),
             new FrameworkPropertyMetadata(12.0, On_AxesTextSize_Changed));
         public double AxesTextSize
         {
@@ -107,7 +107,7 @@ namespace CADPadWPF.Control
 
         private static void On_AxesTextSize_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is CADPadCanvas dh)
+            if (d is Canvas.CADPadCanvas dh)
             {
                 dh.RedrawCoordinateAxes();
             }
@@ -116,7 +116,7 @@ namespace CADPadWPF.Control
         public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register(
             "Scale",
             typeof(double),
-            typeof(CADPadCanvas),
+            typeof(Canvas.CADPadCanvas),
             new FrameworkPropertyMetadata(1.0, On_Scale_Changed));
 
         public double Scale
@@ -130,7 +130,7 @@ namespace CADPadWPF.Control
         }
         private static void On_Scale_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is CADPadCanvas dh)
+            if (d is Canvas.CADPadCanvas dh)
             {
                 dh.Redraw();
             }

@@ -7,12 +7,20 @@ namespace CADPadServices.Interfaces
     {
         IDrawing Drawing { get; }
 
-        List<IDrawingVisual> Geometries { get; set; }
+        List<ICADEnitiyVisual> Geometries { get; set; }
 
-        IDrawingVisual CreateGeometryWraper();
-        void AddGeometry(IDrawingVisual dv);
-        void RemoveGeometry(IDrawingVisual dv);
+        ICADEnitiyVisual CreateCADEnitiyVisual();
+        IDrawingVisual CreateVisual();
+
+        ICursorVisual CursorVisual { get; set; }
+        ISelectionBoxVisual SelectionBoxVisual { get; set; }
+
+
+        void AddVisual(IDrawingVisual dv);
+
+        void RemoveVisual(IDrawingVisual dv);
 
         void Redraw();
+        void ResetGrips();
     }
 }

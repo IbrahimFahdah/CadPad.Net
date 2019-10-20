@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using CADPadDB;
 using CADPadDB.CADEntity;
 using CADPadDB.Maths;
@@ -8,12 +8,16 @@ using CADPadServices.Enums;
 using CADPadServices.ESelection;
 using CADPadServices.Interfaces;
 
-namespace CADPadServices
+namespace CADPadServices.Controllers
 {
     public class PointerContoller: IPointerContoller
     {
-        protected IDrawing _presenter = null;
+        protected IDrawing _drawing = null;
+        protected SnapNodesController _snapNodesMgr = null;
+        protected GripPointsController _anchorMgr = null;
+        protected PickupBox.PickupBox _pickupBox = null;
 
+    
         public PointerModes mode { get; set; } = PointerModes.Default;
 
         /// <summary>
@@ -26,42 +30,28 @@ namespace CADPadServices
             set { _pos = value; }
         }
 
-
+        /// <summary>
+        /// Model sys
+        /// </summary>
         public CADPoint  currentSnapPoint { get; protected set; } = new CADPoint(0, 0);
+        public CADPoint _loc { get; protected set; } = new CADPoint(0, 0);
 
+        protected SelectRectangle _selRect = null;
 
-        protected PickupBox.PickupBox _pickupBox = null;
-        protected SelectRectangleBase _selRect = null;
-
-        //protected LocateCross _locateCross = null;
-
-        protected SnapNodesMgrBase _snapNodesMgr = null;
-        protected AnchorsMgr _anchorMgr = null;
-
-        internal int pickupBoxSide
+        internal SelectRectangle SelRect
         {
-            get { return _pickupBox.side; }
-            set
+            get
             {
-                if (_pickupBox.side != value)
+                if (_selRect == null)
                 {
-                    _pickupBox.side = value;
+                    _selRect = _drawing.CreateSelectRectangle();
                 }
+                return _selRect;
             }
         }
 
-        //internal int locateCrossLength
-        //{
-        //    get { return _locateCross.length; }
-        //    set
-        //    {
-        //        if (_locateCross.length != value)
-        //        {
-        //            _locateCross.length = value;
-        //            UpdateBitmap();
-        //        }
-        //    }
-        //}
+        protected Cursor _cursor = null;
+
 
         protected bool _isShowAnchor = true;
         public bool isShowAnchor
@@ -69,42 +59,40 @@ namespace CADPadServices
             get { return _isShowAnchor; }
             set
             {
-                //if (_isShowAnchor != value)
-                //{
-                //    _anchorMgr.Clear();
-                //    _isShowAnchor = value;
-                //    if (_isShowAnchor)
-                //    {
-                //        _anchorMgr.Update();
-                //    }
-                //}
+                if (_isShowAnchor != value)
+                {
+                    _anchorMgr.Clear();
+                    _isShowAnchor = value;
+                    if (_isShowAnchor)
+                    {
+                        _anchorMgr.Update();
+                    }
+                }
             }
         }
 
-
-
-        public PointerContoller(IDrawing presenter)
+        public PointerContoller(IDrawing drawing)
         {
 
-            _presenter = presenter;
+            _drawing = drawing;
 
-            _pickupBox = new PickupBox.PickupBox(_presenter);
+            _pickupBox = new PickupBox.PickupBox(_drawing);
             _pickupBox.side = 20;
 
-            // _locateCross = new LocateCross(_presenter);
-            //  _locateCross.length = 60;
+             _cursor = new Cursor(_drawing);
+              _cursor.Length = 60;
 
-            _snapNodesMgr = new SnapNodesMgrBase(_presenter);
-            _anchorMgr = new AnchorsMgr(_presenter);
+            _snapNodesMgr = new SnapNodesController(_drawing);
+            _anchorMgr = new GripPointsController(_drawing);
 
         }
+
         #region events
         public IEventResult OnMouseDown(IMouseButtonEventArgs e)
         {
             _pos.X = e.X;
             _pos.Y = e.Y;
             Command cmd = null;
-
             switch (mode)
             {
                 case PointerModes.Default:
@@ -116,17 +104,17 @@ namespace CADPadServices
                             {
                                 
                                 _pickupBox.center = _pos;
-                                List<Selection> sels = _pickupBox.Select(_presenter.CurrentBlock);
+                                List<Selection> sels = _pickupBox.Select(_drawing.CurrentBlock);
                                 if (sels.Count > 0)
                                 {
                                     //user directly clicked on entities.
                                     if (e.IsShiftKeyDown())
                                     {
-                                        (_presenter.Document as Document).selections.Remove(sels);
+                                        (_drawing.Document as Document).selections.Remove(sels);
                                     }
                                     else
                                     {
-                                        (_presenter.Document as Document).selections.Add(sels);
+                                        (_drawing.Document as Document).selections.Add(sels);
                                     }
 
                                     DrawSelection(sels, e.IsShiftKeyDown());
@@ -134,19 +122,20 @@ namespace CADPadServices
                                 else
                                 {
                                     //start a selection box 
-                                    _selRect = _presenter.CreateSelectRectangle();
-                                    _selRect.startPoint = _selRect.endPoint = _pos;
+                                    SelRect.Active = true;
+                                    SelRect.startPoint = SelRect.endPoint = _pos;
                                 }
                             }
                             else
                             {
-                                Database db = (_presenter.Document as Document).database;
+                                Database db = (_drawing.Document as Document).database;
                                 Entity entity = db.GetObject(_anchorMgr.currentGripEntityId) as Entity;
                                 if (entity != null)
                                 {
-                                    //GripPointMoveCmd gripMoveCmd = new GripPointMoveCmd(
-                                    //    entity, _anchorMgr.currentGripPointIndex, _anchorMgr.currentGripPoint);
-                                    //cmd = gripMoveCmd;
+                                    GripPointMoveCmd gripMoveCmd = new GripPointMoveCmd(
+                                        entity, _anchorMgr.currentGripPointIndex, _anchorMgr.currentGripPoint);
+                                
+                                    cmd = gripMoveCmd;
                                 }
                             }
                         }
@@ -160,22 +149,22 @@ namespace CADPadServices
                         if (e.IsLeftPressed)
                         {
                             _pickupBox.center = _pos;
-                            List<Selection> sels = _pickupBox.Select(_presenter.CurrentBlock);
+                            List<Selection> sels = _pickupBox.Select(_drawing.CurrentBlock);
                             if (sels.Count > 0)
                             {
                                 if (e.IsShiftKeyDown())
                                 {
-                                    (_presenter.Document as Document).selections.Remove(sels);
+                                    (_drawing.Document as Document).selections.Remove(sels);
                                 }
                                 else
                                 {
-                                    (_presenter.Document as Document).selections.Add(sels);
+                                    (_drawing.Document as Document).selections.Add(sels);
                                 }
                             }
                             else
                             {
-                                _selRect = _presenter.CreateSelectRectangle();
-                                _selRect.startPoint = _selRect.endPoint = _pos;
+                                SelRect.Active = true;
+                                SelRect.startPoint = SelRect.endPoint = _pos;
                             }
                         }
                     }
@@ -193,32 +182,34 @@ namespace CADPadServices
                     break;
             }
 
-            return null;// return cmd;
+            return new EventResult(){data=cmd};
         }
 
         public IEventResult OnMouseUp(IMouseButtonEventArgs e)
         {
-            if (e.IsLeftPressed)
+            if (e.ChangedButton==MouseButton.Left && e.ButtonState==MouseButtonState.Released)
             {
-                if (_selRect != null)
+                if (SelRect.Active)
                 {
-                    List<Selection> sels = _selRect.Select(_presenter.CurrentBlock);
+                    List<Selection> sels = SelRect.Select(_drawing.CurrentBlock);
                     if (sels.Count > 0)
                     {
                         if (e.IsShiftKeyDown())
                         {
-                            (_presenter.Document as Document).selections.Remove(sels);
+                            (_drawing.Document as Document).selections.Remove(sels);
                         }
                         else
                         {
-                            (_presenter.Document as Document).selections.Add(sels);
+                            (_drawing.Document as Document).selections.Add(sels);
                         }
-
+                        DrawSelection(sels, e.IsShiftKeyDown());
                     }
                 }
-                _selRect = null;
+           
+                SelRect.Reset();
+                Draw();
             }
-
+            _snapNodesMgr.OnMouseUp(e);
             return null;
         }
 
@@ -226,29 +217,36 @@ namespace CADPadServices
         {
             _pos.X = e.X;
             _pos.Y = e.Y;
-
+           _loc =_drawing.CanvasToModel(_pos) ;
             switch (mode)
             {
                 case PointerModes.Default:
-                    if (_selRect != null)
+                    if (SelRect.Active)
                     {
-                        _selRect.endPoint = _pos;
+                        SelRect.endPoint = _pos;
                     }
                     else
                     {
                         currentSnapPoint = _anchorMgr.Snap(_pos);
+                        _loc = currentSnapPoint;
                     }
                     break;
 
                 case PointerModes.Select:
-                    if (_selRect != null)
+                    if (SelRect.Active)
                     {
-                        _selRect.endPoint = _pos;
+                        SelRect.endPoint = _pos;
+                    }
+                    else
+                    {
+                        _loc =_drawing.CanvasToModel(_pos);
                     }
                     break;
 
                 case PointerModes.Locate:
                     currentSnapPoint = _snapNodesMgr.Snap(_pos);
+                    _loc = currentSnapPoint;
+                    _snapNodesMgr.OnMouseMove(e);
                     break;
 
                 case PointerModes.Drag:
@@ -258,7 +256,16 @@ namespace CADPadServices
                     break;
             }
 
+            Draw();
             return null;
+        }
+
+        private void Draw()
+        {
+            _cursor.Draw(mode, _loc, _pickupBox.side, !SelRect.Active);
+
+            SelRect.Draw();
+
         }
 
         public IEventResult OnMouseDoubleClick(IMouseEventArgs e)
@@ -271,15 +278,15 @@ namespace CADPadServices
                         //if (_anchorMgr.currentGripPoint == null)
                         //{
                         //    //_pickupBox.center = _pos;
-                        //    //List<Selection> sels = _pickupBox.Select(_presenter.currentBlock);
+                        //    //List<Selection> sels = _pickupBox.Select(_drawing.currentBlock);
                         //    //if (sels.Count > 0)
                         //    //{
                         //    //    foreach (Selection sel in sels)
                         //    //    {
-                        //    //        DBObject dbobj = (_presenter.Document as Document).database.GetObject(sel.objectId);
+                        //    //        DBObject dbobj = (_drawing.Document as Document).database.GetObject(sel.objectId);
                         //    //        if (dbobj != null && dbobj is MediaTypeNames.Text)
                         //    //        {
-                        //    //            (_presenter.Document as Document).selections.Clear();
+                        //    //            (_drawing.Document as Document).selections.Clear();
                         //    //        }
                         //    //    }
                         //    //}
@@ -310,34 +317,40 @@ namespace CADPadServices
         }
 
         #endregion
+
         public void OnSelectionChanged()
         {
-            //if (_isShowAnchor)
-            //{
-            //    _anchorMgr.Update();
-            //}
+            if (_isShowAnchor)
+            {
+                _anchorMgr.Update();
+            }
         }
 
-        public  void UpdateGripPoints()
+        public void UpdateGripPoints()
         {
-            //_anchorMgr.Clear();
-            //if (_isShowAnchor)
-            //{
-            //    _anchorMgr.Update();
-            //}
+            _anchorMgr.Clear();
+            if (_isShowAnchor)
+            {
+                _anchorMgr.Update();
+            }
         }
 
         private void DrawSelection(List<Selection> sels, bool isShiftKeyDown)
         {
             foreach (var sel in sels)
             {
-                var obj = _presenter.Document.database.GetObject(sel.objectId);
+                var obj = _drawing.Document.database.GetObject(sel.objectId);
                 if (obj is Entity en)
                 {
                     if (en.DrawingVisual != null) en.DrawingVisual.Selected = !isShiftKeyDown;
                     en.Draw();
                 }
 
+            }
+
+            if (_isShowAnchor)
+            {
+                _anchorMgr.Update();
             }
         }
        

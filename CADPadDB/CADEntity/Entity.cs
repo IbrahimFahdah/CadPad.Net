@@ -9,7 +9,7 @@ namespace CADPadDB.CADEntity
     {
         public override string ClassName { get; } = "Entity";
 
-        public IDrawingVisual DrawingVisual { get; set; }
+        public ICADEnitiyVisual DrawingVisual { get; set; }
         public abstract Bounding Bounding
         {
             get;

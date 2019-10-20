@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Drawing;
 using CADPadDB;
 using CADPadDB.CADEntity;
@@ -7,37 +7,27 @@ using CADPadServices.ApplicationServices;
 using CADPadServices.ESelection;
 using CADPadServices.Interfaces;
 
-namespace CADPadServices
+namespace CADPadServices.Controllers
 {
-    public class AnchorsMgr
+    public class GripPointsController
     {
-        private IDrawing _presenter = null;
+        private IDrawing _drawing = null;
 
         private Dictionary<ObjectId, List<GripPoint>> _gripPnts = new Dictionary<ObjectId, List<GripPoint>>();
-        private GripPoint _currGripPoint = null;
-        public GripPoint currentGripPoint
-        {
-            get { return _currGripPoint; }
-        }
-        private ObjectId _currGripEntityId = ObjectId.Null;
-        public ObjectId currentGripEntityId
-        {
-            get { return _currGripEntityId; }
-        }
-        private int _currGripPointIndex = -1;
-        public int currentGripPointIndex
-        {
-            get { return _currGripPointIndex; }
-        }
+        public GripPoint currentGripPoint { get; private set; } = null;
 
-        public AnchorsMgr(IDrawing presenter)
+        public ObjectId currentGripEntityId { get; private set; } = ObjectId.Null;
+
+        public int currentGripPointIndex { get; private set; } = -1;
+
+        public GripPointsController(IDrawing drawing)
         {
-            _presenter = presenter;
+            _drawing = drawing;
         }
 
         public void Update()
         {
-            Document doc = _presenter.Document as Document;
+            Document doc = _drawing.Document as Document;
             if (doc.selections.Count == 0)
             {
                 _gripPnts.Clear();
@@ -75,6 +65,8 @@ namespace CADPadServices
                     _gripPnts[sel.objectId] = entGripPnts;
                 }
             }
+
+            _drawing.ResetGrips();
         }
 
         public void Clear()
@@ -82,7 +74,7 @@ namespace CADPadServices
             _gripPnts.Clear();
         }
 
-        //public void OnPaint(IGraphicsContext graphics)
+        //public void Draw()
         //{
         //    foreach (KeyValuePair<ObjectId, List<GripPoint>> kvp in _gripPnts)
         //    {
@@ -90,17 +82,17 @@ namespace CADPadServices
         //        {
         //            double width = 10;
         //            double height = 10;
-        //            CADPoint posInCanvas = _presenter.ModelToCanvas(gripPnt.Position);
+        //            CADPoint posInCanvas = _drawing.ModelToCanvas(gripPnt.Position);
         //            posInCanvas.X -= width / 2;
         //            posInCanvas.Y -= height / 2;
-        //            _presenter.FillRectangle(graphics, Color.Blue, posInCanvas, width, height, CSYS.Canvas);
+        //            _drawing.FillRectangle(graphics, Color.Blue, posInCanvas, width, height, CSYS.Canvas);
         //        }
         //    }
         //}
 
         public CADPoint Snap(CADPoint posInCanvas)
         {
-            CADPoint posInModel = _presenter.CanvasToModel(posInCanvas);
+            CADPoint posInModel = _drawing.CanvasToModel(posInCanvas);
 
             foreach (KeyValuePair<ObjectId, List<GripPoint>> kvp in _gripPnts)
             {
@@ -110,24 +102,24 @@ namespace CADPadServices
                     ++index;
                     double width = 10;
                     double height = 10;
-                    CADPoint gripPosInCanvas = _presenter.ModelToCanvas(gripPnt.Position);
+                    CADPoint gripPosInCanvas = _drawing.ModelToCanvas(gripPnt.Position);
                     gripPosInCanvas.X -= width / 2;
                     gripPosInCanvas.Y -= height / 2;
                     Rectangle2 rect = new Rectangle2(gripPosInCanvas, width, height);
 
                     if (MathUtils.IsPointInRectangle(posInCanvas, rect))
                     {
-                        _currGripPoint = gripPnt;
-                        _currGripEntityId = kvp.Key;
-                        _currGripPointIndex = index;
+                        currentGripPoint = gripPnt;
+                        currentGripEntityId = kvp.Key;
+                        currentGripPointIndex = index;
                         return gripPnt.Position;
                     }
                 }
             }
 
-            _currGripPoint = null;
-            _currGripEntityId = ObjectId.Null;
-            _currGripPointIndex = -1;
+            currentGripPoint = null;
+            currentGripEntityId = ObjectId.Null;
+            currentGripPointIndex = -1;
             return posInModel;
         }
     }

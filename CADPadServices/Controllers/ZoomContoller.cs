@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using CADPadDB.Maths;
 using CADPadServices.Commands;
 using CADPadServices.Interfaces;
 
-namespace CADPadServices
+namespace CADPadServices.Controllers
 {
     public class ZoomContoller : IZoomContoller
     {

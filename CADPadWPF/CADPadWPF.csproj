@@ -63,17 +63,20 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Control\Visuals\CADGripVisual.cs" />
     <Compile Include="Control\Canvas\CanvasKeyEventArgs.cs" />
-    <Compile Include="Control\GeometryWraper.cs" />
+    <Compile Include="Control\Visuals\CADEnitiyVisual.cs" />
     <Compile Include="Control\Canvas\CADPadCanvas.cs" />
     <Compile Include="Control\Canvas\CADPadCanvas_DP.cs" />
     <Compile Include="Control\CanvasPalette.cs" />
     <Compile Include="Control\Canvas\CanvasMouseWheelEventArgs.cs" />
     <Compile Include="Control\Canvas\CanvasMouseButtonEventArgs.cs" />
     <Compile Include="Control\Canvas\CanvasMouseEventArgs.cs" />
-    <Compile Include="Control\CoordinateAxes.cs" />
+    <Compile Include="Control\Visuals\CADCursorVisual.cs" />
+    <Compile Include="Control\Visuals\SelectionBoxVisual.cs" />
+    <Compile Include="Control\Visuals\CanvasDrawingVisual.cs" />
+    <Compile Include="Control\Visuals\CoordinateAxes.cs" />
     <Compile Include="Control\ExtensionMethods.cs" />
-    <Compile Include="Control\ICadGeometry.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

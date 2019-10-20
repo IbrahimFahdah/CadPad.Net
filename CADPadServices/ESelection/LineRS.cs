@@ -57,12 +57,12 @@ namespace CADPadServices.ESelection
         //        return false;
         //    }
 
-        //    LitMath.Rectangle2 selRect = new LitMath.Rectangle2(
+        //    LitMath.Rectangle2 SelRect = new LitMath.Rectangle2(
         //        new LitMath.Vector2(selectBound.left, selectBound.bottom),
         //        new LitMath.Vector2(selectBound.right, selectBound.top));
 
-        //    if (MathUtils.IsPointInRectangle(line.startPoint, selRect)
-        //        && MathUtils.IsPointInRectangle(line.endPoint, selRect))
+        //    if (MathUtils.IsPointInRectangle(line.startPoint, SelRect)
+        //        && MathUtils.IsPointInRectangle(line.endPoint, SelRect))
         //    {
         //        return true;
         //    }

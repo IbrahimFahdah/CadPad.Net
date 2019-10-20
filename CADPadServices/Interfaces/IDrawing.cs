@@ -30,6 +30,7 @@ namespace CADPadServices.Interfaces
         CADPoint CanvasToModel(CADPoint p);
 
         double CanvasToModel(double p);
+        double ModelToCanvas(double value);
         //void OnMouseDown(IMouseButtonEventArgs e);
         //void OnMouseUp(IMouseButtonEventArgs e);
         //void OnMouseMove(IMouseEventArgs e);
@@ -44,6 +45,14 @@ namespace CADPadServices.Interfaces
         Block CurrentBlock { get; }
         IPointerContoller Pointer { get; set; }
 
-        SelectRectangleBase CreateSelectRectangle();
+        SelectRectangle CreateSelectRectangle();
+        void ResetGrips();
+        IDrawingVisual CreateTempVisual();
+
+        ICursorVisual GetCursorVisual();
+
+        ISelectionBoxVisual GetSelectionBoxVisual();
+
+        void RemoveTempVisual(IDrawingVisual v);
     }
 }

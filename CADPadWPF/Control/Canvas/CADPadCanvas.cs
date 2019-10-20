@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using CADPadDB;
 using CADPadServices.Interfaces;
-using CADPadWPF.Control.Canvas;
+using CADPadWPF.Control.Visuals;
 using Drawing = CADPadServices.Drawing;
 
-namespace CADPadWPF.Control
+namespace CADPadWPF.Control.Canvas
 {
     public partial class CADPadCanvas : FrameworkElement, ICanvas
     {
 
         private CoordinateAxes m_axes = null;
-    
+        private List<CADGripVisual> m_grips = new List<CADGripVisual>();
+        private List<IDrawingVisual> _tempVisuals = new List<IDrawingVisual>();
+
 
         protected bool _initialiseDrawing;
         static CADPadCanvas()
@@ -27,13 +25,13 @@ namespace CADPadWPF.Control
 
             CADPadCanvas.SelectedGeometryProperty = DependencyProperty.Register(
                 "SelectedGeometry",
-                typeof(ICadGeometry),
+                typeof(IDrawingVisual),
                 typeof(CADPadCanvas),
                 new FrameworkPropertyMetadata(null, On_SelectedGeometry_Changed));
 
             CADPadCanvas.GeometryToCreateProperty = DependencyProperty.Register(
                 "GeometryToCreate",
-                typeof(ICadGeometry),
+                typeof(IDrawingVisual),
                 typeof(CADPadCanvas),
                 new FrameworkPropertyMetadata(null, On_GeometryToCreate_Changed));
 
@@ -50,30 +48,56 @@ namespace CADPadWPF.Control
         
         public CADPadCanvas()
         {
-            //OnUpdatePlotHandler += OnUpdatePlot;
-
             this.Loaded += CADPadCanvas_Loaded;
+            this.Cursor = Cursors.None;
         }
 
-        public List<IDrawingVisual> Geometries { get; set; } = new List<IDrawingVisual>();
-        public IDrawingVisual CreateGeometryWraper()
+        public List<ICADEnitiyVisual> Geometries { get; set; } = new List<ICADEnitiyVisual>();
+
+        public ICADEnitiyVisual CreateCADEnitiyVisual()
         {
-            return new GeometryWraper(Drawing);
+            var g =new CADEnitiyVisual(Drawing);
+            return g;
         }
 
-        public void AddGeometry(IDrawingVisual dv)
+
+        public IDrawingVisual CreateVisual()
         {
-            Geometries.Add(dv);
+            return new CanvasDrawingVisual(Drawing);
+        }
+
+        public ICursorVisual CursorVisual { get; set; }
+        public ISelectionBoxVisual SelectionBoxVisual { get; set; }
+
+        public void AddVisual(IDrawingVisual dv)
+        {
+            if (dv is ICADEnitiyVisual)
+            {
+                Geometries.Add((ICADEnitiyVisual)dv);
+            }
+            else
+            {
+                _tempVisuals.Add(dv);
+            }
+
             AddVisualChild((Visual) dv);
             AddLogicalChild((Visual)dv);
         }
 
-        public void RemoveGeometry(IDrawingVisual dv)
+        public void RemoveVisual(IDrawingVisual dv)
         {
             RemoveVisualChild((Visual)dv);
             RemoveLogicalChild((Visual)dv);
-            Geometries.Remove(dv);
+            if(dv is ICADEnitiyVisual)
+            {
+                Geometries.Remove((ICADEnitiyVisual)dv);
+            }
+            else
+            {
+                _tempVisuals.Remove(dv);
+            }
         }
+
         public void InitialiseDrawing()
         {
             if (Drawing == null)
@@ -82,6 +106,12 @@ namespace CADPadWPF.Control
             m_axes = new CoordinateAxes();
             AddVisualChild(m_axes);
             AddLogicalChild(m_axes);
+
+            CursorVisual=new CADCursorVisual(Drawing);
+            AddVisual(CursorVisual);
+
+            SelectionBoxVisual = new SelectionBoxVisual(Drawing);
+            AddVisual(SelectionBoxVisual);
 
             Drawing.Canvas = this;
             Drawing.AxesColor = CanvasPalette.ConvertToCAD(AxesColor);
@@ -95,10 +125,11 @@ namespace CADPadWPF.Control
 
             _initialiseDrawing = true;
         }
+
         protected override int VisualChildrenCount
         {
             // 1 for m_axes
-            get { return 1 + Geometries.Count; }//  m_grips.Count; 
+            get { return 1 + Geometries.Count + m_grips.Count + _tempVisuals.Count; } 
         }
 
       
@@ -116,9 +147,13 @@ namespace CADPadWPF.Control
             if (index >= offset && index - offset < Geometries.Count)
                 geom = Geometries[index - offset];
 
-            //offset += Geometries.Count;
-            //if (index >= offset && index - offset < m_grips.Count)
-            //    return m_grips[index - offset];
+            offset += Geometries.Count;
+            if (index >= offset && index - offset < m_grips.Count)
+                return m_grips[index - offset];
+
+            offset += m_grips.Count;
+            if (index >= offset && index - offset < _tempVisuals.Count)
+                return (Visual)_tempVisuals[index - offset];
 
             return (Visual)geom;
         }
@@ -156,9 +191,9 @@ namespace CADPadWPF.Control
         //=============================================================================
         public static readonly DependencyProperty SelectedGeometryProperty;
 
-        public ICadGeometry SelectedGeometry
+        public IDrawingVisual SelectedGeometry
         {
-            get { return (ICadGeometry)GetValue(CADPadCanvas.SelectedGeometryProperty); }
+            get { return (IDrawingVisual)GetValue(CADPadCanvas.SelectedGeometryProperty); }
             set { SetValue(CADPadCanvas.SelectedGeometryProperty, value); }
         }
         private static void On_SelectedGeometry_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -170,9 +205,9 @@ namespace CADPadWPF.Control
 
         //=============================================================================
         public static readonly DependencyProperty GeometryToCreateProperty;
-        public ICadGeometry GeometryToCreate
+        public IDrawingVisual GeometryToCreate
         {
-            get { return (ICadGeometry)GetValue(CADPadCanvas.GeometryToCreateProperty); }
+            get { return (IDrawingVisual)GetValue(CADPadCanvas.GeometryToCreateProperty); }
             set { SetValue(CADPadCanvas.GeometryToCreateProperty, value); }
         }
         private static void On_GeometryToCreate_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -271,9 +306,10 @@ namespace CADPadWPF.Control
         #region Mouse events
         protected override void OnMouseMove(MouseEventArgs e)
         {
+            var pp=e.GetPosition(this);
             base.OnMouseMove(e);
 
-            if (!this.IsEnabled)
+            if (!this.IsEnabled || pp.Y<0)
                 return;
 
 
@@ -356,41 +392,51 @@ namespace CADPadWPF.Control
             {
                 entity.Draw();
             }
+            foreach (var point in m_grips)
+            {
+                point.Draw();
+            }
         }
 
-        //=============================================================================
-        //private static event EventHandler OnUpdatePlotHandler;
+        private void ClearGrips()
+        {
+            foreach (CADGripVisual g in m_grips)
+            {
+                RemoveVisualChild(g);
+                RemoveLogicalChild(g);
+            }
+            m_grips.Clear();
+        }
 
-        //public static void UpdatePlot()
-        //{
-        //    EventHandler handler = OnUpdatePlotHandler;
-        //    if (handler != null)
-        //        handler(null, EventArgs.Empty);
-        //}
+        public void ResetGrips()
+        {
+            ClearGrips();
 
-
-
-        //private void OnUpdatePlot(object sender, EventArgs e)
-        //{
-        //    if (m_axes != null)
-        //        m_axes.Draw(Drawing);
-
-        //    //if (Geometries != null)
-        //    //{
-        //    //    foreach (ICadGeometry g in Geometries)
-        //    //        g.Draw(this, null);
-        //    //}
-
-        //    //if (m_grips != null)
-        //    //{
-        //    //    foreach (cadGrip g in m_grips)
-        //    //        g.Update();
-        //    //}
-        //}
-
-
-
-
-
+            foreach (var g in Geometries)
+            {
+                List<GripPoint> pnts = g.GetGripPoints();
+                if (g.Selected)
+                {
+                        foreach (GripPoint p in pnts)
+                        {
+                            CADGripVisual newGripVisual = new CADGripVisual(Drawing, p);
+                            m_grips.Add(newGripVisual);
+                            AddVisualChild(newGripVisual);
+                            AddLogicalChild(newGripVisual);
+                            newGripVisual.Draw();
+                        }
+                }
+                else
+                {
+                    foreach (GripPoint p in pnts)
+                    {
+                        CADGripVisual newGripVisual = new CADGripVisual(Drawing, p);
+                        m_grips.Remove(newGripVisual);
+                        RemoveVisualChild(newGripVisual);
+                        RemoveLogicalChild(newGripVisual);
+                    }
+                }
+            }
+        }
     }
 }

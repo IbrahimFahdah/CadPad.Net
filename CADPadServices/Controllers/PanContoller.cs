@@ -1,9 +1,9 @@
-﻿using CADPadDB.Maths;
+using CADPadDB.Maths;
 using CADPadServices.Commands;
 using CADPadServices.Enums;
 using CADPadServices.Interfaces;
 
-namespace CADPadServices
+namespace CADPadServices.Controllers
 {
     public class PanContoller: IPanContoller
     {
