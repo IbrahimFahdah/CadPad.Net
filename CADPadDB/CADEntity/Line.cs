@@ -48,13 +48,11 @@ namespace CADPadDB.CADEntity
             _endPoint = endPnt;
         }
 
-        public override void Draw( )
-        {
-
-            Draw(DrawingVisual);
-        }
+   
         public override void Draw(IDrawingVisual gd)
         {
+            if (gd == null)
+                return;
 
             gd.Open();
             gd.DrawLine(_startPoint, _endPoint);

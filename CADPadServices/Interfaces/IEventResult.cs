@@ -3,5 +3,6 @@
     public interface IEventResult
     {
         object data { get; set; }
+        EventResultStatus status { get; set; }
     }
 }

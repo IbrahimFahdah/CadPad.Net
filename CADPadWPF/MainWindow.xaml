@@ -27,6 +27,27 @@
                 <MenuItem Header="Line"
                           Click="MenuItem_OnClick">
                </MenuItem>
+                <MenuItem Header="Circle"
+                          Click="DrawCircle_OnClick">
+                </MenuItem>
+                <MenuItem Header="Ellipse"
+                          Click="DrawEllipse_OnClick">
+                </MenuItem>
+                <MenuItem Header="Arc"
+                          Click="DrawArc_OnClick">
+                </MenuItem>
+                <MenuItem Header="XLine"
+                          Click="DrawXLine_OnClick">
+                </MenuItem>
+                <MenuItem Header="Ray"
+                          Click="DrawRay_OnClick">
+                </MenuItem>
+                <MenuItem Header="Rectangle"
+                          Click="DrawRectangle_OnClick">
+                </MenuItem>
+                <MenuItem Header="Ployline"
+                          Click="DrawPloyline_OnClick">
+                </MenuItem>
             </MenuItem>
         </Menu>
 

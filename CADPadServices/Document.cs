@@ -4,7 +4,7 @@ using CADPadDB.TableRecord;
 using CADPadServices.ESelection;
 using CADPadServices.Interfaces;
 
-namespace CADPadServices.ApplicationServices
+namespace CADPadServices
 {
     public class Document : IDocument
     {

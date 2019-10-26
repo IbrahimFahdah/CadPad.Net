@@ -13,8 +13,8 @@ namespace CADPadServices.Interfaces
         IDrawingVisual CreateVisual();
 
         ICursorVisual CursorVisual { get; set; }
-        ISelectionBoxVisual SelectionBoxVisual { get; set; }
-
+        ISelectBoxVisual SelectionBoxVisual { get; set; }
+        IGridLayerVisual GridLayerVisual { get; set; }
 
         void AddVisual(IDrawingVisual dv);
 

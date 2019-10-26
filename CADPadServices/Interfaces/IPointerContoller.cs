@@ -10,7 +10,7 @@ namespace CADPadServices.Interfaces
         bool isShowAnchor { get; set; }
         PointerModes mode { get; set; }
 
-        CADPoint  currentSnapPoint { get; }
+        CADPoint  CurrentSnapPoint { get; }
 
    
         void OnSelectionChanged();

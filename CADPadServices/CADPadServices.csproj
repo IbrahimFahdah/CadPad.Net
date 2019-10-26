@@ -6,6 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Commands\Draw\PolygonCmd.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Commands\Draw\PolygonCmd.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CADPadDB\CADPadDB.csproj" />
   </ItemGroup>
 

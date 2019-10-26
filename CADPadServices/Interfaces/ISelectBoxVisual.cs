@@ -3,10 +3,9 @@ using CADPadServices.ESelection;
 
 namespace CADPadServices.Interfaces
 {
-
-    public interface ISelectionBoxVisual : IDrawingVisual
+    public interface ISelectBoxVisual : IDrawingVisual
     {
-        void Draw(SelectRectangle box);
+        void Draw(ISelectBox box);
         void Clear();
     }
 }

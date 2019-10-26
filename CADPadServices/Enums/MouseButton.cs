@@ -1,5 +1,6 @@
 ﻿namespace CADPadServices.Enums
 {
+
     /// <summary>Defines values that specify the buttons on a mouse device. </summary>
     public enum MouseButton
     {

@@ -2,7 +2,7 @@ using CADPadDB;
 using CADPadDB.CADEntity;
 using CADPadDB.Maths;
 
-namespace CADPadServices.PickupBox
+namespace CADPadServices.Hit
 {
     internal class LineHitter : EntityHitter
     {

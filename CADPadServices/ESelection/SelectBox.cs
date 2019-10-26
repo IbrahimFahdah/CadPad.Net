@@ -8,11 +8,11 @@ using CADPadServices.Interfaces;
 
 namespace CADPadServices.ESelection
 {
-    public class SelectRectangle
+    public class SelectBox: ISelectBox
     {
         private IDrawing _drawing = null;
 
-        private ISelectionBoxVisual _selectionBoxVisual = null;
+        private ISelectBoxVisual _selectionBoxVisual = null;
 
         public enum SelectMode
         {
@@ -24,7 +24,7 @@ namespace CADPadServices.ESelection
         /// Canvas CSYS
         /// </summary>
         protected CADPoint _startPoint = new CADPoint(0, 0);
-        public CADPoint startPoint
+        public CADPoint StartPoint
         {
             get { return _startPoint; }
             set { _startPoint = value; }
@@ -37,13 +37,13 @@ namespace CADPadServices.ESelection
 
       
 
-        public CADPoint endPoint
+        public CADPoint EndPoint
         {
             get { return _endPoint; }
             set { _endPoint = value; }
         }
 
-        public SelectMode selectMode
+        public SelectMode SelectionMode
         {
             get
             {
@@ -58,13 +58,13 @@ namespace CADPadServices.ESelection
             }
         }
 
-        public SelectRectangle(IDrawing drawing)
+        public SelectBox(IDrawing drawing)
         {
             _drawing = drawing;
         }
 
 
-        public ISelectionBoxVisual SelectionBoxVisual
+        public ISelectBoxVisual SelectionBoxVisual
         {
             get
             {
@@ -87,7 +87,7 @@ namespace CADPadServices.ESelection
                 _drawing.CanvasToModel(_endPoint));
 
             List<Selection> sels = new List<Selection>();
-            SelectMode selMode = this.selectMode;
+            SelectMode selMode = SelectionMode;
             foreach (Entity entity in block)
             {
                 bool selected = false;
@@ -114,12 +114,12 @@ namespace CADPadServices.ESelection
         public void Reset()
         {
             Active = false;
-            startPoint = endPoint=new CADPoint( );
+            StartPoint = EndPoint=new CADPoint( );
             Draw();
         }
         public void Draw()
         {
-            if(startPoint==endPoint )
+            if(StartPoint==EndPoint )
                 SelectionBoxVisual.Clear();
             SelectionBoxVisual.Draw(this);
         }

@@ -48,7 +48,47 @@ namespace CADPadWPF
 
         private void MenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            LinesChainCmd cmd = new LinesChainCmd();
+            var cmd = new LinesChainCmd();
+            Drawing.OnCommand(cmd);
+        }
+
+        private void DrawCircle_OnClick(object sender, RoutedEventArgs e)
+        {
+            var cmd = new CircleCmd();
+            Drawing.OnCommand(cmd);
+        }
+        private void DrawEllipse_OnClick(object sender, RoutedEventArgs e)
+        {
+            var cmd = new EllipseCmd();
+            Drawing.OnCommand(cmd);
+        }
+        private void DrawArc_OnClick(object sender, RoutedEventArgs e)
+        {
+            var cmd = new ArcCmd();
+            Drawing.OnCommand(cmd);
+        }
+
+        private void DrawXLine_OnClick(object sender, RoutedEventArgs e)
+        {
+            var cmd = new XlineCmd();
+            Drawing.OnCommand(cmd);
+        }
+
+        private void DrawRectangle_OnClick(object sender, RoutedEventArgs e)
+        {
+            var cmd = new RectangleCmd();
+            Drawing.OnCommand(cmd);
+        }
+
+        private void DrawPloyline_OnClick(object sender, RoutedEventArgs e)
+        {
+            var cmd = new PolylineCmd();
+            Drawing.OnCommand(cmd);
+        }
+
+        private void DrawRay_OnClick(object sender, RoutedEventArgs e)
+        {
+            var cmd = new RayCmd();
             Drawing.OnCommand(cmd);
         }
     }

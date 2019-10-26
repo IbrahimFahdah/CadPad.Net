@@ -1,17 +1,28 @@
 ﻿namespace CADPadServices.Enums
 {
     /// <summary>
-    /// 模式
+    /// Drawing pointer states
     /// </summary>
     public enum PointerModes
     {
-        // 默认模式
+        /// <summary>
+        /// Default
+        /// </summary>
         Default = 0,
-        // 选择模式
+
+        /// <summary>
+        /// Selection
+        /// </summary>
         Select = 1,
-        // 定位模式
+
+        /// <summary>
+        /// Creating object
+        /// </summary>
         Locate = 2,
-        // 拖动模式
+
+        /// <summary>
+        /// Dragging
+        /// </summary>
         Drag = 3,
     }
 

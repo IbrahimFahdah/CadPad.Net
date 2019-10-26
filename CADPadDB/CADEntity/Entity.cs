@@ -87,7 +87,9 @@ namespace CADPadDB.CADEntity
 
         public virtual void Draw()
         {
+            Draw(DrawingVisual);
         }
+
         public virtual void Draw(IDrawingVisual gd)
         {
         }

@@ -104,7 +104,7 @@ namespace CADPadServices.Commands
         {
             if (e.IsLeftPressed)
             {
-                _mousePosInWorld = this.Pointer.currentSnapPoint;
+                _mousePosInWorld = this.Pointer.CurrentSnapPoint;
                 _mgr.FinishCurrentCommand();
             }
 
@@ -118,7 +118,7 @@ namespace CADPadServices.Commands
 
         public override IEventResult OnMouseMove(IMouseEventArgs e)
         {
-            _mousePosInWorld = this.Pointer.currentSnapPoint;
+            _mousePosInWorld = this.Pointer.CurrentSnapPoint;
             _entityCopy.SetGripPointAt(_index, _gripPoint, _mousePosInWorld);
             Draw();
             return EventResult.Handled;

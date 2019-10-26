@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CADPadDB;
-using CADPadDB.Maths;
+﻿using CADPadDB.CADEntity;
 using CADPadServices.ESelection;
-using CADPadServices.PickupBox;
 
-namespace CADPadServices
+
+namespace CADPadDB.Maths
 {
     public static class MathUtils
     {
@@ -31,33 +27,33 @@ namespace CADPadServices
             }
         }
 
-        ///// <summary>
-        ///// Cross window
-        ///// https://yal.cc/rectangle-circle-intersection-test/
-        ///// </summary>
-        //public static bool BoundingCross(Bounding bounding, Circle circle)
-        //{
-        //    Vector2 nearestPntOnBound = new Vector2(
-        //        System.Math.Max(bounding.left, System.Math.Min(circle.center.x, bounding.right)),
-        //        System.Math.Max(bounding.bottom, System.Math.Min(circle.center.y, bounding.top)));
+        /// <summary>
+        /// Cross window
+        /// https://yal.cc/rectangle-circle-intersection-test/
+        /// </summary>
+        public static bool BoundingCross(Bounding bounding, Circle circle)
+        {
+            CADPoint nearestPntOnBound = new CADPoint(
+                System.Math.Max(bounding.left, System.Math.Min(circle.center.X, bounding.right)),
+                System.Math.Max(bounding.bottom, System.Math.Min(circle.center.Y, bounding.top)));
 
-        //    if (Vector2.Distance(nearestPntOnBound, circle.center) <= circle.radius)
-        //    {
-        //        double bdLeft = bounding.left;
-        //        double bdRight = bounding.right;
-        //        double bdTop = bounding.top;
-        //        double bdBottom = bounding.bottom;
+            if (CADPoint.Distance(nearestPntOnBound, circle.center) <= circle.radius)
+            {
+                double bdLeft = bounding.left;
+                double bdRight = bounding.right;
+                double bdTop = bounding.top;
+                double bdBottom = bounding.bottom;
 
-        //        return Vector2.Distance(new Vector2(bdLeft, bdTop), circle.center) >= circle.radius
-        //            || Vector2.Distance(new Vector2(bdLeft, bdBottom), circle.center) >= circle.radius
-        //            || Vector2.Distance(new Vector2(bdRight, bdTop), circle.center) >= circle.radius
-        //            || Vector2.Distance(new Vector2(bdRight, bdBottom), circle.center) >= circle.radius;
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //}
+                return CADPoint.Distance(new CADPoint(bdLeft, bdTop), circle.center) >= circle.radius
+                    || CADPoint.Distance(new CADPoint(bdLeft, bdBottom), circle.center) >= circle.radius
+                    || CADPoint.Distance(new CADPoint(bdRight, bdTop), circle.center) >= circle.radius
+                    || CADPoint.Distance(new CADPoint(bdRight, bdBottom), circle.center) >= circle.radius;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         /// <summary>
         /// 值是否在范围内

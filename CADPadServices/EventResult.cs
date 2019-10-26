@@ -7,7 +7,7 @@ namespace CADPadServices
 {
     public class EventResult: IEventResult
     {
-        public EventResultStatus status = EventResultStatus.Invalid;
+        public EventResultStatus status  { get; set; }=EventResultStatus.Invalid;
 
         public object data { get; set; } = null;
 

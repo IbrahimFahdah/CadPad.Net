@@ -4,7 +4,6 @@ using System.Text;
 using CADPadDB;
 using CADPadDB.CADEntity;
 using CADPadDB.Maths;
-using CADPadServices.PickupBox;
 
 namespace CADPadServices.ESelection
 {

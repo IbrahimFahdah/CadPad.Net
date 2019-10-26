@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CADPadDB.Colors;
 
-namespace CADPadServices.ApplicationServices
+namespace CADPadServices
 {
     /// <summary>
     /// 常用颜色集合
@@ -89,7 +89,7 @@ namespace CADPadServices.ApplicationServices
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
         #endregion
     }

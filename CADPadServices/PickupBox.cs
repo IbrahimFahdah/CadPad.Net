@@ -4,16 +4,12 @@ using CADPadDB;
 using CADPadDB.CADEntity;
 using CADPadDB.Maths;
 using CADPadDB.TableRecord;
-using CADPadServices.ApplicationServices;
 using CADPadServices.ESelection;
 using CADPadServices.Interfaces;
-
-namespace CADPadServices.PickupBox
+using CADPadServices.Hit;
+namespace CADPadServices
 {
-    /// <summary>
-    /// 拾取框
-    /// 以Canvas坐标为准
-    /// </summary>
+
     public class PickupBox
     {
         private IDrawing _presenter = null;
@@ -78,11 +74,12 @@ namespace CADPadServices.PickupBox
 
             //
             RegisterEntityHitter(typeof(Line), new LineHitter());
-            //RegisterEntityHitter(typeof(Xline), new XlineHitter());
-            //RegisterEntityHitter(typeof(Ray), new RayHitter());
-            //RegisterEntityHitter(typeof(Polyline), new PolylineHitter());
-            //RegisterEntityHitter(typeof(Circle), new CircleHitter());
-            //RegisterEntityHitter(typeof(Arc), new ArcHitter());
+            RegisterEntityHitter(typeof(Xline), new XlineHitter());
+            RegisterEntityHitter(typeof(Ray), new RayHitter());
+            RegisterEntityHitter(typeof(Polyline), new PolylineHitter());
+            RegisterEntityHitter(typeof(Circle), new CircleHitter());
+            RegisterEntityHitter(typeof(Ellipse), new EllipseHitter());
+            RegisterEntityHitter(typeof(Arc), new ArcHitter());
             //RegisterEntityHitter(typeof(Text), new TextHitter());
         }
 
@@ -91,14 +88,6 @@ namespace CADPadServices.PickupBox
             _entType2EntHitter[entType] = entHitter;
         }
 
-        ///// <summary>
-        ///// Paint
-        ///// </summary>
-        //internal void OnPaint(Graphics graphics)
-        //{
-        //    graphics.DrawImage(_bitmap,
-        //        (float)(_center.x - _bitmap.Width / 2), (float)(_center.y - _bitmap.Height / 2));
-        //}
 
         public List<Selection> Select(Block block)
         {

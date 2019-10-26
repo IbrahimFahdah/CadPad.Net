@@ -3,7 +3,6 @@ using System.Drawing;
 using CADPadDB;
 using CADPadDB.CADEntity;
 using CADPadDB.Maths;
-using CADPadServices.ApplicationServices;
 using CADPadServices.ESelection;
 using CADPadServices.Interfaces;
 

@@ -1,5 +1,4 @@
 ﻿using CADPadDB;
-using CADPadServices.ApplicationServices;
 using CADPadServices.Enums;
 using CADPadServices.Interfaces;
 using ICommand = CADPadServices.Interfaces.ICommand;
@@ -144,13 +143,13 @@ namespace CADPadServices.Commands
 
         public virtual IEventResult OnKeyDown(IKeyEventArgs e)
         {
-            return null;
+            return EventResult.Unhandled;
         }
 
 
         public virtual IEventResult OnKeyUp(IKeyEventArgs e)
         {
-            return null;
+            return EventResult.Unhandled;
         }
 
 

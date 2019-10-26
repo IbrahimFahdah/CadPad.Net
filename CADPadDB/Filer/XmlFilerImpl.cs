@@ -131,6 +131,19 @@ namespace CADPadDB.Filer
             return true;
         }
 
+        public override bool Write(string name, CADVector value)
+        {
+            XmlElement elem = _xmldoc.CreateElement(name);
+            if (elem == null)
+            {
+                return false;
+            }
+            elem.InnerText = value.X.ToString() + ";" + value.Y.ToString();
+            _curXmlNode.AppendChild(elem);
+
+            return true;
+        }
+
         public override bool Write(string name, CADColor value)
         {
             return _Write(name, value);
@@ -250,6 +263,14 @@ namespace CADPadDB.Filer
 
 
             return true;
+        }
+
+        public override bool Read(string name, out CADVector value)
+        {
+            CADPoint tmp;
+            var ret= Read(name, out tmp);
+            value = (CADVector)tmp;
+            return ret;
         }
 
         public override bool Read(string name, out CADColor value)

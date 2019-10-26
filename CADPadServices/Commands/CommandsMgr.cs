@@ -202,16 +202,16 @@ namespace CADPadServices.Commands
         {
             if (_currentCmd != null)
             {
-                _currentCmd.OnKeyDown(e);
-                //if (eRet.state == Command.EventResultStatus.Unhandled)
-                //{
-                //    if (e.IsEscape)
-                //    {
-                //        this.CancelCurrentCommand();
-                //    }
-                //}
+                var eRet=_currentCmd.OnKeyDown(e);
+                if (eRet!=null && eRet.status == EventResultStatus.Unhandled)
+                {
+                    if (e.IsEscape)
+                    {
+                        this.CancelCurrentCommand();
+                    }
+                }
             }
-            return null;
+            return EventResult.Handled;
         }
 
 

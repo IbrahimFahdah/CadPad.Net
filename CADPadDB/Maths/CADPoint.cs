@@ -17,6 +17,29 @@ namespace CADPadDB.Maths
         {
             return new CADPoint(-a.X, -a.Y);
         }
+
+        public static double Distance(CADPoint a, CADPoint b)
+        {
+            CADVector vector = b - a;
+            return vector.Length;
+        }
+
+        public CADPoint lerp(CADPoint a2, double amt)
+        {
+            var x = (1 - amt) * X + amt * a2.X;
+            var y = (1 - amt) * Y + amt * a2.Y;
+            return new CADPoint(x, y);
+        }
+
+        public CADPoint Min(CADPoint point2)
+        {
+            return new CADPoint(Math.Min(X, point2.X), Math.Min(Y, point2.Y));
+        }
+
+        public CADPoint Max(CADPoint point2)
+        {
+            return new CADPoint(Math.Max(X, point2.X), Math.Max(Y, point2.Y));
+        }
     }
 
     public partial struct CADPoint : IFormattable

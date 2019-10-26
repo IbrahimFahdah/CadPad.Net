@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using CADPadDB;
 using CADPadDB.CADEntity;
 using CADPadDB.Maths;
-using CADPadServices.ApplicationServices;
 using CADPadServices.Commands;
 using CADPadServices.Enums;
 using CADPadServices.ESelection;
@@ -10,14 +9,14 @@ using CADPadServices.Interfaces;
 
 namespace CADPadServices.Controllers
 {
-    public class PointerContoller: IPointerContoller
+    public class PointerContoller : IPointerContoller
     {
         protected IDrawing _drawing = null;
         protected SnapNodesController _snapNodesMgr = null;
         protected GripPointsController _anchorMgr = null;
-        protected PickupBox.PickupBox _pickupBox = null;
+        protected PickupBox _pickupBox = null;
 
-    
+
         public PointerModes mode { get; set; } = PointerModes.Default;
 
         /// <summary>
@@ -31,14 +30,14 @@ namespace CADPadServices.Controllers
         }
 
         /// <summary>
-        /// Model sys
+        /// Defined using Model sys.
         /// </summary>
-        public CADPoint  currentSnapPoint { get; protected set; } = new CADPoint(0, 0);
+        public CADPoint CurrentSnapPoint { get; protected set; } = new CADPoint(0, 0);
         public CADPoint _loc { get; protected set; } = new CADPoint(0, 0);
 
-        protected SelectRectangle _selRect = null;
+        protected SelectBox _selRect = null;
 
-        internal SelectRectangle SelRect
+        internal SelectBox SelRect
         {
             get
             {
@@ -76,11 +75,11 @@ namespace CADPadServices.Controllers
 
             _drawing = drawing;
 
-            _pickupBox = new PickupBox.PickupBox(_drawing);
+            _pickupBox = new PickupBox(_drawing);
             _pickupBox.side = 20;
 
-             _cursor = new Cursor(_drawing);
-              _cursor.Length = 60;
+            _cursor = new Cursor(_drawing);
+            _cursor.Length = 60;
 
             _snapNodesMgr = new SnapNodesController(_drawing);
             _anchorMgr = new GripPointsController(_drawing);
@@ -102,7 +101,7 @@ namespace CADPadServices.Controllers
                         {
                             if (_anchorMgr.currentGripPoint == null)
                             {
-                                
+
                                 _pickupBox.center = _pos;
                                 List<Selection> sels = _pickupBox.Select(_drawing.CurrentBlock);
                                 if (sels.Count > 0)
@@ -123,18 +122,20 @@ namespace CADPadServices.Controllers
                                 {
                                     //start a selection box 
                                     SelRect.Active = true;
-                                    SelRect.startPoint = SelRect.endPoint = _pos;
+                                    SelRect.StartPoint = SelRect.EndPoint = _pos;
                                 }
                             }
                             else
                             {
+                                //user selected a grip point
+
                                 Database db = (_drawing.Document as Document).database;
                                 Entity entity = db.GetObject(_anchorMgr.currentGripEntityId) as Entity;
                                 if (entity != null)
                                 {
                                     GripPointMoveCmd gripMoveCmd = new GripPointMoveCmd(
                                         entity, _anchorMgr.currentGripPointIndex, _anchorMgr.currentGripPoint);
-                                
+
                                     cmd = gripMoveCmd;
                                 }
                             }
@@ -164,7 +165,7 @@ namespace CADPadServices.Controllers
                             else
                             {
                                 SelRect.Active = true;
-                                SelRect.startPoint = SelRect.endPoint = _pos;
+                                SelRect.StartPoint = SelRect.EndPoint = _pos;
                             }
                         }
                     }
@@ -172,7 +173,7 @@ namespace CADPadServices.Controllers
                     break;
 
                 case PointerModes.Locate:
-                    currentSnapPoint = _snapNodesMgr.Snap(_pos);
+                    CurrentSnapPoint = _snapNodesMgr.Snap(_pos);
                     break;
 
                 case PointerModes.Drag:
@@ -182,12 +183,12 @@ namespace CADPadServices.Controllers
                     break;
             }
 
-            return new EventResult(){data=cmd};
+            return new EventResult() { data = cmd };
         }
 
         public IEventResult OnMouseUp(IMouseButtonEventArgs e)
         {
-            if (e.ChangedButton==MouseButton.Left && e.ButtonState==MouseButtonState.Released)
+            if (e.ChangedButton == MouseButton.Left && e.ButtonState == MouseButtonState.Released)
             {
                 if (SelRect.Active)
                 {
@@ -205,7 +206,7 @@ namespace CADPadServices.Controllers
                         DrawSelection(sels, e.IsShiftKeyDown());
                     }
                 }
-           
+
                 SelRect.Reset();
                 Draw();
             }
@@ -217,35 +218,35 @@ namespace CADPadServices.Controllers
         {
             _pos.X = e.X;
             _pos.Y = e.Y;
-           _loc =_drawing.CanvasToModel(_pos) ;
+            _loc = _drawing.CanvasToModel(_pos);
             switch (mode)
             {
                 case PointerModes.Default:
                     if (SelRect.Active)
                     {
-                        SelRect.endPoint = _pos;
+                        SelRect.EndPoint = _pos;
                     }
                     else
                     {
-                        currentSnapPoint = _anchorMgr.Snap(_pos);
-                        _loc = currentSnapPoint;
+                        CurrentSnapPoint = _anchorMgr.Snap(_pos);
+                        _loc = CurrentSnapPoint;
                     }
                     break;
 
                 case PointerModes.Select:
                     if (SelRect.Active)
                     {
-                        SelRect.endPoint = _pos;
+                        SelRect.EndPoint = _pos;
                     }
                     else
                     {
-                        _loc =_drawing.CanvasToModel(_pos);
+                        _loc = _drawing.CanvasToModel(_pos);
                     }
                     break;
 
                 case PointerModes.Locate:
-                    currentSnapPoint = _snapNodesMgr.Snap(_pos);
-                    _loc = currentSnapPoint;
+                    CurrentSnapPoint = _snapNodesMgr.Snap(_pos);
+                    _loc = CurrentSnapPoint;
                     _snapNodesMgr.OnMouseMove(e);
                     break;
 
@@ -353,8 +354,8 @@ namespace CADPadServices.Controllers
                 _anchorMgr.Update();
             }
         }
-       
 
-     
+
+
     }
 }

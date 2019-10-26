@@ -3,7 +3,6 @@ using CADPadDB.CADEntity;
 using CADPadDB.Colors;
 using CADPadDB.Maths;
 using CADPadDB.TableRecord;
-using CADPadServices.ApplicationServices;
 using CADPadServices.ESelection;
 
 namespace CADPadServices.Interfaces
@@ -22,8 +21,9 @@ namespace CADPadServices.Interfaces
         double Scale { get; set; }
 
         ICoordinateAxes Axes { get; set; }
+        IGridLayer GridLayer { get; set; }
 
-       CADPoint MousePoint { get; set; }
+        CADPoint MousePoint { get; set; }
 
         CADPoint ModelToCanvas(CADPoint p, bool bWithScale = true);
 
@@ -45,14 +45,15 @@ namespace CADPadServices.Interfaces
         Block CurrentBlock { get; }
         IPointerContoller Pointer { get; set; }
 
-        SelectRectangle CreateSelectRectangle();
+        SelectBox CreateSelectRectangle();
         void ResetGrips();
         IDrawingVisual CreateTempVisual();
 
         ICursorVisual GetCursorVisual();
 
-        ISelectionBoxVisual GetSelectionBoxVisual();
+        ISelectBoxVisual GetSelectionBoxVisual();
 
+        IGridLayerVisual GetGridLayerVisual();
         void RemoveTempVisual(IDrawingVisual v);
     }
 }

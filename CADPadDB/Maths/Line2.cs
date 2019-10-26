@@ -1,6 +1,6 @@
 using CADPadDB.Maths;
 
-namespace CADPadServices.PickupBox
+namespace CADPadDB.Maths
 {
     public struct Line2
     {

@@ -73,6 +73,8 @@
     <Compile Include="Control\Canvas\CanvasMouseButtonEventArgs.cs" />
     <Compile Include="Control\Canvas\CanvasMouseEventArgs.cs" />
     <Compile Include="Control\Visuals\CADCursorVisual.cs" />
+    <Compile Include="Control\Visuals\ChartCore.cs" />
+    <Compile Include="Control\Visuals\GridLayerVisual.cs" />
     <Compile Include="Control\Visuals\SelectionBoxVisual.cs" />
     <Compile Include="Control\Visuals\CanvasDrawingVisual.cs" />
     <Compile Include="Control\Visuals\CoordinateAxes.cs" />

@@ -114,7 +114,9 @@ namespace CADPadServices.Controllers
 
                     case ObjectSnapMode.Center:
                         {
-                         //   gd.DrawCircle(posInCanvas, _threshold, false);
+                            SnapVisual.Open();
+                            SnapVisual.DrawCircle(posInCanvas, _threshold, false);
+                            SnapVisual.Close();
                         }
                         break;
 

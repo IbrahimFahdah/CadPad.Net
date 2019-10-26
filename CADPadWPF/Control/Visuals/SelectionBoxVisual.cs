@@ -32,7 +32,7 @@ namespace CADPadWPF.Control.Visuals
             var w = Math.Abs(p1.X - p2.X);
             var h = Math.Abs(p1.Y - p2.Y);
 
-            DrawRectangle(new CADPoint(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y)), w,h);
+            DrawRectangle(new CADPoint(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y)), w,h,false);
             Close();
         }
 

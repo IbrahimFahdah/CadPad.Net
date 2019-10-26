@@ -37,12 +37,13 @@ namespace CADPadServices.ESelection
         private void Initialize()
         {
             RegisterEntityRS(typeof(Line), new LineRS());
-            //RegisterEntityRS(typeof(Xline), new XlineRS());
-            //RegisterEntityRS(typeof(Ray), new RayRS());
-            //RegisterEntityRS(typeof(Polyline), new PolylineRS());
-            //RegisterEntityRS(typeof(Circle), new CircleRS());
-            //RegisterEntityRS(typeof(Arc), new ArcRS());
-            //RegisterEntityRS(typeof(Text), new TextRS());
+            RegisterEntityRS(typeof(Xline), new XlineRS());
+            RegisterEntityRS(typeof(Ray), new RayRS());
+            RegisterEntityRS(typeof(Polyline), new PolylineRS());
+            RegisterEntityRS(typeof(Circle), new CircleRS());
+            RegisterEntityRS(typeof(Ellipse), new EllipseRS());
+            RegisterEntityRS(typeof(Arc), new ArcRS());
+           // RegisterEntityRS(typeof(Text), new TextRS());
         }
 
         private void RegisterEntityRS(Type type, EntityRS entityRS)

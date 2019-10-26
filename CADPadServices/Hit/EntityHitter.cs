@@ -1,6 +1,6 @@
 using CADPadDB.CADEntity;
 
-namespace CADPadServices.PickupBox
+namespace CADPadServices.Hit
 {
     internal abstract class EntityHitter
     {

@@ -4,7 +4,6 @@ using CADPadDB.CADEntity;
 using CADPadDB.Colors;
 using CADPadDB.Maths;
 using CADPadDB.TableRecord;
-using CADPadServices.ApplicationServices;
 using CADPadServices.Commands;
 using CADPadServices.Commands.Draw;
 using CADPadServices.Controllers;
@@ -23,6 +22,7 @@ namespace CADPadServices
             Pointer = new PointerContoller(this);
             PanContoller = new PanContoller(this);
             ZoomContoller = new ZoomContoller(this);
+            GridLayer =new GridLayer(this);
 
             _cmdsMgr = new CommandsMgr(this);
             _cmdsMgr.commandFinished += this.OnCommandFinished;
@@ -37,14 +37,15 @@ namespace CADPadServices
         public Block CurrentBlock => Document.database.blockTable[Document.currentBlockName] as Block;
 
         public IPointerContoller Pointer { get; set; }
-        public SelectRectangle CreateSelectRectangle()
+        public SelectBox CreateSelectRectangle()
         {
-            return new SelectRectangle(this);
+            return new SelectBox(this);
         }
 
         public IPanContoller PanContoller { get; set; }
         public IZoomContoller ZoomContoller { get; set; }
         public Selections selections => Document.selections;
+        public IGridLayer GridLayer { get; set; }
 
         protected CommandsMgr _cmdsMgr = null;
 
@@ -317,9 +318,14 @@ namespace CADPadServices
             return Canvas.CursorVisual;
         }
 
-        public ISelectionBoxVisual GetSelectionBoxVisual()
+        public ISelectBoxVisual GetSelectionBoxVisual()
         {
             return Canvas.SelectionBoxVisual;
+        }
+
+        public IGridLayerVisual GetGridLayerVisual()
+        {
+            return Canvas.GridLayerVisual;
         }
 
         public void RemoveTempVisual(IDrawingVisual v)
