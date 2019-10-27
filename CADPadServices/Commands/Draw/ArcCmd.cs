@@ -65,7 +65,7 @@ namespace CADPadServices.Commands.Draw
                 case Step.Step1_SpecifyCenter:
                     if (e.IsLeftPressed)
                     {
-                        _arc = presenter.AppendEntity(new Arc(),DBObjectState.BeingConstructed);
+                        _arc = presenter.AppendEntity(new Arc(),DBObjectState.Unconfirmed);
                         _arc.center = this.Pointer.CurrentSnapPoint;
                         _arc.radius = 0;
                         _arc.LayerId = this.document.currentLayerId;
@@ -73,7 +73,7 @@ namespace CADPadServices.Commands.Draw
 
                         _step = Step.Step2_SpecityStartPoint;
 
-                        _line = presenter.AppendEntity(new Line(), DBObjectState.BeingConstructed);
+                        _line = presenter.AppendEntity(new Line(), DBObjectState.Unconfirmed);
                         _line.startPoint = _arc.center;
                         _line.endPoint = this.Pointer.CurrentSnapPoint;
                         _line.Draw();

@@ -46,7 +46,7 @@ namespace CADPadServices.Commands.Draw
             {
                 if (e.IsLeftPressed)
                 {
-                    _circle = Drawing.AppendEntity(new Circle(), DBObjectState.BeingConstructed);
+                    _circle = Drawing.AppendEntity(new Circle(), DBObjectState.Unconfirmed);
                     _circle.center = this.Pointer.CurrentSnapPoint;
                     _circle.radius = 0;
                     _circle.LayerId = this.document.currentLayerId;

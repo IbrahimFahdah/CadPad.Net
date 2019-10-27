@@ -1,6 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
 using CADPadServices.Interfaces;
+using CADPadWPF.Control.Visuals;
 using Drawing = CADPadServices.Drawing;
 
 namespace CADPadWPF.Control.Canvas
@@ -18,9 +20,12 @@ namespace CADPadWPF.Control.Canvas
             set
             {
                 value.Canvas = this;
+                UpdateCanvasProperties(value);
                 SetValue(DrawingProperty, value);
             }
         }
+
+    
         //=============================================================================
         public static readonly DependencyProperty AxesColorProperty = DependencyProperty.Register(
             "AxesColor",
@@ -135,6 +140,25 @@ namespace CADPadWPF.Control.Canvas
                 dh.Redraw();
             }
         }
+        //=============================================================================
+        public static readonly DependencyProperty GridColorProperty = DependencyProperty.Register(
+            "GridColor",
+            typeof(Color),
+            typeof(Canvas.CADPadCanvas),
+            new FrameworkPropertyMetadata(Colors.Black));
+        public Color GridColor
+        {
+            get => (Color)GetValue(GridColorProperty);
+            set
+            {
+                if (Drawing != null)
+                {
+                    Drawing.GridLayer.Color = CanvasPalette.ConvertToCAD(value);
+                    ((GridLayerVisual)this.GridLayerVisual).Pen = null;
+                }
+                SetValue(GridColorProperty, value);
+            }
+        }
 
         //=============================================================================
         public void RedrawCoordinateAxes()
@@ -142,5 +166,12 @@ namespace CADPadWPF.Control.Canvas
             if (m_axes != null)
                 m_axes.Draw(Drawing);
         }
+
+        private void UpdateCanvasProperties(IDrawing drawing)
+        {
+            GridColor = drawing.GridLayer.Color.ConvertToWPF();
+            ((GridLayerVisual)this.GridLayerVisual).Pen = null;
+        }
+
     }
 }

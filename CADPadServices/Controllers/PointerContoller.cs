@@ -161,6 +161,7 @@ namespace CADPadServices.Controllers
                                 {
                                     (_drawing.Document as Document).selections.Add(sels);
                                 }
+                                DrawSelection(sels, e.IsShiftKeyDown());
                             }
                             else
                             {

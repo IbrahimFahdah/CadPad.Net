@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CADPadServices;
 using CADPadServices.Commands.Draw;
-using CADPadWPF.Control;
+using CADPadServices.Commands.Modify;
+using CADPadWPF2;
 using Drawing = CADPadServices.Drawing;
 
 namespace CADPadWPF
@@ -36,6 +38,7 @@ namespace CADPadWPF
 
         public Drawing Drawing { get; set; }
 
+    
         private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
              sCAD.OnKeyDown2(e);
@@ -46,12 +49,26 @@ namespace CADPadWPF
             sCAD.OnKeyUp2(e);
         }
 
-        private void MenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DeleteEntities_OnClick(object sender, RoutedEventArgs e)
         {
-            var cmd = new LinesChainCmd();
-            Drawing.OnCommand(cmd);
+            DeleteEntities_Executed();
         }
-
+        private void CopyEntities_OnClick(object sender, RoutedEventArgs e)
+        {
+            CopyEntities_Executed();
+        }
+        private void MoveEntities_OnClick(object sender, RoutedEventArgs e)
+        {
+            MoveEntities_Executed();
+        }
+        private void MirrorEntities_OnClick(object sender, RoutedEventArgs e)
+        {
+            MirrorEntities_Executed();
+        }
+        private void DrawLine_OnClick(object sender, RoutedEventArgs e)
+        {
+            DrawLine_Executed();
+        }
         private void DrawCircle_OnClick(object sender, RoutedEventArgs e)
         {
             var cmd = new CircleCmd();
@@ -91,8 +108,44 @@ namespace CADPadWPF
             var cmd = new RayCmd();
             Drawing.OnCommand(cmd);
         }
+
+      private void EditGridOptions_OnClick(object sender, RoutedEventArgs e)
+        {
+            var win = new GridLayoutOptions();
+            win.ShowDialog();
+        }
+
+
+        #region Commands
+        private void DrawLine_Executed()
+        {
+            var cmd = new LinesChainCmd();
+            Drawing.OnCommand(cmd);
+        }
+
+        private void CopyEntities_Executed()
+        {
+            var cmd = new CopyCmd();
+            Drawing.OnCommand(cmd);
+        }
+        private void MoveEntities_Executed()
+        {
+            var cmd = new MoveCmd();
+            Drawing.OnCommand(cmd);
+        }
+        private void MirrorEntities_Executed()
+        {
+            var cmd = new MirrorCmd();
+            Drawing.OnCommand(cmd);
+        }
+        private void DeleteEntities_Executed()
+        {
+            var cmd = new DeleteCmd();
+            Drawing.OnCommand(cmd);
+        }
+        #endregion
     }
 
-   
+
 
 }

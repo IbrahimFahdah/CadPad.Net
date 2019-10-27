@@ -24,7 +24,7 @@ namespace CADPadWPF.Control
             return wpf;
         }
 
-        public static Color ConvertToWPF(CADColor color)
+        public static Color ConvertToWPF(this CADColor color)
         {
             return Color.FromRgb(color.r, color.g, color.b);
         }

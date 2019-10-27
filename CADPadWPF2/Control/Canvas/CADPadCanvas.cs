@@ -151,6 +151,7 @@ namespace CADPadWPF.Control.Canvas
 
             RenderOptions.SetEdgeMode((DependencyObject)this, EdgeMode.Aliased);
         }
+
         public void InitialiseDrawing()
         {
             if (Drawing == null)
@@ -173,6 +174,7 @@ namespace CADPadWPF.Control.Canvas
             SelectionBoxVisual = new SelectBoxVisual(Drawing);
             AddVisual(SelectionBoxVisual);
 
+            //Set Drawing properties from Canvas
             Drawing.Canvas = this;
             Drawing.AxesColor = CanvasPalette.ConvertToCAD(AxesColor);
             Drawing.AxesLength = AxesLength;
@@ -180,6 +182,7 @@ namespace CADPadWPF.Control.Canvas
             Drawing.AxesThickness = AxesThickness;
             Drawing.Scale = Scale;
             Drawing.Axes = m_axes;
+            Drawing.GridLayer.Color = CanvasPalette.ConvertToCAD(GridColor);
 
             _initialiseDrawing = true;
         }

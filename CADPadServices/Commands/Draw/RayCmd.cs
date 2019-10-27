@@ -91,7 +91,7 @@ namespace CADPadServices.Commands.Draw
                 case Step.Step1_SpecifyBasePoint:
                     if (e.IsLeftPressed)
                     {
-                        _currXline = presenter.AppendEntity(new Ray(), DBObjectState.BeingConstructed);
+                        _currXline = presenter.AppendEntity(new Ray(), DBObjectState.Unconfirmed);
                         _currXline.basePoint = this.Pointer.CurrentSnapPoint;
                         _currXline.LayerId = this.document.currentLayerId;
                         _currXline.Color = this.document.currentColor;
@@ -112,7 +112,7 @@ namespace CADPadServices.Commands.Draw
                             _currXline.Color = this.document.currentColor;
                             _xlines.Add(_currXline);
 
-                            _currXline = Drawing.AppendEntity((Ray)_currXline.Clone(), DBObjectState.BeingConstructed);
+                            _currXline = Drawing.AppendEntity((Ray)_currXline.Clone(), DBObjectState.Unconfirmed);
                             _currXline.Draw();
                             //_currXline = _currXline.Clone() as Ray;
                         }

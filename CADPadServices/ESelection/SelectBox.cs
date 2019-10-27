@@ -64,13 +64,13 @@ namespace CADPadServices.ESelection
         }
 
 
-        public ISelectBoxVisual SelectionBoxVisual
+        public ISelectBoxVisual SelectBoxVisual
         {
             get
             {
                 if (_selectionBoxVisual == null)
                 {
-                    _selectionBoxVisual = _drawing.GetSelectionBoxVisual();
+                    _selectionBoxVisual = _drawing.GetSelectBoxVisual();
                 }
                 return _selectionBoxVisual;
             }
@@ -120,8 +120,8 @@ namespace CADPadServices.ESelection
         public void Draw()
         {
             if(StartPoint==EndPoint )
-                SelectionBoxVisual.Clear();
-            SelectionBoxVisual.Draw(this);
+                SelectBoxVisual.Clear();
+            SelectBoxVisual.Draw(this);
         }
 
         

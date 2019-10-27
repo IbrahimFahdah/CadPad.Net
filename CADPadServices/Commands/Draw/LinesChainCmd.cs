@@ -64,7 +64,7 @@ namespace CADPadServices.Commands.Draw
             {
                 if (e.IsLeftPressed)
                 {
-                    _currLine = Drawing.AppendEntity(new Line(), DBObjectState.BeingConstructed);
+                    _currLine = Drawing.AppendEntity(new Line(), DBObjectState.Unconfirmed);
                     _currLine.startPoint = this.Pointer.CurrentSnapPoint;
                     _currLine.endPoint = this.Pointer.CurrentSnapPoint;
                     _currLine.LayerId = this.document.currentLayerId;
@@ -86,7 +86,7 @@ namespace CADPadServices.Commands.Draw
                     _currLine.Color = this.document.currentColor;
                     _lines.Add(_currLine);
 
-                    _currLine = Drawing.AppendEntity(new Line(), DBObjectState.BeingConstructed);
+                    _currLine = Drawing.AppendEntity(new Line(), DBObjectState.Unconfirmed);
                     _currLine.startPoint = this.Pointer.CurrentSnapPoint;
                     _currLine.endPoint = this.Pointer.CurrentSnapPoint;
                     _currLine.LayerId = this.document.currentLayerId;

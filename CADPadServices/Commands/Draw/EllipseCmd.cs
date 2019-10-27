@@ -47,7 +47,7 @@ namespace CADPadServices.Commands.Draw
             {
                 if (e.IsLeftPressed)
                 {
-                    _ellipse = Drawing.AppendEntity(new Ellipse(), DBObjectState.BeingConstructed);
+                    _ellipse = Drawing.AppendEntity(new Ellipse(), DBObjectState.Unconfirmed);
                     _ellipse.center = this.Pointer.CurrentSnapPoint;
                     _ellipse.RadiusX = 0;
                     _ellipse.RadiusY = 0;

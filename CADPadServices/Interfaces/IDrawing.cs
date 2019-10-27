@@ -51,9 +51,10 @@ namespace CADPadServices.Interfaces
 
         ICursorVisual GetCursorVisual();
 
-        ISelectBoxVisual GetSelectionBoxVisual();
+        ISelectBoxVisual GetSelectBoxVisual();
 
         IGridLayerVisual GetGridLayerVisual();
         void RemoveTempVisual(IDrawingVisual v);
+        void RemoveUnconfirmed();
     }
 }

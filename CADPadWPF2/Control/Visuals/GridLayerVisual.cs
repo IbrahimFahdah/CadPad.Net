@@ -26,7 +26,7 @@ namespace CADPadWPF.Control.Visuals
             {
                 if (_pen == null)
                 {
-                    var b = new SolidColorBrush(Colors.LightGray);
+                    var b = new SolidColorBrush(_drawing.GridLayer.Color.ConvertToWPF());
 
                     RenderOptions.SetCachingHint(b, CachingHint.Cache);
                     b.Freeze();

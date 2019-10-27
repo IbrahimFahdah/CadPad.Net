@@ -59,10 +59,10 @@ namespace CADPadServices.Commands.Draw
                 case Step.Step1_SpecifyStartPoint:
                     if (e.IsLeftPressed)
                     {
-                        _polyline = presenter.AppendEntity(new Polyline(), DBObjectState.BeingConstructed);
+                        _polyline = presenter.AppendEntity(new Polyline(), DBObjectState.Unconfirmed);
                         _polyline.AddVertexAt(_polyline.NumberOfVertices, this.Pointer.CurrentSnapPoint);
 
-                        _line = presenter.AppendEntity(new Line(), DBObjectState.BeingConstructed);
+                        _line = presenter.AppendEntity(new Line(), DBObjectState.Unconfirmed);
                         _line.startPoint = _line.endPoint = this.Pointer.CurrentSnapPoint;
                         _line.Draw();
                         _step = Step.Step2_SpecifyOtherPoint;

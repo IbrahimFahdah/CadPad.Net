@@ -1,1 +1,6 @@
-fix the issue of entities being added twice. 
+offset
+add file support
+add help info
+add other arcs
+grid dialog 
+layer dialog

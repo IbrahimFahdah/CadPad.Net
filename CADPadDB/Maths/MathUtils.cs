@@ -78,7 +78,7 @@ namespace CADPadDB.Maths
         /// <summary>
         /// 镜像矩阵
         /// </summary>
-        internal static Matrix3 MirrorMatrix(Line2 mirrorLine)
+        public static Matrix3 MirrorMatrix(Line2 mirrorLine)
         {
             CADVector lineDir = mirrorLine.direction;
             Matrix3 matPos1 = Matrix3.Translate(-mirrorLine.startPoint);

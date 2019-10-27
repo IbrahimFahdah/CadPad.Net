@@ -6,7 +6,7 @@ namespace CADPadDB
     public enum DBObjectState
     {
         Default,
-        BeingConstructed,
+        Unconfirmed,
     }
 
 }

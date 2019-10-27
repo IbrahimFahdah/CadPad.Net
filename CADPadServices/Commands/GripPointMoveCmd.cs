@@ -54,7 +54,7 @@ namespace CADPadServices.Commands
         {
             base.Initialize();
 
-            presenter.AppendEntity(_entityCopy, DBObjectState.BeingConstructed);
+            presenter.AppendEntity(_entityCopy, DBObjectState.Unconfirmed);
             tmpLine = presenter.CreateTempVisual();
             this.Pointer.isShowAnchor = true;
             this.Pointer.mode = PointerModes.Locate;

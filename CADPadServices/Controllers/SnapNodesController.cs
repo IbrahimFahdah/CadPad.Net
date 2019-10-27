@@ -39,7 +39,7 @@ namespace CADPadServices.Controllers
             foreach (Entity entity in _drawing.CurrentBlock)
             {
                 List<ObjectSnapPoint> snapPnts = entity.GetSnapPoints();
-                if (snapPnts == null || snapPnts.Count == 0 || entity.State==DBObjectState.BeingConstructed)
+                if (snapPnts == null || snapPnts.Count == 0 || entity.State == DBObjectState.Unconfirmed)
                 {
                     continue;
                 }
@@ -54,10 +54,24 @@ namespace CADPadServices.Controllers
                         return snapPnt.Position;
                     }
                 }
+
+            }
+
+            var g_snapPnts= _drawing.GridLayer.GetSnapPoints(posInModel);
+            foreach (ObjectSnapPoint snapPnt in g_snapPnts)
+            {
+                double dis = (snapPnt.Position - posInModel).Length;
+                double disInCanvas = _drawing.ModelToCanvas(dis);
+                if (disInCanvas <= _threshold)
+                {
+                    _currentObjectSnapPoint = snapPnt;
+
+                    return snapPnt.Position;
+                }
             }
 
             Clear();
-            return new CADPoint(posInModel.X, posInModel.Y) ;
+            return new CADPoint(posInModel.X, posInModel.Y);
         }
 
         public void Clear()

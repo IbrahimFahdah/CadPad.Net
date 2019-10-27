@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using CADPadDB;
 using CADPadDB.Colors;
+using CADPadDB.Maths;
 using CADPadServices.Enums;
 using CADPadServices.Interfaces;
 
@@ -12,7 +14,7 @@ namespace CADPadServices
     {
         private IDrawing _drawing = null;
 
-      
+        List<ObjectSnapPoint> _snapPoints = new List<ObjectSnapPoint>();
 
         IGridLayerVisual _gridLayerVisual;
 
@@ -56,6 +58,23 @@ namespace CADPadServices
             GridLayerVisual.Draw(this);
         }
 
+        public List<ObjectSnapPoint> GetSnapPoints(CADPoint posInModel)
+        {
+            _snapPoints.Clear();
+
+            int spx = SpacingX * (posInModel.X > 0 ? 1 : -1);
+            int spy = SpacingY * (posInModel.Y > 0 ? 1 : -1);
+
+            var nx = (int)posInModel.X / spx;
+            int ny = (int)posInModel.Y / spy;
+
+            _snapPoints.Add(new ObjectSnapPoint(ObjectSnapMode.Grid, new CADPoint(nx * spx, ny * spy)));
+            _snapPoints.Add(new ObjectSnapPoint(ObjectSnapMode.Grid, new CADPoint((nx + 1) * spx, ny * spy)));
+            _snapPoints.Add(new ObjectSnapPoint(ObjectSnapMode.Grid, new CADPoint(nx * spx, (ny + 1) * spy)));
+            _snapPoints.Add(new ObjectSnapPoint(ObjectSnapMode.Grid, new CADPoint((nx + 1) * spx, (ny + 1) * spy)));
+
+            return _snapPoints;
+        }
 
     }
 }

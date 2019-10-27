@@ -28,7 +28,7 @@ namespace CADPadServices.Commands.Draw
             if (_rectangle == null)
             {
                 //_rectangle = new Polyline();
-                _rectangle = presenter.AppendEntity(new Polyline(), DBObjectState.BeingConstructed);
+                _rectangle = presenter.AppendEntity(new Polyline(), DBObjectState.Unconfirmed);
                 _rectangle.closed = true;
                 for (int i = 0; i < 4; ++i)
                 {

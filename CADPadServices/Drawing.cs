@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CADPadDB;
 using CADPadDB.CADEntity;
 using CADPadDB.Colors;
@@ -6,6 +7,7 @@ using CADPadDB.Maths;
 using CADPadDB.TableRecord;
 using CADPadServices.Commands;
 using CADPadServices.Commands.Draw;
+using CADPadServices.Commands.Modify;
 using CADPadServices.Controllers;
 using CADPadServices.ESelection;
 using CADPadServices.Interfaces;
@@ -210,15 +212,15 @@ namespace CADPadServices
                 if (e.IsEscape)
                 {
                     Document.selections.Clear();
-                    foreach (var g in Canvas.Geometries)
-                    {
-                       if(g.Selected)
-                       {
-                            g.Selected = false;
-                            g.Draw();
-                       }
-                    }
-                    Canvas.ResetGrips();
+                    //foreach (var g in Canvas.Geometries)
+                    //{
+                    //   if(g.Selected)
+                    //   {
+                    //        g.Selected = false;
+                    //        g.Draw();
+                    //   }
+                    //}
+                    //Canvas.ResetGrips();
                 }
                 //if (_dynamicInputer.StartCmd(e))
                 //{
@@ -227,14 +229,14 @@ namespace CADPadServices
                 //{
                 //    _document.selections.Clear();
                 //}
-                //else if (e.IsDelete)
-                //{
-                //    if ((document as Document).selections.Count > 0)
-                //    {
-                //        DeleteCmd cmd = new DeleteCmd();
-                //        this.OnCommand(cmd);
-                //    }
-                //}
+                else if (e.IsDelete)
+                {
+                    if ((Document as Document).selections.Count > 0)
+                    {
+                        DeleteCmd cmd = new DeleteCmd();
+                        this.OnCommand(cmd);
+                    }
+                }
             }
 
             return null;
@@ -269,8 +271,10 @@ namespace CADPadServices
 
         public void RemoveEntity<T>(T entity) where T : Entity
         {
+            Canvas.ClearVisualGrips(entity.DrawingVisual);
             Canvas.RemoveVisual(entity.DrawingVisual);
             entity.Erase();
+         
         }
 
         public void OnCommand(ICommand cmd)
@@ -296,13 +300,23 @@ namespace CADPadServices
         public void OnSelectionChanged()
         {
             Pointer.OnSelectionChanged();
-     
+            if(selections.Count==0)
+            {
+                foreach (var g in Canvas.Geometries)
+                {
+                    if (g.Selected)
+                    {
+                        g.Selected = false;
+                        g.Draw();
+                    }
+                }
+                Canvas.ResetGrips();
+            }
             //Canvas.ResetGrips();
         }
 
         public void ResetGrips()
         {
-          
             Canvas.ResetGrips();
         }
 
@@ -318,9 +332,9 @@ namespace CADPadServices
             return Canvas.CursorVisual;
         }
 
-        public ISelectBoxVisual GetSelectionBoxVisual()
+        public ISelectBoxVisual GetSelectBoxVisual()
         {
-            return Canvas.SelectionBoxVisual;
+            return Canvas.SelectBoxVisual;
         }
 
         public IGridLayerVisual GetGridLayerVisual()
@@ -331,6 +345,17 @@ namespace CADPadServices
         public void RemoveTempVisual(IDrawingVisual v)
         {
             Canvas.RemoveVisual(v);
+        }
+
+        public void RemoveUnconfirmed()
+        {
+            Block modelSpace = Document.database.blockTable["ModelSpace"] as Block;
+
+            var toRemove = modelSpace.Where(e => e.State == DBObjectState.Unconfirmed).ToList();
+            foreach (Entity item in toRemove)
+            {
+                RemoveEntity(item);
+            }
         }
     }
 }

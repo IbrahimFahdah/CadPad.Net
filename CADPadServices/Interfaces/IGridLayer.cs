@@ -1,5 +1,8 @@
-﻿using CADPadDB.Colors;
+﻿using CADPadDB;
+using CADPadDB.Colors;
+using CADPadDB.Maths;
 using CADPadServices.Enums;
+using System.Collections.Generic;
 
 namespace CADPadServices.Interfaces
 {
@@ -16,5 +19,6 @@ namespace CADPadServices.Interfaces
 
        double CrossSize { get; set; }
         void Draw();
+        List<ObjectSnapPoint> GetSnapPoints(CADPoint posInModel);
     }
 }
