@@ -109,11 +109,11 @@ namespace CADPadServices.Controllers
                                     //user directly clicked on entities.
                                     if (e.IsShiftKeyDown())
                                     {
-                                        (_drawing.Document as Document).selections.Remove(sels);
+                                        (_drawing.Document as Document).Selections.Remove(sels);
                                     }
                                     else
                                     {
-                                        (_drawing.Document as Document).selections.Add(sels);
+                                        (_drawing.Document as Document).Selections.Add(sels);
                                     }
 
                                     DrawSelection(sels, e.IsShiftKeyDown());
@@ -129,7 +129,7 @@ namespace CADPadServices.Controllers
                             {
                                 //user selected a grip point
 
-                                Database db = (_drawing.Document as Document).database;
+                                Database db = (_drawing.Document as Document).Database;
                                 Entity entity = db.GetObject(_anchorMgr.currentGripEntityId) as Entity;
                                 if (entity != null)
                                 {
@@ -155,11 +155,11 @@ namespace CADPadServices.Controllers
                             {
                                 if (e.IsShiftKeyDown())
                                 {
-                                    (_drawing.Document as Document).selections.Remove(sels);
+                                    (_drawing.Document as Document).Selections.Remove(sels);
                                 }
                                 else
                                 {
-                                    (_drawing.Document as Document).selections.Add(sels);
+                                    (_drawing.Document as Document).Selections.Add(sels);
                                 }
                                 DrawSelection(sels, e.IsShiftKeyDown());
                             }
@@ -198,11 +198,11 @@ namespace CADPadServices.Controllers
                     {
                         if (e.IsShiftKeyDown())
                         {
-                            (_drawing.Document as Document).selections.Remove(sels);
+                            (_drawing.Document as Document).Selections.Remove(sels);
                         }
                         else
                         {
-                            (_drawing.Document as Document).selections.Add(sels);
+                            (_drawing.Document as Document).Selections.Add(sels);
                         }
                         DrawSelection(sels, e.IsShiftKeyDown());
                     }
@@ -341,7 +341,7 @@ namespace CADPadServices.Controllers
         {
             foreach (var sel in sels)
             {
-                var obj = _drawing.Document.database.GetObject(sel.objectId);
+                var obj = _drawing.Document.Database.GetObject(sel.objectId);
                 if (obj is Entity en)
                 {
                     if (en.DrawingVisual != null) en.DrawingVisual.Selected = !isShiftKeyDown;

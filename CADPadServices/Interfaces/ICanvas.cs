@@ -24,5 +24,7 @@ namespace CADPadServices.Interfaces
         void ResetGrips();
 
         void ClearVisualGrips(IDrawingVisual associatedVisual);
+
+        void Clear();
     }
 }

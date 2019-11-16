@@ -27,7 +27,7 @@ namespace CADPadServices.Controllers
         public void Update()
         {
             Document doc = _drawing.Document as Document;
-            if (doc.selections.Count == 0)
+            if (doc.Selections.Count == 0)
             {
                 _gripPnts.Clear();
                 return;
@@ -35,7 +35,7 @@ namespace CADPadServices.Controllers
 
             Dictionary<ObjectId, List<GripPoint>> oldGripPnts = _gripPnts;
             _gripPnts = new Dictionary<ObjectId, List<GripPoint>>();
-            foreach (Selection sel in doc.selections)
+            foreach (Selection sel in doc.Selections)
             {
                 if (sel.objectId == ObjectId.Null)
                 {
@@ -47,7 +47,7 @@ namespace CADPadServices.Controllers
                     continue;
                 }
 
-                DBObject dbobj = doc.database.GetObject(sel.objectId);
+                DBObject dbobj = doc.Database.GetObject(sel.objectId);
                 if (dbobj == null)
                 {
                     continue;

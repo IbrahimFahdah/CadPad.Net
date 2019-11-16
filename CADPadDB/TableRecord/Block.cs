@@ -75,7 +75,7 @@ namespace CADPadDB.TableRecord
 
         public override void XmlOut(Filer.XmlFiler filer)
         {
-            Filer.XmlFilerImpl filerImpl = filer as Filer.XmlFilerImpl;
+            Filer.XmlCADDatabase filerImpl = filer as Filer.XmlCADDatabase;
 
             //
             base.XmlOut(filer);
@@ -94,7 +94,7 @@ namespace CADPadDB.TableRecord
 
         public override void XmlIn(Filer.XmlFiler filer)
         {
-            Filer.XmlFilerImpl filerImpl = filer as Filer.XmlFilerImpl;
+            Filer.XmlCADDatabase filerImpl = filer as Filer.XmlCADDatabase;
 
             base.XmlIn(filerImpl);
 
@@ -104,7 +104,7 @@ namespace CADPadDB.TableRecord
             {
                 foreach (XmlNode entityNode in entitiesNode.ChildNodes)
                 {
-                    Type type = Type.GetType("LitCAD.DatabaseServices." + entityNode.Name);
+                    Type type = Type.GetType("CADPadDB.CADEntity." + entityNode.Name);
                     if (type == null)
                     {
                         continue;

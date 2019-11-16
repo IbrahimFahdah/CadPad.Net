@@ -9,14 +9,10 @@ using CADPadServices.Interfaces;
 
 namespace CADPadServices.Commands.Modify
 {
-    /// <summary>
-    /// 复制命令
-    /// </summary>
+
     public class CopyCmd : ModifyCmd
     {
-        /// <summary>
-        /// 操作的图元
-        /// </summary>
+
         private List<Entity> _items = new List<Entity>();
         private List<Entity> _tempItemsToDraw = new List<Entity>();
         private Line _pathLine = null;
@@ -25,7 +21,7 @@ namespace CADPadServices.Commands.Modify
             Document doc = _mgr.presenter.Document as Document;
             foreach (Selection sel in _mgr.presenter.selections)
             {
-                DBObject dbobj = doc.database.GetObject(sel.objectId);
+                DBObject dbobj = doc.Database.GetObject(sel.objectId);
                 if (dbobj != null && dbobj is Entity)
                 {
                     Entity entity = dbobj as Entity;
@@ -39,9 +35,7 @@ namespace CADPadServices.Commands.Modify
             _pathLine = presenter.AppendEntity(new Line(), DBObjectState.Unconfirmed);
         }
 
-        /// <summary>
-        /// 复制动作结果
-        /// </summary>
+       
         private class CopyAction
         {
             public List<Entity> copyItems = new List<Entity>();
@@ -66,9 +60,7 @@ namespace CADPadServices.Commands.Modify
             _actions.Add(copyAction);
         }
 
-        /// <summary>
-        /// 步骤
-        /// </summary>
+
         private enum Step
         {
             Step1_SelectObjects = 1,
@@ -77,9 +69,7 @@ namespace CADPadServices.Commands.Modify
         }
         private Step _step = Step.Step1_SelectObjects;
 
-        /// <summary>
-        /// 移动路径线
-        /// </summary>
+
         private CADVector translation
         {
             get
@@ -88,9 +78,6 @@ namespace CADPadServices.Commands.Modify
             }
         }
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
         public override void Initialize()
         {
             base.Initialize();
@@ -109,9 +96,6 @@ namespace CADPadServices.Commands.Modify
             }
         }
 
-        /// <summary>
-        /// 提交到数据库
-        /// </summary>
         protected override void Commit()
         {
             //foreach (CopyAction action in _actions)
@@ -124,9 +108,21 @@ namespace CADPadServices.Commands.Modify
             //}
         }
 
-        /// <summary>
-        /// 回滚撤销
-        /// </summary>
+        public override void Redo()
+        {
+            foreach (CopyAction action in _actions)
+            {
+                foreach (Entity copyItem in action.copyItems)
+                {
+                    this.presenter.AppendEntity(copyItem, reUseVisual: true);
+                    copyItem.Draw();
+                }
+            }
+
+            base.Redo();
+        }
+
+
         protected override void Rollback()
         {
             foreach (CopyAction action in _actions)

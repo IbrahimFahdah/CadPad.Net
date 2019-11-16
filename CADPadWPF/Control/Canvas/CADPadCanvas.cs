@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using CADPadDB;
 using CADPadServices.Interfaces;
 using CADPadWPF.Control.Visuals;
@@ -15,7 +13,6 @@ namespace CADPadWPF.Control.Canvas
     {
 
         private CoordinateAxes m_axes = null;
-     //   Image myImage = new Image();
         private List<CADGripVisual> m_grips = new List<CADGripVisual>();
         private List<IDrawingVisual> _tempVisuals = new List<IDrawingVisual>();
 
@@ -23,8 +20,6 @@ namespace CADPadWPF.Control.Canvas
         protected bool _initialiseDrawing;
         static CADPadCanvas()
         {
-
-
 
             CADPadCanvas.SelectedGeometryProperty = DependencyProperty.Register(
                 "SelectedGeometry",
@@ -46,161 +41,6 @@ namespace CADPadWPF.Control.Canvas
                 typeof(CADPadCanvas),
                 new FrameworkPropertyMetadata(new Point(0.0, 0.0), FrameworkPropertyMetadataOptions.None));
             CADPadCanvas.MousePointProperty = MousePointPropertyKey.DependencyProperty;
-        }
-
-
-        public CADPadCanvas()
-        {
-            this.Loaded += CADPadCanvas_Loaded;
-            this.SizeChanged += CADPadCanvas_SizeChanged; ;
-            this.Cursor = Cursors.None;
-            //  this.SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
-         
-            RenderOptions.SetEdgeMode((DependencyObject)this, EdgeMode.Aliased);
-        }
-
-       
-
-        public List<ICADEnitiyVisual> Geometries { get; set; } = new List<ICADEnitiyVisual>();
-
-        public ICADEnitiyVisual CreateCADEnitiyVisual()
-        {
-            var g = new CADEnitiyVisual(Drawing);
-            return g;
-        }
-
-
-        public IDrawingVisual CreateVisual()
-        {
-            return new CanvasDrawingVisual(Drawing);
-        }
-
-        public ICursorVisual CursorVisual { get; set; }
-        public ISelectionBoxVisual SelectionBoxVisual { get; set; }
-
-        public IGridLayerVisual GridLayerVisual { get; set; }
-
-        public void AddVisual(IDrawingVisual dv)
-        {
-            if (dv is ICADEnitiyVisual)
-            {
-                Geometries.Add((ICADEnitiyVisual)dv);
-            }
-            else
-            {
-                _tempVisuals.Add(dv);
-            }
-
-            AddVisualChild((Visual)dv);
-            AddLogicalChild((Visual)dv);
-        }
-
-        public void RemoveVisual(IDrawingVisual dv)
-        {
-            RemoveVisualChild((Visual)dv);
-            RemoveLogicalChild((Visual)dv);
-            if (dv is ICADEnitiyVisual)
-            {
-                Geometries.Remove((ICADEnitiyVisual)dv);
-            }
-            else
-            {
-                _tempVisuals.Remove(dv);
-            }
-        }
-
-        public void InitialiseDrawing()
-        {
-            if (Drawing == null)
-                return;
-
-            m_axes = new CoordinateAxes();
-            AddVisualChild(m_axes);
-            AddLogicalChild(m_axes);
-
-            GridLayerVisual = new GridLayerVisual(Drawing);
-            AddVisual(GridLayerVisual);
-
-            CursorVisual = new CADCursorVisual(Drawing);
-            AddVisual(CursorVisual);
-
-            SelectionBoxVisual = new SelectionBoxVisual(Drawing);
-            AddVisual(SelectionBoxVisual);
-
-            Drawing.Canvas = this;
-            Drawing.AxesColor = CanvasPalette.ConvertToCAD(AxesColor);
-            Drawing.AxesLength = AxesLength;
-            Drawing.AxesTextSize = AxesTextSize;
-            Drawing.AxesThickness = AxesThickness;
-            Drawing.Scale = Scale;
-            Drawing.Axes = m_axes;
-
-
-            // m_axes.Draw();
-
-            _initialiseDrawing = true;
-        }
-
-        protected override int VisualChildrenCount
-        {
-            // 1 for m_axes
-            get { return 1 + Geometries.Count + m_grips.Count + _tempVisuals.Count; }
-        }
-
-
-        //=============================================================================
-        protected override Visual GetVisualChild(int index)
-        {
-            int offset = 0;
-
-            if (index == 0)
-                return m_axes;
-
-            offset += 1;
-
-
-            IDrawingVisual geom = null;
-            if (index >= offset && index - offset < Geometries.Count)
-                geom = Geometries[index - offset];
-
-            offset += Geometries.Count;
-            if (index >= offset && index - offset < m_grips.Count)
-                return m_grips[index - offset];
-
-            offset += m_grips.Count;
-            if (index >= offset && index - offset < _tempVisuals.Count)
-                return (Visual)_tempVisuals[index - offset];
-
-            return (Visual)geom;
-        }
-        private void CADPadCanvas_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (Drawing == null)
-                return;
-
-            InitialiseDrawing();
-
-            // place (0, 0) point at center of SimpleCAD
-            // You should do it on Loaded event, otherwise ActualHeight and ActualWidth will be 0.
-            double rOffset_X = this.ActualWidth / 2;
-            double rOffset_Y = this.ActualHeight / 2;
-
-            ((Drawing)Drawing).Origin.X = -rOffset_X;
-            ((Drawing)Drawing).Origin.Y = -rOffset_Y;
-
-            // read comment in ModelToCanvas()
-            ((Drawing)Drawing).Origin.Y *= -1;
-
-
-            Redraw();
-
-        }
-
-
-
-        private void CADPadCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Redraw();
         }
 
         #region Dependency properties
@@ -302,6 +142,154 @@ namespace CADPadWPF.Control.Canvas
 
         #endregion
 
+
+        public CADPadCanvas()
+        {
+            this.Loaded += CADPadCanvas_Loaded;
+            this.SizeChanged += CADPadCanvas_SizeChanged; ;
+            this.Cursor = Cursors.None;
+
+            RenderOptions.SetEdgeMode((DependencyObject)this, EdgeMode.Aliased);
+        }
+
+        public void InitialiseDrawing()
+        {
+            if (Drawing == null)
+                return;
+
+
+
+            m_axes = new CoordinateAxes();
+            AddVisualChild(m_axes);
+            AddLogicalChild(m_axes);
+
+            GridLayerVisual = new GridLayerVisual(Drawing);
+            AddVisualChild((Visual)GridLayerVisual);
+            AddLogicalChild((Visual)GridLayerVisual);
+
+            CursorVisual = new CADCursorVisual(Drawing);
+            AddVisualChild((Visual)CursorVisual);
+            AddLogicalChild((Visual)CursorVisual);
+
+            SelectionBoxVisual = new SelectBoxVisual(Drawing);
+            AddVisual(SelectionBoxVisual);
+
+            //Set Drawing properties from Canvas
+            Drawing.Canvas = this;
+            Drawing.AxesColor = CanvasPalette.ConvertToCAD(AxesColor);
+            Drawing.AxesLength = AxesLength;
+            Drawing.AxesTextSize = AxesTextSize;
+            Drawing.AxesThickness = AxesThickness;
+            Drawing.Scale = Scale;
+            Drawing.Axes = m_axes;
+            Drawing.GridLayer.Color = CanvasPalette.ConvertToCAD(GridColor);
+
+            _initialiseDrawing = true;
+        }
+   
+        public List<ICADEnitiyVisual> Geometries { get; set; } = new List<ICADEnitiyVisual>();
+
+        public ICursorVisual CursorVisual { get; set; }
+
+        public ISelectBoxVisual SelectionBoxVisual { get; set; }
+
+        public IGridLayerVisual GridLayerVisual { get; set; }
+
+        public void AddVisual(IDrawingVisual dv)
+        {
+            if (dv is ICADEnitiyVisual)
+            {
+                Geometries.Add((ICADEnitiyVisual)dv);
+            }
+            else
+            {
+                _tempVisuals.Add(dv);
+            }
+
+            AddVisualChild((Visual)dv);
+            AddLogicalChild((Visual)dv);
+        }
+
+        public void RemoveVisual(IDrawingVisual dv)
+        {
+            RemoveVisualChild((Visual)dv);
+            RemoveLogicalChild((Visual)dv);
+            if (dv is ICADEnitiyVisual)
+            {
+                Geometries.Remove((ICADEnitiyVisual)dv);
+            }
+            else
+            {
+                _tempVisuals.Remove(dv);
+            }
+        }
+
+        protected override int VisualChildrenCount
+        {
+            // 1 for m_axes
+            get { return _tempVisuals.Count + Geometries.Count + m_grips.Count + 1 + 1 + 1; }
+        }
+
+        protected override Visual GetVisualChild(int index)
+        {
+            int offset = 0;
+
+            if (index >= offset && index - offset < _tempVisuals.Count)
+                return (Visual)_tempVisuals[index - offset];
+
+            offset += _tempVisuals.Count;
+            if (index >= offset && index - offset < m_grips.Count)
+                return m_grips[index - offset];
+
+            offset += m_grips.Count;
+            if (index >= offset && index - offset < Geometries.Count)
+                return (Visual)Geometries[index - offset];
+
+            offset += Geometries.Count;
+            if (index == offset)
+                return (Visual)GridLayerVisual;
+
+            offset += 1;
+            if (index == offset)
+                return m_axes;
+
+            offset += 1;
+            if (index == offset)
+                return (Visual)CursorVisual;
+
+
+            return null;
+        }
+
+        private void CADPadCanvas_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Drawing == null)
+                return;
+
+            InitialiseDrawing();
+
+            // place (0, 0) point at center of SimpleCAD
+            // You should do it on Loaded event, otherwise ActualHeight and ActualWidth will be 0.
+            double rOffset_X = this.ActualWidth / 2;
+            double rOffset_Y = this.ActualHeight / 2;
+
+            ((Drawing)Drawing).Origin.X = -rOffset_X;
+            ((Drawing)Drawing).Origin.Y = -rOffset_Y;
+
+            // read comment in ModelToCanvas()
+            ((Drawing)Drawing).Origin.Y *= -1;
+
+
+            Redraw();
+
+        }
+
+        private void CADPadCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Redraw();
+        }
+
+
         //=============================================================================
         /// <summary>
         ///     Fills in the background based on the Background property.
@@ -329,10 +317,10 @@ namespace CADPadWPF.Control.Canvas
         #region Mouse events
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            var pp=e.GetPosition(this);
+            var pp = e.GetPosition(this);
             base.OnMouseMove(e);
 
-            if (!this.IsEnabled || pp.Y<0)
+            if (!this.IsEnabled || pp.Y < 0)
                 return;
 
 
@@ -360,7 +348,7 @@ namespace CADPadWPF.Control.Canvas
                 return;
 
             Drawing.OnMouseDown(new CanvasMouseButtonEventArgs(e, this));
-          
+
         }
         //=============================================================================
 
@@ -409,32 +397,36 @@ namespace CADPadWPF.Control.Canvas
         public void Redraw()
         {
 
-
             if (m_axes != null)
                 m_axes.Draw(Drawing);
+
 
             if (Drawing?.GridLayer != null)
             {
                 Drawing.GridLayer.Draw();
-              
-                //RenderTargetBitmap bmp = new RenderTargetBitmap(180, 180, 120, 96, PixelFormats.Pbgra32);
-                //bmp.Render((Visual)GridLayerVisual);
-                //myImage.Source = bmp;
-                //RemoveVisualChild(myImage);
-                //AddVisualChild(myImage);
-                //AddLogicalChild(myImage);
-           
-
             }
+
             foreach (var entity in Geometries)
             {
                 entity.Draw();
             }
+
             foreach (var point in m_grips)
             {
                 point.Draw();
             }
-           // this.SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Unspecified );
+            // this.SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Unspecified );
+        }
+
+        public IDrawingVisual CreateVisual()
+        {
+            return new CanvasDrawingVisual(Drawing);
+        }
+
+        public ICADEnitiyVisual CreateCADEnitiyVisual()
+        {
+            var g = new CADEnitiyVisual(Drawing);
+            return g;
         }
 
         private void ClearGrips()
@@ -456,14 +448,14 @@ namespace CADPadWPF.Control.Canvas
                 List<GripPoint> pnts = g.GetGripPoints();
                 if (g.Selected)
                 {
-                        foreach (GripPoint p in pnts)
-                        {
-                            CADGripVisual newGripVisual = new CADGripVisual(Drawing, p);
-                            m_grips.Add(newGripVisual);
-                            AddVisualChild(newGripVisual);
-                            AddLogicalChild(newGripVisual);
-                            newGripVisual.Draw();
-                        }
+                    foreach (GripPoint p in pnts)
+                    {
+                        CADGripVisual newGripVisual = new CADGripVisual(Drawing, p);
+                        m_grips.Add(newGripVisual);
+                        AddVisualChild(newGripVisual);
+                        AddLogicalChild(newGripVisual);
+                        newGripVisual.Draw();
+                    }
                 }
                 else
                 {

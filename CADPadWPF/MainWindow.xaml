@@ -4,79 +4,320 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADPadWPF"
-        xmlns:control="clr-namespace:CADPadWPF.Control"
-        xmlns:canvas="clr-namespace:CADPadWPF.Control.Canvas"
+        xmlns:canvas="clr-namespace:CADPadDrawing.Canvas;assembly=CADPadDrawing"
+        xmlns:helpers="clr-namespace:CADPadWPF.Helpers"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="{Binding WindowTitle.Title}"
+        WindowState="Maximized"
         Height="450"
         Width="800">
 
     <Window.Resources>
-        <local:PointToStringConverter x:Key="PointToStringConverter" />
-
+        <helpers:PointToStringConverter x:Key="PointToStringConverter" />
     </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
 
-        <Menu  >
-            <MenuItem Header="Draw">
-                <MenuItem Header="Line"
-                          Click="MenuItem_OnClick">
-               </MenuItem>
-                <MenuItem Header="Circle"
-                          Click="DrawCircle_OnClick">
+    <Window.InputBindings>
+        <KeyBinding Key="Z"
+                    Modifiers="Control"
+                    Command="{Binding UndoCommand}" />
+        <KeyBinding Key="Y"
+                    Modifiers="Control"
+                    Command="{Binding RedoCommand}" />
+        <KeyBinding Key="S"
+                    Modifiers="Control"
+                    Command="{Binding SaveFileCommand}" />
+        <KeyBinding Key="O"
+                    Modifiers="Control"
+                    Command="{Binding OpenFileCommand}" />
+    </Window.InputBindings>
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New"
+                              Command="{Binding NewFileCommand}" />
+                    <MenuItem Header="_Open"
+                              Icon="&#x1F4C2;"
+                              InputGestureText="Ctrl + O"
+                              Command="{Binding OpenFileCommand}" />
+                    <MenuItem Header="_Save"
+                              Icon="&#x1F4BE;"
+                              InputGestureText="Ctrl + S"
+                              Command="{Binding SaveFileCommand}" />
+                    <MenuItem Header="Save As"
+                              Icon="&#x1F4BE;"
+                              Command="{Binding SaveAsFileCommand}" />
+                    <Separator />
+                    <MenuItem Header="E_xit" />
                 </MenuItem>
-                <MenuItem Header="Ellipse"
-                          Click="DrawEllipse_OnClick">
+
+                <MenuItem Header="_Edit">
+                    <MenuItem Header="_Undo"
+                              Command="{Binding UndoCommand}"
+                              InputGestureText="Ctrl + Z" />
+                    <MenuItem Header="_Redo"
+                              Command="{Binding RedoCommand}"
+                              InputGestureText="Ctrl + Y" />
+
+                    <Separator />
+                    <MenuItem Header="Copy"
+                              ToolTip="Copy drawing entities"
+                              Click="CopyEntities_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\modify\modify_copy.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Move"
+                              ToolTip="Move drawing entities"
+                              Click="MoveEntities_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\modify\modify_move.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Mirror"
+                              ToolTip="Mirror drawing entities"
+                              Click="MirrorEntities_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\modify\modify_mirror.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Delete"
+                              ToolTip="Delete drawing entities"
+                              Click="DeleteEntities_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\modify\modify_erase.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
-                <MenuItem Header="Arc"
-                          Click="DrawArc_OnClick">
-                </MenuItem>
-                <MenuItem Header="XLine"
-                          Click="DrawXLine_OnClick">
-                </MenuItem>
-                <MenuItem Header="Ray"
-                          Click="DrawRay_OnClick">
-                </MenuItem>
-                <MenuItem Header="Rectangle"
-                          Click="DrawRectangle_OnClick">
-                </MenuItem>
-                <MenuItem Header="Ployline"
-                          Click="DrawPloyline_OnClick">
-                </MenuItem>
-            </MenuItem>
-        </Menu>
+
+                <MenuItem Header="Draw Tools">
+                    <MenuItem Header="Line"
+                              ToolTip="Lines (L)"
+                              Click="DrawLine_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\draw\draw_line.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Rectangle"
+                              ToolTip="Rectangle via 2 points"
+                              Click="DrawRectangle_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\draw\draw_rectangle.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Ployline"
+                              ToolTip="Ployline"
+                              Click="DrawPloyline_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\draw\draw_polyline.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Circle"
+                              ToolTip="Circle Centre-Radius"
+                              Click="DrawCircle_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\draw\draw_circle_cr.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Ellipse"
+                              ToolTip="Ellipse Centre-Radius X--Radius Y"
+                              Click="DrawEllipse_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\draw\draw_circle_cr.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Arc"
+                              ToolTip="Arc Start-End"
+                              Click="DrawArc_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\draw\draw_arc_cse.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="XLine"
+                              Click="DrawXLine_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\draw\draw_xline.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Ray"
+                              Click="DrawRay_OnClick">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\draw\draw_ray.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
 
 
+                </MenuItem>
 
-        <!-- NOTES : ZIndex is set to -1 to avoid canvas drawing visuals overlapping the other window controls when panning/zooming. 
-        Also the other window controls' background must not be null or transparent -->
-        <canvas:CADPadCanvas x:Name="sCAD"
-                             Grid.ZIndex="-1"
-                             Grid.Row="1"
-                             Background="Transparent"
-                             Drawing="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing}"
-                             VerticalAlignment="Stretch"
-                             HorizontalAlignment="Stretch">
-        </canvas:CADPadCanvas>
-        <!--  -->
+                <MenuItem Header="Options">
+                    <MenuItem Header="Grid"
+                              Click="EditGridOptions_OnClick">
+                    </MenuItem>
+                </MenuItem>
 
-        <Border Padding="8, 3, 8, 3"
-                BorderThickness="0, 1, 0, 0"
+                <MenuItem Header="Help">
+
+                </MenuItem>
+            </Menu>
+            <ToolBarTray DockPanel.Dock="Top">
+                <ToolBar>
+                    <Button ToolTip="Undo (Ctrl+Z)"
+                            Command="{Binding UndoCommand}"
+                            Name="btnUndo">
+                        <Image >
+                            <Image.Style>
+                                <Style>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnUndo, Path=IsEnabled}"
+                                                     Value="False">
+                                            <Setter Property="Image.Source"
+                                                    Value="resources\undo_disabled.png" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=btnUndo, Path=IsEnabled}"
+                                                     Value="True">
+                                            <Setter Property="Image.Source"
+                                                    Value="resources\undo.png" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                    </Button>
+                    <Button ToolTip="Redo (Ctrl+Y)"
+                            Command="{Binding RedoCommand}"
+                            Name="btnRedo">
+                        <Image>
+                            <Image.Style>
+                                <Style>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=btnRedo, Path=IsEnabled}"
+                                                     Value="False">
+                                            <Setter Property="Image.Source"
+                                                    Value="resources\redo_disabled.png" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=btnRedo, Path=IsEnabled}"
+                                                     Value="True">
+                                            <Setter Property="Image.Source"
+                                                    Value="resources\redo.png" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+        </StackPanel>
+
+        <StatusBar DockPanel.Dock="Bottom"
+                Padding="8, 3, 8, 3"
                 Grid.Row="2"
                 Background="White"
                 BorderBrush="Black">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                </Grid>
+            </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem Grid.Column="2">
+                <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
+            </StatusBarItem>
+            <Separator Grid.Column="3" />
+        </StatusBar>
 
-            <!-- COORDINATES-->
-            <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
+        <ToolBarTray Orientation="Vertical"
+                     DockPanel.Dock="Left"
+                     VerticalAlignment="Stretch">
+            <ToolBar>
+                <Button ToolTip="Lines (L)"
+                        Click="DrawLine_OnClick">
+                    <Image Source="Resources\draw\draw_line.png" />
+                </Button>
+                <Button ToolTip="Ployline"
+                        Click="DrawPloyline_OnClick">
+                    <Image Source="Resources\draw\draw_polyline.png" />
+                </Button>
+                <Button ToolTip="Rectangle via 2 points"
+                        Click="DrawRectangle_OnClick">
+                    <Image Source="Resources\draw\draw_rectangle.png" />
+                </Button>
+                <Button ToolTip="Circle Centre-Radius"
+                        Click="DrawCircle_OnClick">
+                    <Image Source="Resources\draw\draw_circle_cr.png" />
+                </Button>
+                <Button ToolTip="Ellipse Centre-Radius X-Radius Y"
+                        Click="DrawEllipse_OnClick">
+                    <Image Source="Resources\draw\draw_circle_cr.png" />
+                </Button>
+                <Button ToolTip="Arc Start-End"
+                        Click="DrawArc_OnClick">
+                    <Image Source="Resources\draw\draw_arc_cse.png" />
+                </Button>
+                <Button ToolTip="Ray"
+                        Click="DrawRay_OnClick">
+                    <Image Source="Resources\draw\draw_ray.png" />
+                </Button>
+                <Button ToolTip="XLine"
+                        Click="DrawXLine_OnClick">
+                    <Image Source="Resources\draw\draw_xline.png" />
+                </Button>
+            </ToolBar>
+            <ToolBar>
+                <Button ToolTip="Copy drawing entities"
+                        Click="CopyEntities_OnClick">
+                    <Image Source="Resources\modify\modify_copy.png" />
+                </Button>
+                <Button ToolTip="Move drawing entities"
+                        Click="MoveEntities_OnClick">
+                    <Image Source="Resources\modify\modify_move.png" />
+                </Button>
+                <Button ToolTip="Mirror drawing entities"
+                        Click="MirrorEntities_OnClick">
+                    <Image Source="Resources\modify\modify_mirror.png" />
+                </Button>
+                <Button ToolTip="Delete drawing entities"
+                        Click="DeleteEntities_OnClick">
+                    <Image Source="Resources\modify\modify_erase.png" />
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
 
-        </Border>
+        <Grid   HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Grid.ZIndex="-1">
+            <!-- NOTES : ZIndex is set to -1 to avoid canvas drawing visuals overlapping the other window controls when panning/zooming. 
+           Also the other window controls' background must not be null or transparent -->
+            <canvas:CADPadCanvas x:Name="sCAD"
+                                 Grid.Row="1"
+                                 Background="Black"
+                                 VerticalAlignment="Stretch"
+                                 HorizontalAlignment="Stretch"
+                                 AxesColor="Blue"
+                                 AxesTextSize="14"
+                                 Scale="4"
+                                 GridColor="Gray"
+                                 Drawing="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing}">
+            </canvas:CADPadCanvas>
+            <!--  -->
+        </Grid>
 
-    </Grid>
+
+    </DockPanel>
+
+
 
 </Window>
 

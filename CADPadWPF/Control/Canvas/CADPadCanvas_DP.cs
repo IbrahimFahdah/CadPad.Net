@@ -1,6 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Media;
 using CADPadServices.Interfaces;
+using CADPadWPF.Control.Visuals;
 using Drawing = CADPadServices.Drawing;
 
 namespace CADPadWPF.Control.Canvas
@@ -18,9 +20,12 @@ namespace CADPadWPF.Control.Canvas
             set
             {
                 value.Canvas = this;
+                UpdateCanvasProperties(value);
                 SetValue(DrawingProperty, value);
             }
         }
+
+    
         //=============================================================================
         public static readonly DependencyProperty AxesColorProperty = DependencyProperty.Register(
             "AxesColor",
@@ -117,7 +122,7 @@ namespace CADPadWPF.Control.Canvas
             "Scale",
             typeof(double),
             typeof(Canvas.CADPadCanvas),
-            new FrameworkPropertyMetadata(1.0, On_Scale_Changed));
+            new FrameworkPropertyMetadata(2.0, On_Scale_Changed));
 
         public double Scale
         {
@@ -130,9 +135,28 @@ namespace CADPadWPF.Control.Canvas
         }
         private static void On_Scale_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is Canvas.CADPadCanvas dh)
+            if (d is CADPadCanvas dh)
             {
                 dh.Redraw();
+            }
+        }
+        //=============================================================================
+        public static readonly DependencyProperty GridColorProperty = DependencyProperty.Register(
+            "GridColor",
+            typeof(Color),
+            typeof(Canvas.CADPadCanvas),
+            new FrameworkPropertyMetadata(Colors.Black));
+        public Color GridColor
+        {
+            get => (Color)GetValue(GridColorProperty);
+            set
+            {
+                if (Drawing != null)
+                {
+                    Drawing.GridLayer.Color = CanvasPalette.ConvertToCAD(value);
+                    ((GridLayerVisual)this.GridLayerVisual).Pen = null;
+                }
+                SetValue(GridColorProperty, value);
             }
         }
 
@@ -142,5 +166,12 @@ namespace CADPadWPF.Control.Canvas
             if (m_axes != null)
                 m_axes.Draw(Drawing);
         }
+
+        private void UpdateCanvasProperties(IDrawing drawing)
+        {
+            GridColor = drawing.GridLayer.Color.ConvertToWPF();
+            ((GridLayerVisual)this.GridLayerVisual).Pen = null;
+        }
+
     }
 }

@@ -29,7 +29,7 @@ namespace CADPadServices.Commands
 
         public Database database
         {
-            get { return (_mgr.presenter.Document as Document).database; }
+            get { return (_mgr.presenter.Document as Document).Database; }
         }
 
         public IPointerContoller Pointer

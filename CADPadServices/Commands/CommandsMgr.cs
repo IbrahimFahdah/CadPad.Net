@@ -78,15 +78,15 @@ namespace CADPadServices.Commands
             if (_currentCmd != null)
             {
                 _currentCmd.Finish();
-                //if (_currentCmd is Edit.UndoCmd)
-                //{
-                //    this.Undo();
-                //}
-                //else if (_currentCmd is Edit.RedoCmd)
-                //{
-                //    this.Redo();
-                //}
-                //else
+                if (_currentCmd is Edit.UndoCmd)
+                {
+                    this.Undo();
+                }
+                else if (_currentCmd is Edit.RedoCmd)
+                {
+                    this.Redo();
+                }
+                else
                 {
                     _undoCmds.Add(_currentCmd);
                     _redoCmds.Clear();
@@ -97,9 +97,6 @@ namespace CADPadServices.Commands
             }
         }
 
-        /// <summary>
-        /// 取消当前命令
-        /// </summary>
         public void CancelCurrentCommand()
         {
             if (_currentCmd != null)
@@ -111,9 +108,12 @@ namespace CADPadServices.Commands
             }
         }
 
-        /// <summary>
-        /// 撤销
-        /// </summary>
+        public void Clear()
+        {
+            _undoCmds.Clear();
+            _redoCmds.Clear();
+        }
+
         private void Undo()
         {
             if (_undoCmds.Count == 0)
@@ -127,9 +127,6 @@ namespace CADPadServices.Commands
             _redoCmds.Add(cmd);
         }
 
-        /// <summary>
-        /// 重做
-        /// </summary>
         private void Redo()
         {
             if (_redoCmds.Count == 0)
@@ -143,20 +140,6 @@ namespace CADPadServices.Commands
             _undoCmds.Add(cmd);
         }
 
-        ///// <summary>
-        ///// 绘制
-        ///// </summary>
-        //public void OnPaint(IDrawingContext g)
-        //{
-        //    if (_currentCmd != null)
-        //    {
-        //        _currentCmd.OnPaint(g);
-        //    }
-        //}
-
-        /// <summary>
-        /// Mouse Down
-        /// </summary>
         public IEventResult OnMouseDown(IMouseButtonEventArgs e)
         {
             if (_currentCmd != null)

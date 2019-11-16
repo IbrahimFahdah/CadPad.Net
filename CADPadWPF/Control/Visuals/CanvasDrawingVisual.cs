@@ -37,11 +37,11 @@ namespace CADPadWPF.Control.Visuals
             {
                 if (_pen == null)
                 {
-                    var b=new SolidColorBrush(Colors.Black);
+                    var b=new SolidColorBrush(Colors.White);
            
                     RenderOptions.SetCachingHint(b, CachingHint.Cache);
                     b.Freeze();
-                    _pen = new Pen(b, 2);
+                    _pen = new Pen(b, 1);
                     //critical for good performance
                    
                     _pen.Freeze();

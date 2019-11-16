@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using CADPadDB;
+﻿using CADPadDB;
 using CADPadDB.CADEntity;
 using CADPadDB.Maths;
 using CADPadServices.Enums;
@@ -7,34 +6,24 @@ using CADPadServices.Interfaces;
 
 namespace CADPadServices.Commands
 {
-    /// <summary>
-    /// 夹点移动命令
-    /// </summary>
+
     public class GripPointMoveCmd : Command
     {
-        /// <summary>
-        /// 夹点
-        /// </summary>
+
         protected GripPoint _gripPoint = null;
         protected int _index = -1;
 
         protected CADPoint _originalGripPos;
         protected CADPoint _resultGripPos;
 
-        /// <summary>
-        /// 图元
-        /// </summary>
+
         protected Entity _entity = null;
         protected Entity _entityCopy = null;
         private IDrawingVisual tmpLine = null;
-        /// <summary>
-        /// 鼠标位置(世界坐标系)
-        /// </summary>
+
         protected CADPoint _mousePosInWorld;
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
+
         public GripPointMoveCmd(Entity entity, int index, GripPoint gripPoint)
         {
             _entity = entity;
@@ -47,9 +36,7 @@ namespace CADPadServices.Commands
             _mousePosInWorld = _gripPoint.Position;
         }
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
+
         public override void Initialize()
         {
             base.Initialize();
@@ -60,27 +47,24 @@ namespace CADPadServices.Commands
             this.Pointer.mode = PointerModes.Locate;
         }
 
-        /// <summary>
-        /// 撤销
-        /// </summary>
+
         public override void Undo()
         {
             base.Undo();
             _entity.SetGripPointAt(_index, _gripPoint, _originalGripPos);
+            _entity.Draw();
+            Pointer.UpdateGripPoints();
         }
 
-        /// <summary>
-        /// 重做
-        /// </summary>
+
         public override void Redo()
         {
             base.Redo();
             _entity.SetGripPointAt(_index, _gripPoint, _resultGripPos);
+            _entity.Draw();
+            Pointer.UpdateGripPoints();
         }
 
-        /// <summary>
-        /// 完成
-        /// </summary>
         public override void Finish()
         {
             _resultGripPos = _mousePosInWorld;
@@ -92,9 +76,7 @@ namespace CADPadServices.Commands
             base.Finish();
         }
 
-        /// <summary>
-        /// 撤销
-        /// </summary>
+
         public override void Cancel()
         {
             base.Cancel();
@@ -142,7 +124,6 @@ namespace CADPadServices.Commands
 
         public void Draw()
         {
-            //this.anchor.OnDraw(_mgr.presenter, g, Color.Red);
             this.DrawPath();
             _entityCopy.Draw();
         }

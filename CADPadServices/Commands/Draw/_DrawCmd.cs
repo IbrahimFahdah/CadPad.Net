@@ -10,30 +10,34 @@ namespace CADPadServices.Commands.Draw
         protected abstract IEnumerable<Entity> newEntities { get; }
 
         public IDrawing Drawing;
-        /// <summary>
-        /// 初始化
-        /// </summary>
+
         public override void Initialize()
         {
             base.Initialize();
-
-            //_mgr.presenter.selections.Clear();
-            //this.Pointer.isShowAnchor = false;
+            _mgr.presenter.selections.Clear();
+            this.Pointer.isShowAnchor = false;
         }
 
-        /// <summary>
-        /// 结束
-        /// </summary>
+
         public override void Terminate()
         {
-           // _mgr.presenter.selections.Clear();
-
+            _mgr.presenter.selections.Clear();
             base.Terminate();
         }
 
-        /// <summary>
-        /// 提交到数据库
-        /// </summary>
+
+        public override void Redo()
+        {
+
+            foreach (Entity entity in this.newEntities)
+            {
+                this.presenter.AppendEntity(entity, reUseVisual: true);
+                entity.Draw();
+            }
+
+            base.Redo();
+        }
+
         protected override void Commit()
         {
             foreach (Entity entity in this.newEntities)
@@ -43,14 +47,13 @@ namespace CADPadServices.Commands.Draw
             }
         }
 
-        /// <summary>
-        /// 回滚撤销
-        /// </summary>
+
         protected override void Rollback()
         {
             foreach (Entity entity in this.newEntities)
             {
-                entity.Erase();
+                presenter.RemoveEntity(entity);
+               // entity.Erase();
             }
         }
     }

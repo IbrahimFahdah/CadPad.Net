@@ -21,7 +21,7 @@ namespace CADPadServices.Commands.Modify
             Document doc = _mgr.presenter.Document as Document;
             foreach (Selection sel in _mgr.presenter.selections)
             {
-                DBObject dbobj = doc.database.GetObject(sel.objectId);
+                DBObject dbobj = doc.Database.GetObject(sel.objectId);
                 if (dbobj != null && dbobj is Entity)
                 {
                     Entity entity = dbobj as Entity;
@@ -36,9 +36,7 @@ namespace CADPadServices.Commands.Modify
             _pathLine = presenter.AppendEntity(new Line(), DBObjectState.Unconfirmed);
         }
 
-        /// <summary>
-        /// 步骤
-        /// </summary>
+
         private enum Step
         {
             Step1_SelectObjects = 1,
@@ -73,9 +71,7 @@ namespace CADPadServices.Commands.Modify
             }
         }
 
-        /// <summary>
-        /// 提交到数据库
-        /// </summary>
+
         protected override void Commit()
         {
             foreach (Entity item in _items)
@@ -85,9 +81,7 @@ namespace CADPadServices.Commands.Modify
             }
         }
 
-        /// <summary>
-        /// 回滚撤销
-        /// </summary>
+
         protected override void Rollback()
         {
             foreach (Entity item in _items)

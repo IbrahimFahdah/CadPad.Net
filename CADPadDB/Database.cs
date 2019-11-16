@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 using CADPadDB.CADEntity;
+using CADPadDB.Filer;
 using CADPadDB.Table;
 using CADPadDB.TableRecord;
 
@@ -8,27 +10,19 @@ namespace CADPadDB
 {
     public class Database
     {
-
-        private BlockTable _blockTable = null;
-        public BlockTable blockTable
-        {
-            get { return _blockTable; }
-        }
+     
         public static ObjectId BlockTableId
         {
             get { return new ObjectId(TableIds.BlockTableId); }
         }
 
-     
-        private LayerTable _layerTable = null;
         public static ObjectId LayerTableId
         {
             get { return new ObjectId(TableIds.LayerTableId); }
         }
-        public LayerTable layerTable
-        {
-            get { return _layerTable; }
-        }
+
+        public BlockTable blockTable { get; } = null;
+        public LayerTable layerTable { get; } = null;
 
         /// <summary>
         /// ID
@@ -59,27 +53,19 @@ namespace CADPadDB
 
         private ObjectIdMgr _idMgr = null;
 
-      
-        private string _fileName = null;
-        public string fileName
-        {
-            get { return _fileName; }
-        }
-
-      
         public Database()
         {
             _dictId2Object = new Dictionary<ObjectId, DBObject>();
             _idMgr = new ObjectIdMgr(this);
 
-            _blockTable = new BlockTable(this);
+            blockTable = new BlockTable(this);
             Block modelSpace = new Block();
             modelSpace.name = "ModelSpace";
-            _blockTable.Add(modelSpace);
-            IdentifyDBTable(_blockTable);
+            blockTable.Add(modelSpace);
+            IdentifyDBTable(blockTable);
 
-            _layerTable = new LayerTable(this);
-            IdentifyDBTable(_layerTable);
+            layerTable = new LayerTable(this);
+            IdentifyDBTable(layerTable);
         }
 
       
@@ -95,65 +81,37 @@ namespace CADPadDB
             }
         }
 
-     
-        public void Open(string fileFullPath)
+        public void Write(Stream stream)
         {
-            if (_fileName == null
-                || _fileName == "")
-            {
-                XmlIn(fileFullPath);
-            }
-        }
-
-     
-        public void Save()
-        {
-            if (_fileName != null
-                && System.IO.File.Exists(_fileName))
-            {
-                XmlOut(_fileName);
-            }
-        }
-
-    
-        public void SaveAs(string fileFullPath, bool rename = false)
-        {
-            XmlOut(fileFullPath);
-            if (rename)
-            {
-                _fileName = fileFullPath;
-            }
-        }
-
-    
-        internal void XmlOut(string xmlFileFullPath)
-        {
-            Filer.XmlFilerImpl xmlFilerImpl = new Filer.XmlFilerImpl();
+            XmlCADDatabase xmlFilerImpl = new XmlCADDatabase();
 
             //
             xmlFilerImpl.NewSubNodeAndInsert("Database");
             {
                 // block table
-                xmlFilerImpl.NewSubNodeAndInsert(_blockTable.ClassName);
-                _blockTable.XmlOut(xmlFilerImpl);
+                xmlFilerImpl.NewSubNodeAndInsert(blockTable.ClassName);
+                blockTable.XmlOut(xmlFilerImpl);
                 xmlFilerImpl.Pop();
 
                 // Layer table
-                xmlFilerImpl.NewSubNodeAndInsert(_layerTable.ClassName);
-                _layerTable.XmlOut(xmlFilerImpl);
+                xmlFilerImpl.NewSubNodeAndInsert(layerTable.ClassName);
+                layerTable.XmlOut(xmlFilerImpl);
                 xmlFilerImpl.Pop();
             }
             xmlFilerImpl.Pop();
 
-            //
-            xmlFilerImpl.Save(xmlFileFullPath);
+            xmlFilerImpl.Save(stream);
         }
 
-
-        internal bool XmlIn(string xmlFileFullPath)
+        public void Read(Stream stream)
         {
-            Filer.XmlFilerImpl xmlFilerImpl = new Filer.XmlFilerImpl();
-            xmlFilerImpl.Load(xmlFileFullPath);
+            XmlIn(stream);
+        }
+
+        internal bool XmlIn(Stream stream)
+        {
+            XmlCADDatabase xmlFilerImpl = new XmlCADDatabase();
+            xmlFilerImpl.Load(stream);
 
             //
             XmlDocument xmldoc = xmlFilerImpl.xmldoc;
@@ -169,25 +127,23 @@ namespace CADPadDB
             ClearBlockTable();
 
             // Layer table
-            XmlNode layerTblNode = dbNode.SelectSingleNode(_layerTable.ClassName);
+            XmlNode layerTblNode = dbNode.SelectSingleNode(layerTable.ClassName);
             if (layerTblNode == null)
             {
                 return false;
             }
             xmlFilerImpl.curXmlNode = layerTblNode;
-            _layerTable.XmlIn(xmlFilerImpl);
+            layerTable.XmlIn(xmlFilerImpl);
 
             // block table
-            XmlNode blockTblNode = dbNode.SelectSingleNode(_blockTable.ClassName);
+            XmlNode blockTblNode = dbNode.SelectSingleNode(blockTable.ClassName);
             if (blockTblNode == null)
             {
                 return false;
             }
             xmlFilerImpl.curXmlNode = blockTblNode;
-            _blockTable.XmlIn(xmlFilerImpl);
+            blockTable.XmlIn(xmlFilerImpl);
 
-            //
-            _fileName = xmlFileFullPath;
             _idMgr.reset();
             return true;
         }
@@ -196,11 +152,11 @@ namespace CADPadDB
         private void ClearLayerTable()
         {
             List<Layer> allLayers = new List<Layer>();
-            foreach (Layer layer in _layerTable)
+            foreach (Layer layer in layerTable)
             {
                 allLayers.Add(layer);
             }
-            _layerTable.Clear();
+            layerTable.Clear();
 
             foreach (Layer layer in allLayers)
             {
@@ -214,7 +170,7 @@ namespace CADPadDB
             Dictionary<Entity, Entity> allEnts = new Dictionary<Entity,Entity>();
             List<Block> allBlocks = new List<Block>();
 
-            foreach (Block block in _blockTable)
+            foreach (Block block in blockTable)
             {
                 foreach (Entity entity in block)
                 {
@@ -223,7 +179,7 @@ namespace CADPadDB
                 block.Clear();
                 allBlocks.Add(block);
             }
-            _blockTable.Clear();
+            blockTable.Clear();
 
             foreach (KeyValuePair<Entity, Entity> kvp in allEnts)
             {

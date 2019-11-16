@@ -1,12 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Xml;
 using CADPadDB.Colors;
 using CADPadDB.Maths;
 
 namespace CADPadDB.Filer
 {
-
-    internal class XmlFilerImpl : XmlFiler
+    public class XmlCADDatabase : XmlFiler
     {
 
         protected XmlDocument _xmldoc = null;
@@ -24,27 +24,27 @@ namespace CADPadDB.Filer
         }
 
 
-        public XmlFilerImpl()
+        public XmlCADDatabase()
         {
             _xmldoc = new XmlDocument();
         }
 
-        public XmlFilerImpl(XmlNode parentNode)
+        public XmlCADDatabase(XmlNode parentNode)
         {
             _curXmlNode = parentNode.OwnerDocument;
             _curXmlNode = parentNode;
         }
 
-        public void Load(string xmlFileFullPath)
+        public void Load(Stream stream)
         {
-            _xmldoc.Load(xmlFileFullPath);
+            _xmldoc.Load(stream);
         }
 
-        public void Save(string fileFullPath)
+        public void Save(Stream stream)
         {
             if (_xmldoc != null)
             {
-                _xmldoc.Save(fileFullPath);
+                _xmldoc.Save(stream);
             }
         }
 

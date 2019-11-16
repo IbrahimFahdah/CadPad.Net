@@ -151,7 +151,7 @@ namespace CADPadDB.Table
 
         public override void XmlOut(Filer.XmlFiler filer)
         {
-            Filer.XmlFilerImpl filerImpl = filer as Filer.XmlFilerImpl;
+            Filer.XmlCADDatabase filerImpl = filer as Filer.XmlCADDatabase;
 
             base.XmlOut(filer);
             foreach (DBTableRecord item in _items)

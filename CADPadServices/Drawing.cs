@@ -19,7 +19,7 @@ namespace CADPadServices
         public Drawing(Document doc)
         {
             Document = doc;
-            doc.selections.changed += this.OnSelectionChanged;
+            doc.Selections.changed += this.OnSelectionChanged;
 
             Pointer = new PointerContoller(this);
             PanContoller = new PanContoller(this);
@@ -36,7 +36,7 @@ namespace CADPadServices
         public ICanvas Canvas { get; set; }
         public Document Document { get; private set; }
 
-        public Block CurrentBlock => Document.database.blockTable[Document.currentBlockName] as Block;
+        public Block CurrentBlock => Document.Database.blockTable[Document.CurrentBlockName] as Block;
 
         public IPointerContoller Pointer { get; set; }
         public SelectBox CreateSelectRectangle()
@@ -46,7 +46,7 @@ namespace CADPadServices
 
         public IPanContoller PanContoller { get; set; }
         public IZoomContoller ZoomContoller { get; set; }
-        public Selections selections => Document.selections;
+        public Selections selections => Document.Selections;
         public IGridLayer GridLayer { get; set; }
 
         protected CommandsMgr _cmdsMgr = null;
@@ -74,6 +74,9 @@ namespace CADPadServices
         /// Offset of left top corner of plot from (0;0) point.
         /// </summary>
         public CADVector Origin = new CADVector(0.0, 0.0);
+
+        public bool CanUndo => _cmdsMgr.canUndo;
+        public bool CanRedo => _cmdsMgr.canRedo;
 
         public CADPoint CanvasToModel(CADPoint localPnt)
         {
@@ -211,7 +214,7 @@ namespace CADPadServices
             {
                 if (e.IsEscape)
                 {
-                    Document.selections.Clear();
+                    Document.Selections.Clear();
                     //foreach (var g in Canvas.Geometries)
                     //{
                     //   if(g.Selected)
@@ -231,7 +234,7 @@ namespace CADPadServices
                 //}
                 else if (e.IsDelete)
                 {
-                    if ((Document as Document).selections.Count > 0)
+                    if ((Document as Document).Selections.Count > 0)
                     {
                         DeleteCmd cmd = new DeleteCmd();
                         this.OnCommand(cmd);
@@ -254,19 +257,52 @@ namespace CADPadServices
             return null;
         }
 
-        public T AppendEntity<T>(T entity, DBObjectState state = DBObjectState.Default) where T : Entity
+        public T AppendEntity<T>(T entity,  DBObjectState state = DBObjectState.Default, bool reUseVisual = false) where T : Entity
         {
-            Block modelSpace = Document.database.blockTable["ModelSpace"] as Block;
+            Block modelSpace = CurrentBlock;
             entity.State = state;
             modelSpace.AppendEntity(entity);
 
-            var drawingVisual = Canvas.CreateCADEnitiyVisual();
-            Canvas.AddVisual(drawingVisual);
-            drawingVisual.Entity = entity;
-            entity.DrawingVisual = drawingVisual;
+            var drawingVisual = entity.DrawingVisual;
+            if (reUseVisual == false || entity.DrawingVisual == null)
+            {
+                drawingVisual = Canvas.CreateCADEnitiyVisual();
 
+                drawingVisual.Entity = entity;
+                entity.DrawingVisual = drawingVisual;
+
+            }
+
+            if (entity.DrawingVisual != null)
+            {
+                Canvas.AddVisual(drawingVisual);
+            }
 
             return entity;
+        }
+
+        public void Rebuild()
+        {
+            Canvas.Clear();
+            foreach (var entity in CurrentBlock)
+            {
+               var drawingVisual = Canvas.CreateCADEnitiyVisual();
+                drawingVisual.Entity = entity;
+                entity.DrawingVisual = drawingVisual;
+                Canvas.AddVisual(drawingVisual);
+            }
+            Canvas.Redraw();
+        }
+
+        public void Clear()
+        {
+            var items = CurrentBlock.ToList();
+            
+            foreach (var entity in items)
+            {
+                RemoveEntity(entity);
+            }
+            _cmdsMgr.Clear();
         }
 
         public void RemoveEntity<T>(T entity) where T : Entity
@@ -349,7 +385,7 @@ namespace CADPadServices
 
         public void RemoveUnconfirmed()
         {
-            Block modelSpace = Document.database.blockTable["ModelSpace"] as Block;
+            Block modelSpace = Document.Database.blockTable["ModelSpace"] as Block;
 
             var toRemove = modelSpace.Where(e => e.State == DBObjectState.Unconfirmed).ToList();
             foreach (Entity item in toRemove)

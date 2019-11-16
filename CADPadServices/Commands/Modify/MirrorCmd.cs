@@ -9,52 +9,32 @@ using CADPadServices.Interfaces;
 
 namespace CADPadServices.Commands.Modify
 {
-    /// <summary>
-    /// 镜像命令
-    /// </summary>
+
     public class MirrorCmd : ModifyCmd
     {
-        /// <summary>
-        /// 源图元
-        /// </summary>
+
         private List<Entity> _entities = new List<Entity>();
 
-        /// <summary>
-        /// 结果图元
-        /// </summary>
         private List<Entity> _resultEntities = new List<Entity>();
 
-        /// <summary>
-        /// 源图元是否被删除
-        /// </summary>
+
         private bool _isSrcDeleted = false;
 
-        /// <summary>
-        /// 镜像线
-        /// </summary>
+
         private IDrawingVisual _mirrorLine = null;
         protected CADPoint startPoint;
         protected CADPoint endPoint;
 
-        /// <summary>
-        /// 步骤
-        /// </summary>
+
         private enum Step
         {
-            // 选择对象
             Step1_SelectObject = 1,
-            // 指定镜像线第一点
             Step2_SpecifyMirrorLinePoint1st = 2,
-            // 指定镜像线第二点
             Step3_SpecifyMirrorLinePoint2nd = 3,
-            // 是否删除源对象
             Step4_WhetherDelSrc = 4,
         }
         private Step _step = Step.Step1_SelectObject;
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
         public override void Initialize()
         {
             base.Initialize();
@@ -88,9 +68,7 @@ namespace CADPadServices.Commands.Modify
 
         }
 
-        /// <summary>
-        /// 提交到数据库
-        /// </summary>
+
         protected override void Commit()
         {
             foreach (Entity item in _resultEntities)
@@ -100,9 +78,19 @@ namespace CADPadServices.Commands.Modify
             }
         }
 
-        /// <summary>
-        /// 回滚撤销
-        /// </summary>
+        public override void Redo()
+        {
+
+            foreach (Entity entity in this._resultEntities)
+            {
+                this.presenter.AppendEntity(entity, reUseVisual: true);
+                entity.Draw();
+            }
+
+            base.Redo();
+        }
+
+
         protected override void Rollback()
         {
             foreach (Entity item in _resultEntities)
@@ -225,23 +213,6 @@ namespace CADPadServices.Commands.Modify
         {
             return EventResult.Handled;
         }
-
-        //public override void OnPaint(IGraphicsContext g)
-        //{
-        //    if (_step == Step.Step3_SpecifyMirrorLinePoint2nd)
-        //    {
-        //        presenter.DrawEntity(g, _mirrorLine);
-        //    }
-
-        //    if (_step == Step.Step3_SpecifyMirrorLinePoint2nd
-        //        || _step == Step.Step4_WhetherDelSrc)
-        //    {
-        //        foreach (Entity entity in _resultEntities)
-        //        {
-        //            presenter.DrawEntity(g, entity);
-        //        }
-        //    }
-        //}
 
         private void DrawMirrorLine()
         {

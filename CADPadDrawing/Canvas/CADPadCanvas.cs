@@ -485,5 +485,16 @@ namespace CADPadDrawing.Canvas
                 //}
             }
         }
+
+        public void Clear()
+        {
+            ClearGrips();
+            foreach (Visual g in Geometries)
+            {
+                RemoveVisualChild(g);
+                RemoveLogicalChild(g);
+       
+            }
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace CADPadDB.Table
 
         public override void XmlIn(Filer.XmlFiler filer)
         {
-            Filer.XmlFilerImpl filerImpl = filer as Filer.XmlFilerImpl;
+            Filer.XmlCADDatabase filerImpl = filer as Filer.XmlCADDatabase;
 
             base.XmlIn(filer);
 

@@ -10,13 +10,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{743898E0-D469-4C6A-8D80-3BC132C7E952}"
 	ProjectSection(SolutionItems) = preProject
 		todo.txt = todo.txt
+		UMLClassDia.vsdx = UMLClassDia.vsdx
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CADPadWPF2", "CADPadWPF2\CADPadWPF2.csproj", "{0A5373DD-025D-44B5-842C-3304C2688424}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CADPadDrawing", "CADPadDrawing\CADPadDrawing.csproj", "{09F05D99-787E-465D-BF37-D924646ABCBD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WPF", "WPF", "{C7184DE7-7CD0-4859-AC40-E21A8A7FFC03}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CADPadWPF", "CADPadWPF\CADPadWPF.csproj", "{B1C7E656-31A5-4CC9-93E3-56B61B9DA9B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,21 +33,21 @@ Global
 		{C4FCA1FA-55F6-4D23-A020-89F080F06AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4FCA1FA-55F6-4D23-A020-89F080F06AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4FCA1FA-55F6-4D23-A020-89F080F06AA0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0A5373DD-025D-44B5-842C-3304C2688424}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0A5373DD-025D-44B5-842C-3304C2688424}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0A5373DD-025D-44B5-842C-3304C2688424}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0A5373DD-025D-44B5-842C-3304C2688424}.Release|Any CPU.Build.0 = Release|Any CPU
 		{09F05D99-787E-465D-BF37-D924646ABCBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{09F05D99-787E-465D-BF37-D924646ABCBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09F05D99-787E-465D-BF37-D924646ABCBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09F05D99-787E-465D-BF37-D924646ABCBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C7E656-31A5-4CC9-93E3-56B61B9DA9B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C7E656-31A5-4CC9-93E3-56B61B9DA9B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C7E656-31A5-4CC9-93E3-56B61B9DA9B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C7E656-31A5-4CC9-93E3-56B61B9DA9B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{0A5373DD-025D-44B5-842C-3304C2688424} = {C7184DE7-7CD0-4859-AC40-E21A8A7FFC03}
 		{09F05D99-787E-465D-BF37-D924646ABCBD} = {C7184DE7-7CD0-4859-AC40-E21A8A7FFC03}
+		{B1C7E656-31A5-4CC9-93E3-56B61B9DA9B0} = {C7184DE7-7CD0-4859-AC40-E21A8A7FFC03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {36258797-C77D-44FF-A859-08BFE7FD8164}

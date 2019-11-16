@@ -36,7 +36,7 @@ namespace CADPadServices.Interfaces
         //void OnMouseMove(IMouseEventArgs e);
 
 
-        T AppendEntity<T>(T entity, DBObjectState state = DBObjectState.Default) where T : Entity;
+        T AppendEntity<T>(T entity, DBObjectState state = DBObjectState.Default, bool reUseVisual = false) where T : Entity;
         void RemoveEntity<T>(T entity) where T : Entity;
 
         Selections selections { get; }
