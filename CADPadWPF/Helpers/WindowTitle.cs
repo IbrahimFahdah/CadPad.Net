@@ -32,6 +32,8 @@ namespace CADPadWPF.Helpers
             }
         }
 
+        public bool HasFileName => !string.IsNullOrWhiteSpace(FileName);
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

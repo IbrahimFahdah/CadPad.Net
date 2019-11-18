@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CADPadWPF"
         xmlns:canvas="clr-namespace:CADPadDrawing.Canvas;assembly=CADPadDrawing"
         xmlns:helpers="clr-namespace:CADPadWPF.Helpers"
+        xmlns:controlpanelviews="clr-namespace:CADPadWPF.ControlPanelViews"
         mc:Ignorable="d"
         Title="{Binding WindowTitle.Title}"
         WindowState="Maximized"
@@ -25,10 +26,13 @@
                     Command="{Binding RedoCommand}" />
         <KeyBinding Key="S"
                     Modifiers="Control"
-                    Command="{Binding SaveFileCommand}" />
+                    Command="{Binding FileMenuCommands.SaveFileCommand}" />
         <KeyBinding Key="O"
                     Modifiers="Control"
-                    Command="{Binding OpenFileCommand}" />
+                    Command="{Binding FileMenuCommands.OpenFileCommand}" />
+        <KeyBinding Key="F4"
+                    Modifiers="Alt"
+                    Command="{Binding FileMenuCommands.ExitCommand}" />
     </Window.InputBindings>
 
     <DockPanel>
@@ -36,20 +40,22 @@
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
                     <MenuItem Header="_New"
-                              Command="{Binding NewFileCommand}" />
+                              Icon="&#x1f4c4;"
+                              Command="{Binding FileMenuCommands.NewFileCommand}" />
                     <MenuItem Header="_Open"
                               Icon="&#x1F4C2;"
                               InputGestureText="Ctrl + O"
-                              Command="{Binding OpenFileCommand}" />
+                              Command="{Binding FileMenuCommands.OpenFileCommand}" />
                     <MenuItem Header="_Save"
                               Icon="&#x1F4BE;"
                               InputGestureText="Ctrl + S"
-                              Command="{Binding SaveFileCommand}" />
+                              Command="{Binding FileMenuCommands.SaveFileCommand}" />
                     <MenuItem Header="Save As"
-                              Icon="&#x1F4BE;"
-                              Command="{Binding SaveAsFileCommand}" />
+                              Command="{Binding FileMenuCommands.SaveAsFileCommand}" />
                     <Separator />
-                    <MenuItem Header="E_xit" />
+                    <MenuItem Header="E_xit"
+                              InputGestureText="Alt + F4"
+                              Command="{Binding FileMenuCommands.ExitCommand}" />
                 </MenuItem>
 
                 <MenuItem Header="_Edit">
@@ -94,54 +100,54 @@
                 <MenuItem Header="Draw Tools">
                     <MenuItem Header="Line"
                               ToolTip="Lines (L)"
-                              Click="DrawLine_OnClick">
+                              Command="{Binding DrawingCommands.LinesChainCommand}">
                         <MenuItem.Icon>
                             <Image Source="Resources\draw\draw_line.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="Rectangle"
                               ToolTip="Rectangle via 2 points"
-                              Click="DrawRectangle_OnClick">
+                              Command="{Binding DrawingCommands.RectangleCommand}">
                         <MenuItem.Icon>
                             <Image Source="Resources\draw\draw_rectangle.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="Ployline"
                               ToolTip="Ployline"
-                              Click="DrawPloyline_OnClick">
+                              Command="{Binding DrawingCommands.PolylineCommand}">
                         <MenuItem.Icon>
                             <Image Source="Resources\draw\draw_polyline.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="Circle"
                               ToolTip="Circle Centre-Radius"
-                              Click="DrawCircle_OnClick">
+                              Command="{Binding DrawingCommands.CircleCommand}">
                         <MenuItem.Icon>
                             <Image Source="Resources\draw\draw_circle_cr.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="Ellipse"
                               ToolTip="Ellipse Centre-Radius X--Radius Y"
-                              Click="DrawEllipse_OnClick">
+                              Command="{Binding DrawingCommands.EllipseCommand}">
                         <MenuItem.Icon>
                             <Image Source="Resources\draw\draw_circle_cr.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="Arc"
                               ToolTip="Arc Start-End"
-                              Click="DrawArc_OnClick">
+                              Command="{Binding DrawingCommands.ArcCommand}">
                         <MenuItem.Icon>
                             <Image Source="Resources\draw\draw_arc_cse.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="XLine"
-                              Click="DrawXLine_OnClick">
+                              Command="{Binding DrawingCommands.XLineCommand}">
                         <MenuItem.Icon>
                             <Image Source="Resources\draw\draw_xline.png" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Header="Ray"
-                              Click="DrawRay_OnClick">
+                              Command="{Binding DrawingCommands.RayCommand}">
                         <MenuItem.Icon>
                             <Image Source="Resources\draw\draw_ray.png" />
                         </MenuItem.Icon>
@@ -157,7 +163,8 @@
                 </MenuItem>
 
                 <MenuItem Header="Help">
-
+                  <MenuItem Header="About..."
+                            Command="{Binding AboutDialogCommand}" />
                 </MenuItem>
             </Menu>
             <ToolBarTray DockPanel.Dock="Top">
@@ -165,7 +172,7 @@
                     <Button ToolTip="Undo (Ctrl+Z)"
                             Command="{Binding UndoCommand}"
                             Name="btnUndo">
-                        <Image >
+                        <Image>
                             <Image.Style>
                                 <Style>
                                     <Style.Triggers>
@@ -211,31 +218,31 @@
         </StackPanel>
 
         <StatusBar DockPanel.Dock="Bottom"
-                Padding="8, 3, 8, 3"
-                Grid.Row="2"
-                Background="White"
-                BorderBrush="Black">
+                   Padding="8, 3, 8, 3"
+                   Grid.Row="2"
+                   Background="White"
+                   BorderBrush="Black">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="100" />
-                    </Grid.ColumnDefinitions>
-                </Grid>
-            </ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
             <StatusBarItem>
                 <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
             </StatusBarItem>
             <Separator Grid.Column="1" />
-            <StatusBarItem Grid.Column="2">
+            <!--<StatusBarItem Grid.Column="2">
                 <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
             </StatusBarItem>
-            <Separator Grid.Column="3" />
+            <Separator Grid.Column="3" />-->
         </StatusBar>
 
         <ToolBarTray Orientation="Vertical"
@@ -243,35 +250,35 @@
                      VerticalAlignment="Stretch">
             <ToolBar>
                 <Button ToolTip="Lines (L)"
-                        Click="DrawLine_OnClick">
+                        Command="{Binding DrawingCommands.LinesChainCommand}">
                     <Image Source="Resources\draw\draw_line.png" />
                 </Button>
                 <Button ToolTip="Ployline"
-                        Click="DrawPloyline_OnClick">
+                        Command="{Binding DrawingCommands.PolylineCommand}">
                     <Image Source="Resources\draw\draw_polyline.png" />
                 </Button>
                 <Button ToolTip="Rectangle via 2 points"
-                        Click="DrawRectangle_OnClick">
+                        Command="{Binding DrawingCommands.RectangleCommand}">
                     <Image Source="Resources\draw\draw_rectangle.png" />
                 </Button>
                 <Button ToolTip="Circle Centre-Radius"
-                        Click="DrawCircle_OnClick">
+                        Command="{Binding DrawingCommands.CircleCommand}">
                     <Image Source="Resources\draw\draw_circle_cr.png" />
                 </Button>
                 <Button ToolTip="Ellipse Centre-Radius X-Radius Y"
-                        Click="DrawEllipse_OnClick">
+                        Command="{Binding DrawingCommands.EllipseCommand}">
                     <Image Source="Resources\draw\draw_circle_cr.png" />
                 </Button>
                 <Button ToolTip="Arc Start-End"
-                        Click="DrawArc_OnClick">
+                        Command="{Binding DrawingCommands.ArcCommand}">
                     <Image Source="Resources\draw\draw_arc_cse.png" />
                 </Button>
                 <Button ToolTip="Ray"
-                        Click="DrawRay_OnClick">
+                        Command="{Binding DrawingCommands.RayCommand}">
                     <Image Source="Resources\draw\draw_ray.png" />
                 </Button>
                 <Button ToolTip="XLine"
-                        Click="DrawXLine_OnClick">
+                        Command="{Binding DrawingCommands.XLineCommand}">
                     <Image Source="Resources\draw\draw_xline.png" />
                 </Button>
             </ToolBar>
@@ -295,11 +302,15 @@
             </ToolBar>
         </ToolBarTray>
 
-        <Grid   HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Grid.ZIndex="-1">
+
+        <Grid  Grid.ZIndex="-1">
             <!-- NOTES : ZIndex is set to -1 to avoid canvas drawing visuals overlapping the other window controls when panning/zooming. 
            Also the other window controls' background must not be null or transparent -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
             <canvas:CADPadCanvas x:Name="sCAD"
                                  Grid.Row="1"
                                  Background="Black"
@@ -311,8 +322,15 @@
                                  GridColor="Gray"
                                  Drawing="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing}">
             </canvas:CADPadCanvas>
-            <!--  -->
+           
+
+            <GridSplitter Grid.Column="1"
+                          Width="5"
+                          HorizontalAlignment="Stretch" />
+            <controlpanelviews:ControlPanel Grid.Column="2">
+            </controlpanelviews:ControlPanel>
         </Grid>
+       
 
 
     </DockPanel>

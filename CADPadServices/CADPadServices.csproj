@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CADPadDB\CADPadDB.csproj" />
+    <ProjectReference Include="..\netDxf\netDxf.csproj" />
   </ItemGroup>
 
 </Project>

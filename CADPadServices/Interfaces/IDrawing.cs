@@ -56,5 +56,7 @@ namespace CADPadServices.Interfaces
         IGridLayerVisual GetGridLayerVisual();
         void RemoveTempVisual(IDrawingVisual v);
         void RemoveUnconfirmed();
+
+        void Clear();
     }
 }
