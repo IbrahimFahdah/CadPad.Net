@@ -54,7 +54,7 @@ namespace CADPadDB.CADEntity
             if (gd == null)
                 return;
 
-            gd.Open();
+            gd.Open(Color);
             gd.DrawLine(_startPoint, _endPoint);
             gd.Close();
         }

@@ -16,6 +16,11 @@ namespace CADPadDrawing.Visuals
         private Brush _fillBrush = null;
         protected DrawingContext thisDC = null;
 
+        public void SetColor(CADPadDB.Colors.CADColor color)
+        {
+            _pen = new Pen(new SolidColorBrush(color.ConvertToWPF()), 1);
+        }
+
         public CanvasDrawingVisual(IDrawing drawing)
         {
             _drawing = drawing;
@@ -23,7 +28,16 @@ namespace CADPadDrawing.Visuals
 
         public void Open()
         {
+            Open(null);
+        }
+
+        public void Open(CADPadDB.Colors.CADColor? drawingColor)
+        {
             thisDC = this.RenderOpen();
+            if (drawingColor.HasValue)
+            {
+                SetColor(drawingColor.Value);
+            }
         }
         public void Close()
         {

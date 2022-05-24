@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -48,16 +51,16 @@ namespace netDxf
         /// <param name="rotation">Rotation in degrees of the ellipse.</param>
         public BoundingRectangle(Vector2 center, double majorAxis, double minorAxis, double rotation)
         {
-            double rot = rotation*MathHelper.DegToRad;
-            double a = majorAxis*0.5*Math.Cos(rot);
-            double b = minorAxis*0.5*Math.Sin(rot);
-            double c = majorAxis*0.5*Math.Sin(rot);
-            double d = minorAxis*0.5*Math.Cos(rot);
+            double rot = rotation * MathHelper.DegToRad;
+            double a = majorAxis * 0.5 * Math.Cos(rot);
+            double b = minorAxis * 0.5 * Math.Sin(rot);
+            double c = majorAxis * 0.5 * Math.Sin(rot);
+            double d = minorAxis * 0.5 * Math.Cos(rot);
 
-            double width = Math.Sqrt(a*a + b*b)*2;
-            double height = Math.Sqrt(c*c + d*d)*2;
-            this.min = new Vector2(center.X - width*0.5, center.Y - height*0.5);
-            this.max = new Vector2(center.X + width*0.5, center.Y + height*0.5);
+            double width = Math.Sqrt(a * a + b * b) * 2;
+            double height = Math.Sqrt(c * c + d * d) * 2;
+            this.min = new Vector2(center.X - width * 0.5, center.Y - height * 0.5);
+            this.max = new Vector2(center.X + width * 0.5, center.Y + height * 0.5);
         }
 
         /// <summary>
@@ -79,8 +82,8 @@ namespace netDxf
         /// <param name="height">Height of the bounding rectangle.</param>
         public BoundingRectangle(Vector2 center, double width, double height)
         {
-            this.min = new Vector2(center.X - width*0.5, center.Y - height*0.5);
-            this.max = new Vector2(center.X + width*0.5, center.Y + height*0.5);
+            this.min = new Vector2(center.X - width * 0.5, center.Y - height * 0.5);
+            this.max = new Vector2(center.X + width * 0.5, center.Y + height * 0.5);
         }
 
         /// <summary>
@@ -101,7 +104,9 @@ namespace netDxf
         public BoundingRectangle(IEnumerable<Vector2> points)
         {
             if (points == null)
+            {
                 throw new ArgumentNullException(nameof(points));
+            }
 
             double minX = double.MaxValue;
             double minY = double.MaxValue;
@@ -113,13 +118,24 @@ namespace netDxf
             {
                 any = true;
                 if (minX > point.X)
+                {
                     minX = point.X;
+                }
+
                 if (minY > point.Y)
+                {
                     minY = point.Y;
+                }
+
                 if (maxX < point.X)
+                {
                     maxX = point.X;
+                }
+
                 if (maxY < point.Y)
+                {
                     maxY = point.Y;
+                }
             }
             if (any)
             {
@@ -160,7 +176,7 @@ namespace netDxf
         /// </summary>
         public Vector2 Center
         {
-            get { return (this.min + this.max)*0.5; }
+            get { return (this.min + this.max) * 0.5; }
         }
 
         /// <summary>
@@ -168,7 +184,7 @@ namespace netDxf
         /// </summary>
         public double Radius
         {
-            get { return Vector2.Distance(this.min, this.max)*0.5; }
+            get { return Vector2.Distance(this.min, this.max) * 0.5; }
         }
 
         /// <summary>
@@ -211,42 +227,62 @@ namespace netDxf
         public static BoundingRectangle Union(BoundingRectangle aabr1, BoundingRectangle aabr2)
         {
             if (aabr1 == null && aabr2 == null)
+            {
                 return null;
+            }
+
             if (aabr1 == null)
+            {
                 return aabr2;
+            }
+
             if (aabr2 == null)
+            {
                 return aabr1;
+            }
 
             Vector2 min = new Vector2();
             Vector2 max = new Vector2();
             for (int i = 0; i < 2; i++)
             {
                 if (aabr1.Min[i] <= aabr2.Min[i])
+                {
                     min[i] = aabr1.Min[i];
+                }
                 else
+                {
                     min[i] = aabr2.Min[i];
+                }
 
                 if (aabr1.Max[i] >= aabr2.Max[i])
+                {
                     max[i] = aabr1.Max[i];
+                }
                 else
+                {
                     max[i] = aabr2.Max[i];
+                }
             }
             return new BoundingRectangle(min, max);
         }
 
         /// <summary>
-        /// Obtains the union of a bounding rectangles list .
+        /// Obtains the union of a bounding rectangles list.
         /// </summary>
         /// <param name="rectangles">A list of bounding rectangles.</param>
         /// <returns>The resulting bounding rectangle.</returns>
         public static BoundingRectangle Union(IEnumerable<BoundingRectangle> rectangles)
         {
             if (rectangles == null)
+            {
                 throw new ArgumentNullException(nameof(rectangles));
+            }
 
             BoundingRectangle rtnAABR = null;
             foreach (BoundingRectangle aabr in rectangles)
+            {
                 rtnAABR = Union(rtnAABR, aabr);
+            }
 
             return rtnAABR;
         }

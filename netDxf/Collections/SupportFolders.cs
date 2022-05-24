@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -65,7 +68,9 @@ namespace netDxf.Collections
         public SupportFolders(IEnumerable<string> folders)
         {
             if (folders == null)
+            {
                 throw new ArgumentNullException(nameof(folders));
+            }
             this.folders = new List<string>();
             this.AddRange(folders);
         }
@@ -82,12 +87,18 @@ namespace netDxf.Collections
         /// <remarks>If the specified file already exists it return the same value, if neither it cannot be found in any of the support folders it will return an empty string.</remarks>
         public string FindFile(string file)
         {
-            if(File.Exists(file)) return file;
+            if (File.Exists(file))
+            {
+                return file;
+            }
             string name = Path.GetFileName(file);
             foreach (string folder in this.folders)
             {
                 string newFile = string.Format("{0}{1}{2}", folder, Path.DirectorySeparatorChar, name);
-                if (File.Exists(newFile)) return newFile;
+                if (File.Exists(newFile))
+                {
+                    return newFile;
+                }
             }
 
             return string.Empty;
@@ -110,7 +121,9 @@ namespace netDxf.Collections
             set
             {
                 if (string.IsNullOrEmpty(value))
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.folders[index] = value;
             }
         }
@@ -157,8 +170,10 @@ namespace netDxf.Collections
         /// <param name="item">Folder path to add to the list. The item cannot be null.</param>
         public void Add(string item)
         {
-            if(string.IsNullOrEmpty(item))
+            if (string.IsNullOrEmpty(item))
+            {
                 throw new ArgumentNullException(nameof(item));
+            }
             this.folders.Add(item);
         }
 
@@ -169,7 +184,9 @@ namespace netDxf.Collections
         public void AddRange(IEnumerable<string> collection)
         {
             if (collection == null)
+            {
                 throw new ArgumentNullException(nameof(collection));
+            }
             foreach (string s in collection)
             {
                 this.folders.Add(s);
@@ -192,7 +209,9 @@ namespace netDxf.Collections
         public bool Contains(string item)
         {
             if (string.IsNullOrEmpty(item))
+            {
                 throw new ArgumentNullException(nameof(item));
+            }
             return this.folders.Contains(item);
         }
 
@@ -214,7 +233,9 @@ namespace netDxf.Collections
         public bool Remove(string item)
         {
             if (string.IsNullOrEmpty(item))
+            {
                 throw new ArgumentNullException(nameof(item));
+            }
             return this.folders.Remove(item);
         }
 
@@ -235,6 +256,10 @@ namespace netDxf.Collections
         /// <param name="item">The object to insert into the list.</param>
         public void Insert(int index, string item)
         {
+            if (string.IsNullOrEmpty(item))
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
             this.folders.Insert(index, item);
         }
 

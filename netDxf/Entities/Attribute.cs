@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -27,7 +30,7 @@ using netDxf.Tables;
 namespace netDxf.Entities
 {
     /// <summary>
-    /// Represents a attribute <see cref="EntityObject">entity</see>.
+    /// Represents an attribute.
     /// </summary>
     /// <remarks>
     /// The attribute position, rotation, height and width factor values also includes the transformation of the <see cref="Insert">Insert</see> entity to which it belongs.<br />
@@ -104,8 +107,8 @@ namespace netDxf.Entities
         private Vector3 normal;
 
         private AttributeDefinition definition;
-        private string tag;
-        private object attValue;
+        private readonly string tag;
+        private string attValue;
         private TextStyle style;
         private Vector3 position;
         private AttributeFlags flags;
@@ -122,9 +125,10 @@ namespace netDxf.Entities
 
         #region constructor
 
-        internal Attribute()
+        internal Attribute(string tag)
             : base(DxfObjectCode.Attribute)
         {
+            this.tag = string.IsNullOrEmpty(tag) ? string.Empty : tag;
         }
 
         /// <summary>
@@ -135,7 +139,9 @@ namespace netDxf.Entities
             : base(DxfObjectCode.Attribute)
         {
             if (definition == null)
+            {
                 throw new ArgumentNullException(nameof(definition));
+            }
 
             this.color = definition.Color;
             this.layer = definition.Layer;
@@ -174,9 +180,7 @@ namespace netDxf.Entities
             get { return this.color; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.color = value;
+                this.color = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -189,7 +193,9 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.layer = this.OnLayerChangedEvent(this.layer, value);
             }
         }
@@ -203,7 +209,9 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -225,9 +233,7 @@ namespace netDxf.Entities
             get { return this.transparency; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.transparency = value;
+                this.transparency = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -240,7 +246,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The line type scale must be greater than zero.");
+                }
                 this.linetypeScale = value;
             }
         }
@@ -264,12 +272,14 @@ namespace netDxf.Entities
             {
                 this.normal = Vector3.Normalize(value);
                 if (Vector3.IsNaN(this.normal))
+                {
                     throw new ArgumentException("The normal can not be the zero vector.", nameof(value));
+                }
             }
         }
 
         /// <summary>
-        /// Gets the owner of the actual dxf object.
+        /// Gets the owner of the actual DXF object.
         /// </summary>
         public new Insert Owner
         {
@@ -293,7 +303,6 @@ namespace netDxf.Entities
         public string Tag
         {
             get { return this.tag; }
-            internal set { this.tag = value; }
         }
 
         /// <summary>
@@ -309,7 +318,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The height should be greater than zero.");
+                }
                 this.height = value;
             }
         }
@@ -324,7 +335,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Text width must be greater than zero.");
+                }
                 this.width = value;
             }
         }
@@ -342,7 +355,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The width factor should be greater than zero.");
+                }
                 this.widthFactor = value;
             }
         }
@@ -357,7 +372,9 @@ namespace netDxf.Entities
             set
             {
                 if (value < -85.0 || value > 85.0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The oblique angle valid values range from -85 to 85.");
+                }
                 this.obliqueAngle = value;
             }
         }
@@ -365,10 +382,10 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets or sets the attribute value.
         /// </summary>
-        public object Value
+        public string Value
         {
             get { return this.attValue; }
-            set { this.attValue = value; }
+            set { this.attValue = string.IsNullOrEmpty(value) ? string.Empty : value; }
         }
 
         /// <summary>
@@ -383,7 +400,9 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.style = this.OnTextStyleChangedEvent(this.style, value);
             }
         }
@@ -456,15 +475,24 @@ namespace netDxf.Entities
         {
             bool mirrText;
             if (this.Owner == null)
+            {
                 mirrText = Text.DefaultMirrText;
-            else if(this.Owner.Owner == null)
+            }
+            else if (this.Owner.Owner == null)
+            {
                 mirrText = Text.DefaultMirrText;
+            }
             else
+            {
                 mirrText = this.Owner.Owner.Record.Owner.Owner.DrawingVariables.MirrText;
+            }
 
             Vector3 newPosition = transformation * this.Position + translation;
             Vector3 newNormal = transformation * this.Normal;
-            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
 
             Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
 
@@ -496,10 +524,13 @@ namespace netDxf.Entities
 
             if (mirrText)
             {
-                if (Vector2.CrossProduct(newUvector, newVvector) < 0)
+                if (Vector2.CrossProduct(newUvector, newVvector) < 0.0)
                 {
                     newObliqueAngle = 90 - (newRotation - newObliqueAngle);
-                    if(!(this.Alignment == TextAlignment.Fit || this.Alignment == TextAlignment.Aligned)) newRotation += 180;
+                    if (!(this.Alignment == TextAlignment.Fit || this.Alignment == TextAlignment.Aligned))
+                    {
+                        newRotation += 180;
+                    }
                     this.IsBackward = !this.IsBackward;
                 }
                 else
@@ -576,25 +607,36 @@ namespace netDxf.Entities
                 }
             }
 
-            // the oblique angle is defined between -85 nad 85 degrees
+            // the oblique angle is defined between -85 and 85 degrees
             newObliqueAngle = MathHelper.NormalizeAngle(newObliqueAngle);
             if (newObliqueAngle > 180)
+            {
                 newObliqueAngle = 180 - newObliqueAngle;
+            }
+
             if (newObliqueAngle < -85)
+            {
                 newObliqueAngle = -85;
+            }
             else if (newObliqueAngle > 85)
+            {
                 newObliqueAngle = 85;
+            }
 
             // the height must be greater than zero, the cos is always positive between -85 and 85
             double newHeight = newVvector.Modulus() * Math.Cos(newObliqueAngle * MathHelper.DegToRad);
             newHeight = MathHelper.IsZero(newHeight) ? MathHelper.Epsilon : newHeight;
 
-            // the width factor is defined between 0.01 nad 100
+            // the width factor is defined between 0.01 and 100
             double newWidthFactor = newUvector.Modulus() / newHeight;
-            if(newWidthFactor<0.01)
+            if (newWidthFactor < 0.01)
+            {
                 newWidthFactor = 0.01;
+            }
             else if (newWidthFactor > 100)
+            {
                 newWidthFactor = 100;
+            }
 
             this.Position = newPosition;
             this.Normal = newNormal;
@@ -629,7 +671,7 @@ namespace netDxf.Entities
         /// <returns>A new Attribute that is a copy of this instance.</returns>
         public object Clone()
         {
-            Attribute entity = new Attribute
+            Attribute entity = new Attribute(this.tag)
             {
                 //Attribute properties
                 Layer = (Layer) this.Layer.Clone(),
@@ -641,7 +683,6 @@ namespace netDxf.Entities
                 Normal = this.Normal,
                 IsVisible = this.isVisible,
                 Definition = (AttributeDefinition) this.definition?.Clone(),
-                Tag = this.tag,
                 Height = this.height,
                 Width = this.width,
                 WidthFactor = this.widthFactor,
@@ -655,6 +696,11 @@ namespace netDxf.Entities
                 IsBackward = this.isBackward,
                 IsUpsideDown = this.isUpsideDown
             };
+
+            foreach (XData data in this.XData.Values)
+            {
+                entity.XData.Add((XData)data.Clone());
+            }
 
             return entity;
         }

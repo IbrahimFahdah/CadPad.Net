@@ -4,9 +4,9 @@ namespace CADPadDB
 {
     public interface IDrawingVisual
     {
-       
 
         void Open();
+        void Open(Colors.CADColor? drawingColor);
         void Close();
 
         void DrawCircle(CADPoint center, double radius, bool mdoelToCanvas = true);

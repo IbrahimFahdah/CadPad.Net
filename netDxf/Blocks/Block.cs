@@ -1,27 +1,31 @@
-#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using netDxf.Collections;
 using netDxf.Entities;
 using netDxf.Header;
@@ -33,19 +37,13 @@ namespace netDxf.Blocks
     /// <summary>
     /// Represents a block definition.
     /// </summary>
-    /// <remarks>
-    /// Avoid to add any kind of dimensions to the block's entities list, programs loading DXF files with them seems to behave in a weird fashion.
-    /// This is not applicable when working in the Model and Paper space blocks.
-    /// </remarks>
     public class Block :
         TableObject
     {
         #region delegates and events
 
         public delegate void LayerChangedEventHandler(Block sender, TableObjectChangedEventArgs<Layer> e);
-
         public event LayerChangedEventHandler LayerChanged;
-
         protected virtual Layer OnLayerChangedEvent(Layer oldLayer, Layer newLayer)
         {
             LayerChangedEventHandler ae = this.LayerChanged;
@@ -59,9 +57,7 @@ namespace netDxf.Blocks
         }
 
         public delegate void EntityAddedEventHandler(Block sender, BlockEntityChangeEventArgs e);
-
         public event EntityAddedEventHandler EntityAdded;
-
         protected virtual void OnEntityAddedEvent(EntityObject item)
         {
             EntityAddedEventHandler ae = this.EntityAdded;
@@ -72,9 +68,7 @@ namespace netDxf.Blocks
         }
 
         public delegate void EntityRemovedEventHandler(Block sender, BlockEntityChangeEventArgs e);
-
         public event EntityRemovedEventHandler EntityRemoved;
-
         protected virtual void OnEntityRemovedEvent(EntityObject item)
         {
             EntityRemovedEventHandler ae = this.EntityRemoved;
@@ -85,9 +79,7 @@ namespace netDxf.Blocks
         }
 
         public delegate void AttributeDefinitionAddedEventHandler(Block sender, BlockAttributeDefinitionChangeEventArgs e);
-
         public event AttributeDefinitionAddedEventHandler AttributeDefinitionAdded;
-
         protected virtual void OnAttributeDefinitionAddedEvent(AttributeDefinition item)
         {
             AttributeDefinitionAddedEventHandler ae = this.AttributeDefinitionAdded;
@@ -98,9 +90,7 @@ namespace netDxf.Blocks
         }
 
         public delegate void AttributeDefinitionRemovedEventHandler(Block sender, BlockAttributeDefinitionChangeEventArgs e);
-
         public event AttributeDefinitionRemovedEventHandler AttributeDefinitionRemoved;
-
         protected virtual void OnAttributeDefinitionRemovedEvent(AttributeDefinition item)
         {
             AttributeDefinitionRemovedEventHandler ae = this.AttributeDefinitionRemoved;
@@ -184,6 +174,11 @@ namespace netDxf.Blocks
                 throw new ArgumentNullException(nameof(xrefFile));
             }
 
+            if (xrefFile.IndexOfAny(Path.GetInvalidPathChars()) == 0)
+            {
+                throw new ArgumentException("File path contains invalid characters.", nameof(xrefFile));
+            }
+
             this.xrefFile = xrefFile;
             this.flags = BlockTypeFlags.XRef | BlockTypeFlags.ResolvedExternalReference;
             if (overlay)
@@ -226,7 +221,9 @@ namespace netDxf.Blocks
             : base(name, DxfObjectCode.Block, checkName)
         {
             if (string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name));
+            }
 
             this.IsReserved = string.Equals(name, DefaultModelSpaceName, StringComparison.OrdinalIgnoreCase);
             this.forInternalUse = name.StartsWith("*");
@@ -266,7 +263,13 @@ namespace netDxf.Blocks
         /// <summary>
         /// Gets the name of the table object.
         /// </summary>
-        /// <remarks>Table object names are case insensitive.</remarks>
+        /// <remarks>
+        /// Table object names are case insensitive.<br />
+        /// The internal blocks that start with "*U" or "*T" can be safely renamed.
+        /// They are internally created to represent dynamic blocks, arrays, and tables;
+        /// although the information of those objects is lost when importing the DXF,
+        /// the block that represent its graphical appearance is imported.
+        /// </remarks>
         public new string Name
         {
             get { return base.Name; }
@@ -274,7 +277,18 @@ namespace netDxf.Blocks
             {
                 if (this.forInternalUse)
                 {
-                    throw new ArgumentException("Blocks for internal use cannot be renamed.", nameof(value));
+                    if (this.Name.StartsWith("*U", StringComparison.InvariantCultureIgnoreCase) || this.Name.StartsWith("*T", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        // The internal blocks that starts with "*U" and "*T" are created by AutoCad as a graphical representation of other kind of entities
+                        // like dynamic blocks, arrays, and tables; although the information of those objects is lost when importing the DXF,
+                        // the block that represent its graphical appearance is imported.
+                        // They should be safe to rename.
+                        this.flags &= ~BlockTypeFlags.AnonymousBlock;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Blocks for internal use cannot be renamed.", nameof(value));
+                    }
                 }
                 base.Name = value;
                 this.Record.Name = value;
@@ -386,7 +400,7 @@ namespace netDxf.Blocks
         /// </summary>
         public bool IsForInternalUseOnly
         {
-            get { return this.Name.StartsWith("*"); }
+            get { return this.forInternalUse; }
         }
 
         #endregion
@@ -419,13 +433,16 @@ namespace netDxf.Blocks
                 throw new ArgumentNullException(nameof(doc));
             }
 
-            Block block = new Block(name) {Origin = doc.DrawingVariables.InsBase};
+            Block block = new Block(name)
+            {
+                Origin = doc.DrawingVariables.InsBase
+            };
             block.Record.Units = doc.DrawingVariables.InsUnits;
 
             // When a Block is created form a DxfDocument or DXF file, any Hatch entity that it may contain will have its associative property set to false.
             // This will avoid problems when the same entity its associated to multiple hatches,
             // or when any of any of its paths is defined by the intersection of several entities.
-            foreach (Hatch hatch in doc.Hatches)
+            foreach (Hatch hatch in doc.Entities.Hatches)
             {
                 hatch.UnLinkBoundary();
             }
@@ -541,8 +558,10 @@ namespace netDxf.Blocks
 
             foreach (AttributeDefinition attdef in this.attributes.Values)
             {
-                if(!dwg.Layouts[Layout.ModelSpaceName].AssociatedBlock.AttributeDefinitions.ContainsTag(attdef.Tag))
+                if (!dwg.Layouts[Layout.ModelSpaceName].AssociatedBlock.AttributeDefinitions.ContainsTag(attdef.Tag))
+                {
                     dwg.Layouts[Layout.ModelSpaceName].AssociatedBlock.AttributeDefinitions.Add((AttributeDefinition) attdef.Clone());
+                }
             }
 
             foreach (EntityObject entity in this.entities)
@@ -557,12 +576,10 @@ namespace netDxf.Blocks
 
         #region internal methods
 
-        /// <summary>
-        /// Hack to change the table name without having to check its name. Some invalid characters are used for internal purposes only.
-        /// </summary>
-        /// <param name="newName">Table object new name.</param>
         internal new void SetName(string newName, bool checkName)
         {
+            // Hack to change the table name without having to check its name.
+            // Some invalid characters are used for internal purposes only.
             base.SetName(newName, checkName);
             this.Record.Name = newName;
             this.forInternalUse = newName.StartsWith("*");
@@ -583,7 +600,7 @@ namespace netDxf.Blocks
             {
                 Description = block.description,
                 Flags = block.flags,
-                Layer = (Layer)block.Layer.Clone(),
+                Layer = (Layer) block.Layer.Clone(),
                 Origin = block.origin
             };
 
@@ -644,16 +661,16 @@ namespace netDxf.Blocks
         /// Some objects might consume more than one, is, for example, the case of polylines that will assign
         /// automatically a handle to its vertexes. The entity number will be converted to an hexadecimal number.
         /// </remarks>
-        internal override long AsignHandle(long entityNumber)
+        internal override long AssignHandle(long entityNumber)
         {
-            entityNumber = this.Owner.AsignHandle(entityNumber);
-            entityNumber = this.end.AsignHandle(entityNumber);
+            entityNumber = this.Owner.AssignHandle(entityNumber);
+            entityNumber = this.end.AssignHandle(entityNumber);
             foreach (AttributeDefinition attdef in this.attributes.Values)
             {
-                entityNumber = attdef.AsignHandle(entityNumber);
+                entityNumber = attdef.AssignHandle(entityNumber);
             }
 
-            return base.AsignHandle(entityNumber);
+            return base.AssignHandle(entityNumber);
         }
 
         #endregion
@@ -745,10 +762,6 @@ namespace netDxf.Blocks
                 e.Cancel = true;
             }
             else if (this.Flags.HasFlag(BlockTypeFlags.ExternallyDependent))
-            {
-                e.Cancel = true;
-            }
-            else if (this.Name.StartsWith(DefaultPaperSpaceName)) // paper space blocks do not contain attribute definitions
             {
                 e.Cancel = true;
             }

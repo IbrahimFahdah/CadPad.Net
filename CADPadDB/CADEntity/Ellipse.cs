@@ -52,7 +52,7 @@ namespace CADPadDB.CADEntity
             if (gd == null)
                 return;
 
-            gd.Open();
+            gd.Open(Color);
             gd.DrawEllipse(_center, RadiusX, RadiusY);
             gd.Close();
         }

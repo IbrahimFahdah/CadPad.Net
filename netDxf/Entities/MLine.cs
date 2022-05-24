@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -36,9 +39,7 @@ namespace netDxf.Entities
         #region delegates and events
 
         public delegate void MLineStyleChangedEventHandler(MLine sender, TableObjectChangedEventArgs<MLineStyle> e);
-
         public event MLineStyleChangedEventHandler MLineStyleChanged;
-
         protected virtual MLineStyle OnMLineStyleChangedEvent(MLineStyle oldMLineStyle, MLineStyle newMLineStyle)
         {
             MLineStyleChangedEventHandler ae = this.MLineStyleChanged;
@@ -137,20 +138,31 @@ namespace netDxf.Entities
         {
             this.scale = scale;
             if (style == null)
+            {
                 throw new ArgumentNullException(nameof(style));
+            }
+
             if (isClosed)
+            {
                 this.flags = MLineFlags.Has | MLineFlags.Closed;
+            }
             else
+            {
                 this.flags = MLineFlags.Has;
+            }
 
             this.style = style;
             this.justification = MLineJustification.Zero;
             this.elevation = 0.0;
             if (vertexes == null)
+            {
                 throw new ArgumentNullException(nameof(vertexes));
+            }
             this.vertexes = new List<MLineVertex>();
             foreach (Vector2 point in vertexes)
+            {
                 this.vertexes.Add(new MLineVertex(point, Vector2.Zero, Vector2.Zero, null));
+            }
             this.Update();
         }
 
@@ -193,9 +205,13 @@ namespace netDxf.Entities
             set
             {
                 if (value)
+                {
                     this.flags |= MLineFlags.Closed;
+                }
                 else
+                {
                     this.flags &= ~MLineFlags.Closed;
+                }
             }
         }
 
@@ -208,9 +224,13 @@ namespace netDxf.Entities
             set
             {
                 if (value)
+                {
                     this.flags |= MLineFlags.NoStartCaps;
+                }
                 else
+                {
                     this.flags &= ~MLineFlags.NoStartCaps;
+                }
             }
         }
 
@@ -223,9 +243,13 @@ namespace netDxf.Entities
             set
             {
                 if (value)
+                {
                     this.flags |= MLineFlags.NoEndCaps;
+                }
                 else
+                {
                     this.flags &= ~MLineFlags.NoEndCaps;
+                }
             }
         }
 
@@ -247,7 +271,9 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.style = this.OnMLineStyleChangedEvent(this.style, value);
             }
         }
@@ -374,7 +400,9 @@ namespace netDxf.Entities
         public void Update()
         {
             if (this.vertexes.Count == 0)
+            {
                 return;
+            }
 
             double reference = 0.0;
             switch (this.justification)
@@ -392,7 +420,9 @@ namespace netDxf.Entities
 
             Vector2 prevDir;
             if (this.vertexes[0].Position.Equals(this.vertexes[this.vertexes.Count - 1].Position))
+            {
                 prevDir = Vector2.UnitY;
+            }
             else
             {
                 prevDir = this.vertexes[0].Position - this.vertexes[this.vertexes.Count - 1].Position;
@@ -407,7 +437,9 @@ namespace netDxf.Entities
                 if (i == 0)
                 {
                     if (this.vertexes[i + 1].Position.Equals(position))
+                    {
                         dir = Vector2.UnitY;
+                    }
                     else
                     {
                         dir = this.vertexes[i + 1].Position - position;
@@ -429,7 +461,9 @@ namespace netDxf.Entities
                     if (this.IsClosed)
                     {
                         if (this.vertexes[0].Position.Equals(position))
+                        {
                             dir = Vector2.UnitY;
+                        }
                         else
                         {
                             dir = this.vertexes[0].Position - position;
@@ -448,7 +482,9 @@ namespace netDxf.Entities
                 else
                 {
                     if (this.vertexes[i + 1].Position.Equals(position))
+                    {
                         dir = Vector2.UnitY;
+                    }
                     else
                     {
                         dir = this.vertexes[i + 1].Position - position;
@@ -461,9 +497,9 @@ namespace netDxf.Entities
                 prevDir = dir;
 
                 List<double>[] distances = new List<double>[this.style.Elements.Count];
-                double angleMitter = Vector2.Angle(miter);
+                double angleMiter = Vector2.Angle(miter);
                 double angleDir = Vector2.Angle(dir);
-                double cos = Math.Cos(angleMitter - (MathHelper.HalfPI + angleDir));
+                double cos = Math.Cos(angleMiter - (MathHelper.HalfPI + angleDir));
                 for (int j = 0; j < this.style.Elements.Count; j++)
                 {
                     double distance = (this.style.Elements[j].Offset + reference)/cos;
@@ -488,8 +524,8 @@ namespace netDxf.Entities
 
             Matrix3 transformation = MathHelper.ArbitraryAxis(this.Normal);
 
-            // precomputed points at mline vertexes for start and end caps calculations
-            Vector2[][] cornerVextexes = new Vector2[this.vertexes.Count][];
+            // precomputed points at multiline vertexes for start and end caps calculations
+            Vector2[][] cornerVertexes = new Vector2[this.vertexes.Count][];
 
             for (int i = 0; i < this.vertexes.Count; i++)
             {
@@ -497,23 +533,30 @@ namespace netDxf.Entities
                 MLineVertex nextVertex;
 
                 if (this.IsClosed && i == this.vertexes.Count - 1)
+                {
                     nextVertex = this.vertexes[0];
+                }
                 else if (!this.IsClosed && i == this.vertexes.Count - 1)
+                {
                     continue;
+                }
                 else
                 {
                     nextVertex = this.vertexes[i + 1];
-                    cornerVextexes[i + 1] = new Vector2[this.style.Elements.Count];
+                    cornerVertexes[i + 1] = new Vector2[this.style.Elements.Count];
                 }
 
-                cornerVextexes[i] = new Vector2[this.style.Elements.Count];
+                cornerVertexes[i] = new Vector2[this.style.Elements.Count];
 
                 for (int j = 0; j < this.style.Elements.Count; j++)
                 {
-                    if(vertex.Distances[j].Count == 0) continue;
+                    if (vertex.Distances[j].Count == 0)
+                    {
+                        continue;
+                    }
 
                     Vector2 refStart = vertex.Position + vertex.Miter * vertex.Distances[j][0];
-                    cornerVextexes[i][j] = refStart;
+                    cornerVertexes[i][j] = refStart;
                     for (int k = 1; k < vertex.Distances[j].Count; k++)
                     {
                         Vector2 start = refStart + vertex.Direction * vertex.Distances[j][k];
@@ -521,7 +564,7 @@ namespace netDxf.Entities
                         if (k >= vertex.Distances[j].Count - 1)
                         {
                             end = nextVertex.Position + nextVertex.Miter * nextVertex.Distances[j][0];                       
-                            if(!this.IsClosed) cornerVextexes[i + 1][j] = end;
+                            if(!this.IsClosed) cornerVertexes[i + 1][j] = end;
                         }
                         else
                         {
@@ -543,18 +586,21 @@ namespace netDxf.Entities
                 Linetype linetype1 = this.style.Elements[0].Linetype;
                 Linetype linetype2 = this.style.Elements[this.style.Elements.Count - 1].Linetype;
 
-                for (int i = 0; i < cornerVextexes.Length; i++)
+                for (int i = 0; i < cornerVertexes.Length; i++)
                 {
-                    if (!this.IsClosed && (i == 0 || i == cornerVextexes.Length - 1)) continue;
+                    if (!this.IsClosed && (i == 0 || i == cornerVertexes.Length - 1))
+                    {
+                        continue;
+                    }
 
-                    Vector2 start = cornerVextexes[i][0];
-                    Vector2 end = cornerVextexes[i][cornerVextexes[0].Length - 1];
+                    Vector2 start = cornerVertexes[i][0];
+                    Vector2 end = cornerVertexes[i][cornerVertexes[0].Length - 1];
 
                     entities.AddRange(this.CreateSquareCap(start, end, transformation, color1, linetype1, color2, linetype2));
                 }
             }
 
-            // when the mline is closed there are no caps
+            // when the multiline is closed there are no caps
             if (this.IsClosed) return entities;
 
             if (!this.NoStartCaps)
@@ -566,8 +612,8 @@ namespace netDxf.Entities
                     Linetype linetype1 = this.style.Elements[0].Linetype;
                     Linetype linetype2 = this.style.Elements[this.style.Elements.Count - 1].Linetype;
 
-                    Vector2 start = cornerVextexes[0][0];
-                    Vector2 end = cornerVextexes[0][cornerVextexes[0].Length - 1];
+                    Vector2 start = cornerVertexes[0][0];
+                    Vector2 end = cornerVertexes[0][cornerVertexes[0].Length - 1];
 
                     entities.AddRange(this.scale >= 0 ?
                         this.CreateRoundCap(start, end, transformation, color1, linetype1, color2, linetype2) :
@@ -576,7 +622,7 @@ namespace netDxf.Entities
 
                 if (this.style.Flags.HasFlag(MLineStyleFlags.StartInnerArcsCap))
                 {
-                    int j = (int) (this.style.Elements.Count / 2.0); // Math.Floor
+                    int j = (int) (this.style.Elements.Count * 0.5); // Math.Floor
 
                     for (int i = 1; i < j; i++)
                     {
@@ -585,8 +631,8 @@ namespace netDxf.Entities
                         Linetype linetype1 = this.style.Elements[i].Linetype;
                         Linetype linetype2 = this.style.Elements[this.style.Elements.Count - 1 - i].Linetype;
 
-                        Vector2 start = cornerVextexes[0][i];
-                        Vector2 end = cornerVextexes[0][cornerVextexes[0].Length - 1 - i];
+                        Vector2 start = cornerVertexes[0][i];
+                        Vector2 end = cornerVertexes[0][cornerVertexes[0].Length - 1 - i];
 
                         entities.AddRange(this.scale >= 0 ?
                             this.CreateRoundCap(start, end, transformation, color1, linetype1, color2, linetype2) :
@@ -601,8 +647,8 @@ namespace netDxf.Entities
                     Linetype linetype1 = this.style.Elements[0].Linetype;
                     Linetype linetype2 = this.style.Elements[this.style.Elements.Count - 1].Linetype;
 
-                    Vector2 start = cornerVextexes[0][0];
-                    Vector2 end = cornerVextexes[0][cornerVextexes[0].Length - 1];
+                    Vector2 start = cornerVertexes[0][0];
+                    Vector2 end = cornerVertexes[0][cornerVertexes[0].Length - 1];
 
                     entities.AddRange(this.CreateSquareCap(start, end, transformation, color1, linetype1, color2, linetype2));
                 }
@@ -617,8 +663,8 @@ namespace netDxf.Entities
                     Linetype linetype1 = this.style.Elements[this.style.Elements.Count - 1].Linetype;
                     Linetype linetype2 = this.style.Elements[0].Linetype;
                    
-                    Vector2 start = cornerVextexes[this.vertexes.Count - 1][cornerVextexes[0].Length - 1];
-                    Vector2 end = cornerVextexes[this.vertexes.Count - 1][0];
+                    Vector2 start = cornerVertexes[this.vertexes.Count - 1][cornerVertexes[0].Length - 1];
+                    Vector2 end = cornerVertexes[this.vertexes.Count - 1][0];
 
                     entities.AddRange(this.scale >= 0 ?
                         this.CreateRoundCap(start, end, transformation, color1, linetype1, color2, linetype2) :
@@ -627,7 +673,7 @@ namespace netDxf.Entities
 
                 if (this.style.Flags.HasFlag(MLineStyleFlags.EndInnerArcsCap))
                 {
-                    int j = (int) (this.style.Elements.Count / 2.0); // Math.Floor
+                    int j = (int) (this.style.Elements.Count * 0.5); // Math.Floor
 
                     for (int i = 1; i < j; i++)
                     {
@@ -636,8 +682,8 @@ namespace netDxf.Entities
                         Linetype linetype1 = this.style.Elements[this.style.Elements.Count - 1 - i].Linetype;
                         Linetype linetype2 = this.style.Elements[i].Linetype;
 
-                        Vector2 start = cornerVextexes[this.vertexes.Count - 1][cornerVextexes[0].Length - 1 - i];
-                        Vector2 end = cornerVextexes[this.vertexes.Count - 1][i];
+                        Vector2 start = cornerVertexes[this.vertexes.Count - 1][cornerVertexes[0].Length - 1 - i];
+                        Vector2 end = cornerVertexes[this.vertexes.Count - 1][i];
 
                         entities.AddRange(this.scale >= 0 ?
                             this.CreateRoundCap(start, end, transformation, color1, linetype1, color2, linetype2) :
@@ -652,8 +698,8 @@ namespace netDxf.Entities
                     Linetype linetype1 = this.style.Elements[this.style.Elements.Count - 1].Linetype;
                     Linetype linetype2 = this.style.Elements[0].Linetype;
 
-                    Vector2 start = cornerVextexes[this.vertexes.Count - 1][cornerVextexes[0].Length - 1];
-                    Vector2 end = cornerVextexes[this.vertexes.Count - 1][0];
+                    Vector2 start = cornerVertexes[this.vertexes.Count - 1][cornerVertexes[0].Length - 1];
+                    Vector2 end = cornerVertexes[this.vertexes.Count - 1][0];
 
                     entities.AddRange(this.CreateSquareCap(start, end, transformation, color1, linetype1, color2, linetype2));
                 }
@@ -679,7 +725,10 @@ namespace netDxf.Entities
         public override void TransformBy(Matrix3 transformation, Vector3 translation)
         {
             Vector3 newNormal = transformation * this.Normal;
-            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
 
             double newElevation = this.Elevation;
 
@@ -711,7 +760,7 @@ namespace netDxf.Entities
                 v = transOW * new Vector3(m.X, m.Y, 0.0);
                 v = transformation * v;
                 v = transWO * v;
-                Vector2 mitter = new Vector2(v.X, v.Y);
+                Vector2 miter = new Vector2(v.X, v.Y);
 
                 List<double>[] newDistances = new List<double>[this.style.Elements.Count];
                 for (int j = 0; j < this.style.Elements.Count; j++)
@@ -722,7 +771,7 @@ namespace netDxf.Entities
                         newDistances[j].Add(this.Vertexes[i].Distances[j][k]*newScale);
                     }
                 }
-                this.vertexes[i] = new MLineVertex(position, direction, mitter, newDistances);
+                this.vertexes[i] = new MLineVertex(position, direction, miter, newDistances);
             }
 
             if (Vector2.CrossProduct(this.Vertexes[0].Miter, this.Vertexes[0].Direction) < 0) newScale = -newScale;
@@ -758,10 +807,14 @@ namespace netDxf.Entities
             };
 
             foreach (MLineVertex vertex in this.vertexes)
+            {
                 entity.vertexes.Add((MLineVertex) vertex.Clone());
+            }
 
             foreach (XData data in this.XData.Values)
+            {
                 entity.XData.Add((XData) data.Clone());
+            }
 
             return entity;
         }

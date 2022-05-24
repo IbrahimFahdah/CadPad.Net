@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -42,14 +45,14 @@ namespace netDxf.Units
         private string gradiansSymbol;
         private string feetSymbol;
         private string inchesSymbol;
-        private double fractionHeigthScale;
+        private double fractionHeightScale;
         private FractionFormatType fractionType;
-        private bool supressLinearLeadingZeros;
-        private bool supressLinearTrailingZeros;
-        private bool supressAngularLeadingZeros;
-        private bool supressAngularTrailingZeros;
-        private bool supressZeroFeet;
-        private bool supressZeroInches;
+        private bool suppressLinearLeadingZeros;
+        private bool suppressLinearTrailingZeros;
+        private bool suppressAngularLeadingZeros;
+        private bool suppressAngularTrailingZeros;
+        private bool suppressZeroFeet;
+        private bool suppressZeroInches;
 
         #endregion
 
@@ -71,14 +74,14 @@ namespace netDxf.Units
             this.gradiansSymbol = "g";
             this.feetSymbol = "\'";
             this.inchesSymbol = "\"";
-            this.fractionHeigthScale = 1.0;
+            this.fractionHeightScale = 1.0;
             this.fractionType = FractionFormatType.Horizontal;
-            this.supressLinearLeadingZeros = false;
-            this.supressLinearTrailingZeros = false;
-            this.supressAngularLeadingZeros = false;
-            this.supressAngularTrailingZeros = false;
-            this.supressZeroFeet = true;
-            this.supressZeroInches = true;
+            this.suppressLinearLeadingZeros = false;
+            this.suppressLinearTrailingZeros = false;
+            this.suppressAngularLeadingZeros = false;
+            this.suppressAngularTrailingZeros = false;
+            this.suppressZeroFeet = true;
+            this.suppressZeroInches = true;
         }
 
         #endregion
@@ -97,7 +100,9 @@ namespace netDxf.Units
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The number of decimal places must be equals or greater than zero.");
+                }
                 this.linearDecimalPlaces = value;
             }
         }
@@ -111,7 +116,9 @@ namespace netDxf.Units
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The number of decimal places must be equals or greater than zero.");
+                }
                 this.angularDecimalPlaces = value;
             }
         }
@@ -202,12 +209,14 @@ namespace netDxf.Units
         /// </summary>
         public double FractionHeightScale
         {
-            get { return this.fractionHeigthScale; }
+            get { return this.fractionHeightScale; }
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The fraction height scale must be greater than zero.");
-                this.fractionHeigthScale = value;
+                }
+                this.fractionHeightScale = value;
             }
         }
 
@@ -228,55 +237,55 @@ namespace netDxf.Units
         /// <summary>
         /// Suppresses leading zeros in linear decimal dimensions (for example, 0.5000 becomes .5000).
         /// </summary>
-        public bool SupressLinearLeadingZeros
+        public bool SuppressLinearLeadingZeros
         {
-            get { return this.supressLinearLeadingZeros; }
-            set { this.supressLinearLeadingZeros = value; }
+            get { return this.suppressLinearLeadingZeros; }
+            set { this.suppressLinearLeadingZeros = value; }
         }
 
         /// <summary>
         /// Suppresses trailing zeros in linear decimal dimensions (for example, 12.5000 becomes 12.5).
         /// </summary>
-        public bool SupressLinearTrailingZeros
+        public bool SuppressLinearTrailingZeros
         {
-            get { return this.supressLinearTrailingZeros; }
-            set { this.supressLinearTrailingZeros = value; }
+            get { return this.suppressLinearTrailingZeros; }
+            set { this.suppressLinearTrailingZeros = value; }
         }
 
         /// <summary>
         /// Suppresses leading zeros in angular decimal dimensions (for example, 0.5000 becomes .5000).
         /// </summary>
-        public bool SupressAngularLeadingZeros
+        public bool SuppressAngularLeadingZeros
         {
-            get { return this.supressAngularLeadingZeros; }
-            set { this.supressAngularLeadingZeros = value; }
+            get { return this.suppressAngularLeadingZeros; }
+            set { this.suppressAngularLeadingZeros = value; }
         }
 
         /// <summary>
         /// Suppresses trailing zeros in angular decimal dimensions (for example, 12.5000 becomes 12.5).
         /// </summary>
-        public bool SupressAngularTrailingZeros
+        public bool SuppressAngularTrailingZeros
         {
-            get { return this.supressAngularTrailingZeros; }
-            set { this.supressAngularTrailingZeros = value; }
+            get { return this.suppressAngularTrailingZeros; }
+            set { this.suppressAngularTrailingZeros = value; }
         }
 
         /// <summary>
         /// Suppresses zero feet in architectural dimensions.
         /// </summary>
-        public bool SupressZeroFeet
+        public bool SuppressZeroFeet
         {
-            get { return this.supressZeroFeet; }
-            set { this.supressZeroFeet = value; }
+            get { return this.suppressZeroFeet; }
+            set { this.suppressZeroFeet = value; }
         }
 
         /// <summary>
         /// Suppresses zero inches in architectural dimensions.
         /// </summary>
-        public bool SupressZeroInches
+        public bool SuppressZeroInches
         {
-            get { return this.supressZeroInches; }
-            set { this.supressZeroInches = value; }
+            get { return this.suppressZeroInches; }
+            set { this.suppressZeroInches = value; }
         }
 
         #endregion

@@ -1,26 +1,30 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
+using System.Collections.Generic;
 using netDxf.Collections;
 
 namespace netDxf.Tables
@@ -37,7 +41,6 @@ namespace netDxf.Tables
         private Vector3 xAxis;
         private Vector3 yAxis;
         private Vector3 zAxis;
-        private double elevation;
 
         #endregion
 
@@ -56,13 +59,14 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.Ucs, checkName)
         {
             if (string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name), "The UCS name should be at least one character long.");
+            }
 
             this.origin = Vector3.Zero;
             this.xAxis = Vector3.UnitX;
             this.yAxis = Vector3.UnitY;
             this.zAxis = Vector3.UnitZ;
-            this.elevation = 0;
         }
 
         /// <summary>
@@ -84,14 +88,16 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.Ucs, checkName)
         {
             if (!Vector3.ArePerpendicular(xDirection, yDirection))
+            {
                 throw new ArgumentException("X-axis direction and Y-axis direction must be perpendicular.");
+            }
+
             this.origin = origin;
             this.xAxis = xDirection;
             this.xAxis.Normalize();
             this.yAxis = yDirection;
             this.yAxis.Normalize();
             this.zAxis = Vector3.CrossProduct(this.xAxis, this.yAxis);
-            this.elevation = 0;
         }
 
         #endregion
@@ -132,15 +138,6 @@ namespace netDxf.Tables
         }
 
         /// <summary>
-        /// Gets or sets the user coordinate system elevation.
-        /// </summary>
-        public double Elevation
-        {
-            get { return this.elevation; }
-            set { this.elevation = value; }
-        }
-
-        /// <summary>
         /// Gets the owner of the actual user coordinate system.
         /// </summary>
         public new UCSs Owner
@@ -161,7 +158,9 @@ namespace netDxf.Tables
         public void SetAxis(Vector3 xDirection, Vector3 yDirection)
         {
             if (!Vector3.ArePerpendicular(xDirection, yDirection))
+            {
                 throw new ArgumentException("X-axis direction and Y-axis direction must be perpendicular.");
+            }
             this.xAxis = xDirection;
             this.xAxis.Normalize();
             this.yAxis = yDirection;
@@ -175,7 +174,7 @@ namespace netDxf.Tables
         /// <param name="name">User coordinate system name.</param>
         /// <param name="origin">Origin in WCS.</param>
         /// <param name="xDirection">X-axis direction in WCS.</param>
-        /// <param name="pointOnPlaneXY">Point on the XYplane.</param>
+        /// <param name="pointOnPlaneXY">Point on the XY plane.</param>
         /// <returns>A new user coordinate system.</returns>
         public static UCS FromXAxisAndPointOnXYplane(string name, Vector3 origin, Vector3 xDirection, Vector3 pointOnPlaneXY)
         {
@@ -186,6 +185,25 @@ namespace netDxf.Tables
             ucs.zAxis = Vector3.CrossProduct(xDirection, pointOnPlaneXY);
             ucs.zAxis.Normalize();
             ucs.yAxis = Vector3.CrossProduct(ucs.zAxis, ucs.xAxis);
+            return ucs;
+        }
+
+        /// <summary>
+        /// Creates a new user coordinate system from the XY plane normal (z-axis).
+        /// </summary>
+        /// <param name="name">User coordinate system name.</param>
+        /// <param name="origin">Origin in WCS.</param>
+        /// <param name="normal">XY plane normal (z-axis).</param>
+        /// <returns>A new user coordinate system.</returns>
+        /// <remarks>This method uses the ArbitraryAxis algorithm to obtain the user coordinate system x-axis and y-axis.</remarks>
+        public static UCS FromNormal(string name, Vector3 origin, Vector3 normal)
+        {
+            Matrix3 mat = MathHelper.ArbitraryAxis(normal);
+            UCS ucs = new UCS(name);
+            ucs.origin = origin;
+            ucs.xAxis = new Vector3(mat.M11, mat.M21, mat.M31);
+            ucs.yAxis = new Vector3(mat.M12, mat.M22, mat.M32);
+            ucs.zAxis = new Vector3(mat.M13, mat.M23, mat.M33);
             return ucs;
         }
 
@@ -211,6 +229,90 @@ namespace netDxf.Tables
             return ucs;
         }
 
+        /// <summary>
+        /// Gets the user coordinate system rotation matrix.
+        /// </summary>
+        /// <returns>A Matrix3.</returns>
+        public Matrix3 GetTransformation()
+        {
+            return new Matrix3(this.xAxis.X, this.yAxis.X, this.zAxis.X,
+                               this.xAxis.Y, this.yAxis.Y, this.zAxis.Y,
+                               this.xAxis.Z, this.yAxis.Z, this.zAxis.Z);
+        }
+
+        /// <summary>
+        /// Transforms a point between coordinate systems.
+        /// </summary>
+        /// <param name="point">Point to transform.</param>
+        /// <param name="from">Points coordinate system.</param>
+        /// <param name="to">Coordinate system of the transformed points.</param>
+        /// <returns>Transformed point list.</returns>
+        public Vector3 Transform(Vector3 point, CoordinateSystem from, CoordinateSystem to)
+        {
+            Matrix3 transformation = this.GetTransformation();
+            Vector3 translation = this.origin;
+
+            switch (from)
+            {
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
+                {
+                    transformation = transformation.Transpose();
+                    return transformation * (point - translation);
+                }
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                {
+                    return transformation * point + translation;
+                }
+                default:
+                    return point;
+            }
+        }
+
+        /// <summary>
+        /// Transforms a point list between coordinate systems.
+        /// </summary>
+        /// <param name="points">Points to transform.</param>
+        /// <param name="from">Points coordinate system.</param>
+        /// <param name="to">Coordinate system of the transformed points.</param>
+        /// <returns>Transformed point list.</returns>
+        public List<Vector3> Transform(IEnumerable<Vector3> points, CoordinateSystem from, CoordinateSystem to)
+        {
+            if (points == null)
+            {
+                throw new ArgumentNullException(nameof(points));
+            }
+
+            Matrix3 transformation = this.GetTransformation();
+            Vector3 translation = this.origin;
+            List<Vector3> transPoints;
+
+            switch (from)
+            {
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
+                {
+                    transPoints = new List<Vector3>();
+                    transformation = transformation.Transpose();
+                    foreach (Vector3 p in points)
+                    {
+                        transPoints.Add(transformation * (p - translation));
+                    }
+
+                    return transPoints;
+                }
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                {
+                    transPoints = new List<Vector3>();
+                    foreach (Vector3 p in points)
+                    {
+                        transPoints.Add(transformation * p + translation);
+                    }
+                    return transPoints;
+                }
+                default:
+                    return new List<Vector3>(points);
+            }
+        }
+
         #endregion
 
         #region overrides
@@ -228,11 +330,12 @@ namespace netDxf.Tables
                 xAxis = this.xAxis,
                 yAxis = this.yAxis,
                 zAxis = this.zAxis,
-                Elevation = this.elevation
             };
 
             foreach (XData data in this.XData.Values)
+            {
                 copy.XData.Add((XData)data.Clone());
+            }
 
             return copy;
         }

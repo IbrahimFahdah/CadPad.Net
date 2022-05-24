@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -36,9 +39,7 @@ namespace netDxf.Tables
         #region delegates and events
 
         public delegate void LinetypeChangedEventHandler(TableObject sender, TableObjectChangedEventArgs<Linetype> e);
-
         public event LinetypeChangedEventHandler LinetypeChanged;
-
         protected virtual Linetype OnLinetypeChangedEvent(Linetype oldLinetype, Linetype newLinetype)
         {
             LinetypeChangedEventHandler ae = this.LinetypeChanged;
@@ -52,9 +53,7 @@ namespace netDxf.Tables
         }
 
         public delegate void TextStyleChangedEventHandler(TableObject sender, TableObjectChangedEventArgs<TextStyle> e);
-
         public event TextStyleChangedEventHandler TextStyleChanged;
-
         protected virtual TextStyle OnTextStyleChangedEvent(TextStyle oldTextStyle, TextStyle newTextStyle)
         {
             TextStyleChangedEventHandler ae = this.TextStyleChanged;
@@ -68,9 +67,7 @@ namespace netDxf.Tables
         }
 
         public delegate void BlockChangedEventHandler(TableObject sender, TableObjectChangedEventArgs<Block> e);
-
         public event BlockChangedEventHandler BlockChanged;
-
         protected virtual Block OnBlockChangedEvent(Block oldBlock, Block newBlock)
         {
             BlockChangedEventHandler ae = this.BlockChanged;
@@ -233,7 +230,9 @@ namespace netDxf.Tables
             : base(name, DxfObjectCode.DimStyle, checkName)
         {
             if (string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name), "The dimension style name should be at least one character long.");
+            }
 
             this.IsReserved = name.Equals(DefaultName, StringComparison.OrdinalIgnoreCase);
 
@@ -328,9 +327,7 @@ namespace netDxf.Tables
             get { return this.dimclrd; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.dimclrd = value;
+                this.dimclrd = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -346,7 +343,9 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.dimltype = this.OnLinetypeChangedEvent(this.dimltype, value);
             }
         }
@@ -402,7 +401,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The DimLineExtend must be equals or greater than zero.");
+                }
                 this.dimdle = value;
             }
         }
@@ -413,7 +414,7 @@ namespace netDxf.Tables
         /// <remarks>
         /// Default: 0.38<br />
         /// This value is stored only for information purposes.
-        /// Base dimensions are a compound entity made of several dimensions, there is no actual dxf entity that represents that.
+        /// Base dimensions are a compound entity made of several dimensions, there is no actual DXF entity that represents that.
         /// </remarks>
         public double DimBaselineSpacing
         {
@@ -421,7 +422,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The DimBaselineSpacing must be equals or greater than zero.");
+                }
                 this.dimdli = value;
             }
         }
@@ -438,9 +441,7 @@ namespace netDxf.Tables
             get { return this.dimclre; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.dimclre = value;
+                this.dimclre = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -456,7 +457,9 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.dimltex1 = this.OnLinetypeChangedEvent(this.dimltex1, value);
             }
         }
@@ -473,7 +476,9 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.dimltex2 = this.OnLinetypeChangedEvent(this.dimltex2, value);
             }
         }
@@ -526,7 +531,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The ExtLineOffset must be equals or greater than zero.");
+                }
                 this.dimexo = value;
             }
         }
@@ -543,7 +550,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The ExtLineExtend must be equals or greater than zero.");
+                }
                 this.dimexe = value;
             }
         }
@@ -572,7 +581,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The ExtLineFixedLength must be equals or greater than zero.");
+                }
                 this.dimfxl = value;
             }
         }
@@ -629,7 +640,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The ArrowSize must be equals or greater than zero.");
+                }
                 this.dimasz = value;
             }
         }
@@ -642,9 +655,9 @@ namespace netDxf.Tables
         /// 0 - No center marks or lines are drawn.<br />
         /// greater than 0 - Center marks are drawn.<br />
         /// lower than 0 - Center marks and centerlines are drawn.<br />
-        /// The absolute value specifies the size of the center mark or centerline. 
-        /// The size of the centerline is the length of the centerline segment that extends outside the circle or arc.
-        /// It is also the size of the gap between the center mark and the start of the centerline. 
+        /// The absolute value specifies the size of the center mark or center line. 
+        /// The size of the center line is the length of the center line segment that extends outside the circle or arc.
+        /// It is also the size of the gap between the center mark and the start of the center line. 
         /// The size of the center mark is the distance from the center of the circle or arc to the end of the center mark.
         /// </remarks>
         public double CenterMarkSize
@@ -669,7 +682,9 @@ namespace netDxf.Tables
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.dimtxsty = this.OnTextStyleChangedEvent(this.dimtxsty, value);
             }
         }
@@ -686,9 +701,7 @@ namespace netDxf.Tables
             get { return this.dimclrt; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.dimclrt = value;
+                this.dimclrt = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -717,7 +730,9 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The TextHeight must be greater than zero.");
+                }
                 this.dimtxt = value;
             }
         }
@@ -809,7 +824,9 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The TextFractionHeightScale must be greater than zero.");
+                }
                 this.dimtfac = value;
             }
         }
@@ -859,7 +876,9 @@ namespace netDxf.Tables
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The DimScaleOverall must be greater than zero.");
+                }
                 this.dimscale = value;
             }
         }
@@ -919,7 +938,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < -1)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The AngularPrecision must be greater than -1.");
+                }
                 this.dimadec = value;
             }
         }
@@ -938,7 +959,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The LengthPrecision must be equals or greater than zero.");
+                }
                 this.dimdec = value;
             }
         }
@@ -993,7 +1016,9 @@ namespace netDxf.Tables
             set
             {
                 if (MathHelper.IsZero(value))
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The scale factor cannot be zero.");
+                }
                 this.dimlfac = value;
             }
         }
@@ -1029,7 +1054,9 @@ namespace netDxf.Tables
             set
             {
                 if (value == AngleUnitType.SurveyorUnits)
+                {
                     throw new ArgumentException("Surveyor's units are not applicable in angular dimensions.");
+                }
                 this.dimaunit = value;
             }
         }
@@ -1136,7 +1163,9 @@ namespace netDxf.Tables
             set
             {
                 if (value < 0.000001 && !MathHelper.IsZero(value, double.Epsilon))
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The nearest value to round all distances must be equal or greater than 0.000001 or zero (no rounding off).");
+                }
                 this.dimrnd = value;
             }
         }
@@ -1154,9 +1183,7 @@ namespace netDxf.Tables
             get { return this.alternateUnits; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.alternateUnits = value;
+                this.alternateUnits = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -1172,9 +1199,7 @@ namespace netDxf.Tables
             get { return this.tolerances; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.tolerances = value;
+                this.tolerances = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -1272,7 +1297,9 @@ namespace netDxf.Tables
             };
 
             foreach (XData data in this.XData.Values)
+            {
                 copy.XData.Add((XData)data.Clone());
+            }
 
             return copy;
         }

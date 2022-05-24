@@ -1,3 +1,7 @@
+# Motivation
+A fork of a great [Ibrahim Fahdah's repository](https://github.com/IbrahimFahdah/CadPad.Net). 
+The goal is to add some missing functionalities (Spline etc.).
+
 # CadPad.Net
 2D CAD library using .Net Core 3.0. A WPF .NET Core 3.0 program is included to demonstrate how the library can be used using one of Microsoft technologies for Windows applications. It should be very easy to convert the program to another technology such as Winforms because the library has not been written to target a specific Windows technology. 
 

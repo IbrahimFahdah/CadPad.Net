@@ -8,9 +8,11 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace CADPadServices.Serilization
-{
+{    
     public class DXFDrawingContentDeserializer : DrawingContentDeserializer
     {
+        private IDrawing _currentDrawing;
+
         private Stream _stream;
         public DXFDrawingContentDeserializer(Stream stream)
         {
@@ -20,9 +22,13 @@ namespace CADPadServices.Serilization
         public override void Read(IDrawing drawing)
         {
             try
-            {
-
+            {                
                 DxfDocument dxf = DxfDocument.Load(_stream);
+                
+                _currentDrawing = drawing;
+
+                ReadLayers(dxf);
+
                 var entities = new List<Entity>();
                 entities.AddRange(ReadLines(dxf));
                 entities.AddRange(ReadPolylines(dxf));
@@ -37,9 +43,10 @@ namespace CADPadServices.Serilization
 
                 foreach (var item in entities)
                 {
+                    //if (!(item.LayerId.id >= 10009 && (item.LayerId.id <= 10012))) continue;
                     drawing.CurrentBlock.AppendEntity(item);
+                    System.Diagnostics.Debug.WriteLine($"=== Added: {item.ClassName}, layerId: {item.LayerId}");
                 }
-
             }
             finally
             {
@@ -48,10 +55,47 @@ namespace CADPadServices.Serilization
             }
         }
 
+        void ReadLayers(DxfDocument doc)
+        {
+            var layersTable = _currentDrawing.Document.Database.layerTable;
+            
+            foreach (var layer in doc.Layers)
+            {
+                if (layersTable.Has(layer.Name)) continue;
+
+                var tabLayer = new CADPadDB.TableRecord.Layer(layer.Name);
+                tabLayer.name = layer.Name;
+                tabLayer.color = layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) : MapDxfColor(layer.Color);
+                tabLayer.lineWeight = MapDxfLineWeight(layer.Lineweight);
+                layersTable.Add(tabLayer);
+
+                System.Diagnostics.Trace.WriteLine($"Added layer: {layer.Name}, id: {tabLayer.id}");
+            }
+        }
+
+        void AssignEntityLayer(Entity entity, string layerName)
+        {
+            if (_currentDrawing.Document.Database.layerTable.Has(layerName))
+            {
+                entity.LayerId = _currentDrawing.Document.Database.layerTable[layerName].id;
+                System.Diagnostics.Trace.WriteLine($"Add {entity.ClassName} to layer: {layerName}");
+            }
+        }
+
+        CADPadDB.LineWeight MapDxfLineWeight(Lineweight lineWeight)
+        {
+            return (CADPadDB.LineWeight)lineWeight;
+        }
+
+        CADPadDB.Colors.CADColor MapDxfColor(AciColor aciColor)
+        {
+            return CADPadDB.Colors.CADColor.FromArgb(aciColor.R, aciColor.G, aciColor.B);
+        }
+
         List<Entity> ReadLines(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var line in doc.Lines)
+            foreach (var line in doc.Entities.Lines)
             {
                 entities.Add(ReadLine(line, 0, 0));
             }
@@ -65,41 +109,45 @@ namespace CADPadServices.Serilization
             l.startPoint = new CADPoint(line.StartPoint.X + x, line.StartPoint.Y + y);
             l.endPoint = new CADPoint(line.EndPoint.X + x, line.EndPoint.Y + y);
 
+            AssignEntityLayer(l, line.Layer.Name);
+            l.Color = line.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255,0,0) : MapDxfColor(line.Color);
+
             return l;
         }
 
         List<Entity> ReadPolylines(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var item in doc.LwPolylines)
+            foreach (var item in doc.Entities.Polylines2D)
             {
-                entities.Add(ReadPolyline(item.Vertexes, item.IsClosed, 0, 0));
+                var poly = ReadPolyline(item.Vertexes, item.IsClosed, 0, 0);
+                AssignEntityLayer(poly, item.Layer.Name);
+                poly.Color = item.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) : MapDxfColor(item.Color);
+                entities.Add(poly);
             }
             return entities;
         }
 
-        Polyline ReadPolyline(List<netDxf.Entities.LwPolylineVertex> vertices, bool isClosed, double x, double y)
+        Polyline ReadPolyline(List<netDxf.Entities.Polyline2DVertex> vertices, bool isClosed, double x, double y)
         {
             Polyline poly = new Polyline();
             for (int i = 0; i < vertices.Count; i++)
             {
-                netDxf.Entities.LwPolylineVertex vertex =vertices[i];
+                netDxf.Entities.Polyline2DVertex vertex =vertices[i];
                 var point = new CADPoint(vertex.Position.X + x, vertex.Position.Y + y);
                 poly.AddVertexAt(i, point);
-
             }
             if (isClosed)
             {
                 poly.closed = true;
             }
-
             return poly;
         }
 
         List<Entity> ReadCircles(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var item in doc.Circles)
+            foreach (var item in doc.Entities.Circles)
             {
                 entities.Add(ReadCircle(item, 0, 0));
             }
@@ -113,13 +161,16 @@ namespace CADPadServices.Serilization
             c.center = new CADPoint(circle.Center.X + x, circle.Center.Y + y);
             c.radius = circle.Radius;
 
+            AssignEntityLayer(c, circle.Layer.Name);
+            c.Color = circle.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) : MapDxfColor(circle.Color);
+
             return c;
         }
 
         List<Entity> ReadEllipses(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var item in doc.Ellipses)
+            foreach (var item in doc.Entities.Ellipses)
             {
                 entities.Add(ReadEllipse(item, 0, 0));
             }
@@ -141,13 +192,16 @@ namespace CADPadServices.Serilization
             c.RadiusX = ellipse.MajorAxis;
             c.RadiusY = ellipse.MinorAxis;
 
+            AssignEntityLayer(c, ellipse.Layer.Name);
+            c.Color = ellipse.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) : MapDxfColor(ellipse.Color);
+
             return c;
         }
 
         List<Entity> ReadArcs(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var item in doc.Arcs)
+            foreach (var item in doc.Entities.Arcs)
             {
                 entities.Add(ReadArc(item, 0, 0));
             }
@@ -162,6 +216,9 @@ namespace CADPadServices.Serilization
             c.radius = arc.Radius;
             c.startAngle = arc.StartAngle ;
             c.endAngle = arc.EndAngle;
+
+            AssignEntityLayer(c, arc.Layer.Name);
+            c.Color = arc.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) :  MapDxfColor(arc.Color);
 
             return c;
         }

@@ -6,7 +6,7 @@ using CADPadDB.TableRecord;
 namespace CADPadDB.CADEntity
 {
     public abstract class Entity : DBObject
-    {
+    {        
         public override string ClassName { get; } = "Entity";
 
         public ICADEnitiyVisual DrawingVisual { get; set; }

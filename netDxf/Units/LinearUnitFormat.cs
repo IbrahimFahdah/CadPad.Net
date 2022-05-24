@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -41,7 +44,9 @@ namespace netDxf.Units
         public static string ToScientific(double length, UnitStyleFormat format)
         {
             if (format == null)
+            {
                 throw new ArgumentNullException(nameof(format));
+            }
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {
@@ -60,7 +65,9 @@ namespace netDxf.Units
         public static string ToDecimal(double length, UnitStyleFormat format)
         {
             if (format == null)
+            {
                 throw new ArgumentNullException(nameof(format));
+            }
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {
@@ -80,7 +87,9 @@ namespace netDxf.Units
         public static string ToArchitectural(double length, UnitStyleFormat format)
         {
             if (format == null)
+            {
                 throw new ArgumentNullException(nameof(format));
+            }
 
             int feet = (int) (length/12);
             double inchesDec = length - 12*feet;
@@ -90,22 +99,28 @@ namespace netDxf.Units
             {
                 if (feet == 0)
                 {
-                    if (format.SupressZeroFeet)
+                    if (format.SuppressZeroFeet)
+                    {
                         return string.Format("0{0}", format.InchesSymbol);
-                    if (format.SupressZeroInches)
+                    }
+
+                    if (format.SuppressZeroInches)
+                    {
                         return string.Format("0{0}", format.FeetSymbol);
+                    }
 
                     return string.Format("0{0}{1}0{2}", format.FeetSymbol, format.FeetInchesSeparator, format.InchesSymbol);
                 }
-                if (format.SupressZeroInches)
+
+                if (format.SuppressZeroInches)
+                {
                     return string.Format("{0}{1}", feet, format.FeetSymbol);
+                }
 
                 return string.Format("{0}{1}{2}0{3}", feet, format.FeetSymbol, format.FeetInchesSeparator, format.InchesSymbol);
             }
 
-            int numerator;
-            int denominator;
-            GetFraction(inchesDec, (short) Math.Pow(2, format.LinearDecimalPlaces), out numerator, out denominator);
+            GetFraction(inchesDec, (short) Math.Pow(2, format.LinearDecimalPlaces), out int numerator, out int denominator);
 
             if (numerator == 0)
             {
@@ -113,22 +128,32 @@ namespace netDxf.Units
                 {
                     if (feet == 0)
                     {
-                        if (format.SupressZeroFeet)
+                        if (format.SuppressZeroFeet)
+                        {
                             return string.Format("0{0}", format.InchesSymbol);
-                        if (format.SupressZeroInches)
+                        }
+
+                        if (format.SuppressZeroInches)
+                        {
                             return string.Format("0{0}", format.FeetSymbol);
+                        }
 
                         return string.Format("0{0}{1}0{2}", format.FeetSymbol, format.FeetInchesSeparator, format.InchesSymbol);
                     }
-                    if (format.SupressZeroInches)
+
+                    if (format.SuppressZeroInches)
+                    {
                         return string.Format("{0}{1}", feet, format.FeetSymbol);
+                    }
 
                     return string.Format("{0}{1}{2}0{3}", feet, format.FeetSymbol, format.FeetInchesSeparator, format.InchesSymbol);
                 }
                 if (feet == 0)
                 {
-                    if (format.SupressZeroFeet)
+                    if (format.SuppressZeroFeet)
+                    {
                         return string.Format("{0}{1}", inches, format.InchesSymbol );
+                    }
 
                     return string.Format("0{0}{1}{2}{3}", format.FeetSymbol, format.FeetInchesSeparator, inches, format.InchesSymbol);
                 }
@@ -138,10 +163,14 @@ namespace netDxf.Units
 
             string text = string.Empty;
             string feetStr;
-            if (format.SupressZeroFeet && feet == 0)
+            if (format.SuppressZeroFeet && feet == 0)
+            {
                 feetStr = string.Empty;
+            }
             else
+            {
                 feetStr = feet + format.FeetSymbol + format.FeetInchesSeparator;
+            }
             switch (format.FractionType)
             {
                 case FractionFormatType.Diagonal:
@@ -167,7 +196,9 @@ namespace netDxf.Units
         public static string ToEngineering(double length, UnitStyleFormat format)
         {
             if (format == null)
+            {
                 throw new ArgumentNullException(nameof(format));
+            }
 
             NumberFormatInfo numberFormat = new NumberFormatInfo
             {
@@ -180,14 +211,22 @@ namespace netDxf.Units
             {
                 if (feet == 0)
                 {
-                    if (format.SupressZeroFeet)
+                    if (format.SuppressZeroFeet)
+                    {
                         return string.Format("0{0}", format.InchesSymbol);
-                    if (format.SupressZeroInches)
+                    }
+
+                    if (format.SuppressZeroInches)
+                    {
                         return string.Format("0{0}", format.FeetSymbol);
+                    }
                     return string.Format("0{0}{1}0{2}", format.FeetSymbol, format.FeetInchesSeparator, format.InchesSymbol);
                 }
-                if (format.SupressZeroInches)
+
+                if (format.SuppressZeroInches)
+                {
                     return string.Format("{0}{1}", feet, format.FeetSymbol);
+                }
 
                 return string.Format("{0}{1}{2}0{3}", feet, format.FeetSymbol, format.FeetInchesSeparator, format.InchesSymbol);
             }
@@ -195,8 +234,10 @@ namespace netDxf.Units
             string inchesDec = inches.ToString(DecimalNumberFormat(format), numberFormat);
             if (feet == 0)
             {
-                if (format.SupressZeroFeet)
+                if (format.SuppressZeroFeet)
+                {
                     return string.Format("{0}{1}", inches, format.InchesSymbol);
+                }
 
                 return string.Format("0{0}{1}{2}{3}", format.FeetSymbol, format.FeetInchesSeparator, inchesDec, format.InchesSymbol);
             }
@@ -212,14 +253,16 @@ namespace netDxf.Units
         public static string ToFractional(double length, UnitStyleFormat format)
         {
             if (format == null)
+            {
                 throw new ArgumentNullException(nameof(format));
+            }
 
             int num = (int) length;
-            int numerator;
-            int denominator;
-            GetFraction(length, (short) Math.Pow(2, format.LinearDecimalPlaces), out numerator, out denominator);
+            GetFraction(length, (short) Math.Pow(2, format.LinearDecimalPlaces), out int numerator, out int denominator);
             if (numerator == 0)
+            {
                 return string.Format("{0}", (int) length);
+            }
 
             string text = string.Empty;
             switch (format.FractionType)
@@ -244,19 +287,27 @@ namespace netDxf.Units
         private static string DecimalNumberFormat(UnitStyleFormat format)
         {
             char[] zeroes = new char[format.LinearDecimalPlaces + 2];
-            if (format.SupressLinearLeadingZeros)
+            if (format.SuppressLinearLeadingZeros)
+            {
                 zeroes[0] = '#';
+            }
             else
+            {
                 zeroes[0] = '0';
+            }
 
             zeroes[1] = '.';
 
             for (int i = 2; i < zeroes.Length; i++)
             {
-                if (format.SupressLinearTrailingZeros)
+                if (format.SuppressLinearTrailingZeros)
+                {
                     zeroes[i] = '#';
+                }
                 else
+                {
                     zeroes[i] = '0';
+                }
             }
             return new string(zeroes);
         }
@@ -266,7 +317,9 @@ namespace netDxf.Units
             numerator = Convert.ToInt32((number - (int) number)*precision);
             int commonFactor = GetGCD(numerator, precision);
             if (commonFactor <= 0)
+            {
                 commonFactor = 1;
+            }
             numerator = numerator/commonFactor;
             denominator = precision/commonFactor;
         }

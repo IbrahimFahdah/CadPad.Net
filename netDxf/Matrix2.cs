@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -77,8 +80,8 @@ namespace netDxf
         {
             get
             {
-                return new Matrix2(0, 0,
-                                   0, 0);
+                return new Matrix2(0.0, 0.0,
+                                   0.0, 0.0) {dirty = false, isIdentity = false};
             }
         }
 
@@ -89,8 +92,8 @@ namespace netDxf
         {
             get
             {
-                return new Matrix2(1, 0,
-                                   0, 1) {dirty = false, isIdentity = true};
+                return new Matrix2(1.0, 0.0,
+                                   0.0, 1.0) {dirty = false, isIdentity = true};
             }
         }
 
@@ -327,11 +330,18 @@ namespace netDxf
         /// <returns>Matrix2.</returns>
         public static Matrix2 operator *(Matrix2 a, Matrix2 b)
         {
-            if (a.IsIdentity) return b;
-            if (b.IsIdentity) return a;
+            if (a.IsIdentity)
+            {
+                return b;
+            }
 
-            return new Matrix2(a.M11*b.M11 + a.M12*b.M21, a.M11*b.M12 + a.M12*b.M22,
-                               a.M21*b.M11 + a.M22*b.M21, a.M21*b.M12 + a.M22*b.M22);
+            if (b.IsIdentity)
+            {
+                return a;
+            }
+
+            return new Matrix2(a.M11 * b.M11 + a.M12 * b.M21, a.M11 * b.M12 + a.M12 * b.M22,
+                               a.M21 * b.M11 + a.M22 * b.M21, a.M21 * b.M12 + a.M22 * b.M22);
         }
 
         /// <summary>
@@ -342,11 +352,18 @@ namespace netDxf
         /// <returns>Matrix2.</returns>
         public static Matrix2 Multiply(Matrix2 a, Matrix2 b)
         {
-            if (a.IsIdentity) return b;
-            if (b.IsIdentity) return a;
+            if (a.IsIdentity)
+            {
+                return b;
+            }
 
-            return new Matrix2(a.M11*b.M11 + a.M12*b.M21, a.M11*b.M12 + a.M12*b.M22,
-                               a.M21*b.M11 + a.M22*b.M21, a.M21*b.M12 + a.M22*b.M22);
+            if (b.IsIdentity)
+            {
+                return a;
+            }
+
+            return new Matrix2(a.M11 * b.M11 + a.M12 * b.M21, a.M11 * b.M12 + a.M12 * b.M22,
+                               a.M21 * b.M11 + a.M22 * b.M21, a.M21 * b.M12 + a.M22 * b.M22);
         }
 
         /// <summary>
@@ -358,8 +375,8 @@ namespace netDxf
         /// <remarks>Matrix2 adopts the convention of using column vectors.</remarks>
         public static Vector2 operator *(Matrix2 a, Vector2 u)
         {
-            return a.IsIdentity ? u : new Vector2(a.M11*u.X + a.M12*u.Y,
-                                                  a.M21*u.X + a.M22*u.Y);
+            return a.IsIdentity ? u : new Vector2(a.M11 * u.X + a.M12 * u.Y,
+                                                  a.M21 * u.X + a.M22 * u.Y);
         }
 
         /// <summary>
@@ -371,8 +388,8 @@ namespace netDxf
         /// <remarks>Matrix2 adopts the convention of using column vectors.</remarks>
         public static Vector2 Multiply(Matrix2 a, Vector2 u)
         {
-            return a.IsIdentity ? u : new Vector2(a.M11*u.X + a.M12*u.Y,
-                                                  a.M21*u.X + a.M22*u.Y);
+            return a.IsIdentity ? u : new Vector2(a.M11 * u.X + a.M12 * u.Y,
+                                                  a.M21 * u.X + a.M22 * u.Y);
         }
 
         /// <summary>
@@ -383,8 +400,8 @@ namespace netDxf
         /// <returns>Matrix2.</returns>
         public static Matrix2 operator *(Matrix2 m, double a)
         {
-            return new Matrix2(m.M11*a, m.M12*a,
-                               m.M21*a, m.M22*a);
+            return new Matrix2(m.M11 * a, m.M12 * a,
+                               m.M21 * a, m.M22 * a);
         }
 
         /// <summary>
@@ -395,8 +412,8 @@ namespace netDxf
         /// <returns>Matrix2.</returns>
         public static Matrix2 Multiply(Matrix2 m, double a)
         {
-            return new Matrix2(m.M11*a, m.M12*a,
-                               m.M21*a, m.M22*a);
+            return new Matrix2(m.M11 * a, m.M12 * a,
+                               m.M21 * a, m.M22 * a);
         }
 
         /// <summary>
@@ -440,15 +457,21 @@ namespace netDxf
         /// <returns>Inverse Matrix2.</returns>
         public Matrix2 Inverse()
         {
-            if (this.IsIdentity) return Identity;
+            if (this.IsIdentity)
+            {
+                return Identity;
+            }
 
             double det = this.Determinant();
             if (MathHelper.IsZero(det))
+            {
                 throw new ArithmeticException("The matrix is not invertible.");
+            }
 
-            det = 1/det;
-            return new Matrix2(det*this.m22, -det*this.m12,
-                               -det*this.m21, det*this.m11);
+            det = 1 / det;
+
+            return new Matrix2(det * this.m22, -det * this.m12,
+                               -det * this.m21, det * this.m11);
         }
 
         /// <summary>
@@ -506,8 +529,8 @@ namespace netDxf
         /// <returns>A scaling matrix.</returns>
         public static Matrix2 Scale(double x, double y)
         {
-            return new Matrix2(x, 0,
-                               0, y);
+            return new Matrix2(x, 0.0,
+                               0.0, y);
         }
 
         #endregion
@@ -569,8 +592,11 @@ namespace netDxf
         /// <returns>True if obj and this instance are the same type and represent the same value; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Matrix2)
-                return this.Equals((Matrix2) obj);
+            if (obj is Matrix2 matrix)
+            {
+                return this.Equals(matrix);
+            }
+
             return false;
         }
 
