@@ -43,9 +43,7 @@ namespace CADPadServices.Serilization
 
                 foreach (var item in entities)
                 {
-                    //if (!(item.LayerId.id >= 10009 && (item.LayerId.id <= 10012))) continue;
                     drawing.CurrentBlock.AppendEntity(item);
-                    System.Diagnostics.Debug.WriteLine($"=== Added: {item.ClassName}, layerId: {item.LayerId}");
                 }
             }
             finally
@@ -65,11 +63,9 @@ namespace CADPadServices.Serilization
 
                 var tabLayer = new CADPadDB.TableRecord.Layer(layer.Name);
                 tabLayer.name = layer.Name;
-                tabLayer.color = layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) : MapDxfColor(layer.Color);
+                tabLayer.color = MapDxfColor(layer.Color);
                 tabLayer.lineWeight = MapDxfLineWeight(layer.Lineweight);
                 layersTable.Add(tabLayer);
-
-                System.Diagnostics.Trace.WriteLine($"Added layer: {layer.Name}, id: {tabLayer.id}");
             }
         }
 
@@ -78,7 +74,6 @@ namespace CADPadServices.Serilization
             if (_currentDrawing.Document.Database.layerTable.Has(layerName))
             {
                 entity.LayerId = _currentDrawing.Document.Database.layerTable[layerName].id;
-                System.Diagnostics.Trace.WriteLine($"Add {entity.ClassName} to layer: {layerName}");
             }
         }
 
@@ -110,7 +105,7 @@ namespace CADPadServices.Serilization
             l.endPoint = new CADPoint(line.EndPoint.X + x, line.EndPoint.Y + y);
 
             AssignEntityLayer(l, line.Layer.Name);
-            l.Color = line.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255,0,0) : MapDxfColor(line.Color);
+            l.Color = MapDxfColor(line.Color);
 
             return l;
         }
@@ -122,7 +117,7 @@ namespace CADPadServices.Serilization
             {
                 var poly = ReadPolyline(item.Vertexes, item.IsClosed, 0, 0);
                 AssignEntityLayer(poly, item.Layer.Name);
-                poly.Color = item.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) : MapDxfColor(item.Color);
+                poly.Color = MapDxfColor(item.Color);
                 entities.Add(poly);
             }
             return entities;
@@ -162,7 +157,7 @@ namespace CADPadServices.Serilization
             c.radius = circle.Radius;
 
             AssignEntityLayer(c, circle.Layer.Name);
-            c.Color = circle.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) : MapDxfColor(circle.Color);
+            c.Color = MapDxfColor(circle.Color);
 
             return c;
         }
@@ -193,7 +188,7 @@ namespace CADPadServices.Serilization
             c.RadiusY = ellipse.MinorAxis;
 
             AssignEntityLayer(c, ellipse.Layer.Name);
-            c.Color = ellipse.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) : MapDxfColor(ellipse.Color);
+            c.Color = MapDxfColor(ellipse.Color);
 
             return c;
         }
@@ -214,11 +209,11 @@ namespace CADPadServices.Serilization
             Arc c = new Arc();
             c.center = new CADPoint(arc.Center.X + x, arc.Center.Y + y);
             c.radius = arc.Radius;
-            c.startAngle = arc.StartAngle ;
-            c.endAngle = arc.EndAngle;
+            c.startAngle = Utils.DegreeToRadian(arc.StartAngle);
+            c.endAngle = Utils.DegreeToRadian(arc.EndAngle);
 
             AssignEntityLayer(c, arc.Layer.Name);
-            c.Color = arc.Layer.Name == "Kontur 1" ? CADPadDB.Colors.CADColor.FromArgb(255, 0, 0) :  MapDxfColor(arc.Color);
+            c.Color = MapDxfColor(arc.Color);
 
             return c;
         }

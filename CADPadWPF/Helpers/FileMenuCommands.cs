@@ -52,7 +52,8 @@ namespace CADPadWPF.Helpers
             // If no filename was specified, prompt the user for one.
             if (fileName == null)
             {
-                _win.WindowTitle.FileName = RequestFileName();
+                 fileName = RequestFileName();
+                _win.WindowTitle.FileName = fileName;
             }
 
             // Save the document to the specified file.

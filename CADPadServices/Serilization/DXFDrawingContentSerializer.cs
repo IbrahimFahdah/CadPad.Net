@@ -66,8 +66,11 @@ namespace CADPadServices.Serilization
         private void WriteArc(DxfDocument doc, Arc arc)
         {
             var radius = CADPoint.Distance(arc.center, arc.startPoint);
-            doc.Entities.Add(new netDxf.Entities.Arc(new Vector2(arc.center.X, arc.center.Y),
-             radius, arc.startAngle, arc.endAngle));
+            doc.Entities.Add(new netDxf.Entities.Arc(
+                new Vector2(arc.center.X, arc.center.Y),
+                radius,  
+                Utils.RadianToDegree(arc.startAngle), 
+                Utils.RadianToDegree(arc.endAngle)));
         }
         private void WritePolyline(DxfDocument doc, Polyline polyline)
         {

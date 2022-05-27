@@ -76,7 +76,5 @@ namespace CADPadDrawing.Visuals
         {
             Entity?.Draw(this);
         }
-
-
     }
 }
