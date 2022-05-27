@@ -12,13 +12,15 @@ namespace CADPadDrawing.Visuals
     public class CanvasDrawingVisual : DrawingVisual, IDrawingVisual
     {
         protected IDrawing _drawing;
-        private Pen _pen;
+        protected Pen _pen;
         private Brush _fillBrush = null;
         protected DrawingContext thisDC = null;
 
         public void SetColor(CADPadDB.Colors.CADColor color)
-        {
-            _pen = new Pen(new SolidColorBrush(color.ConvertToWPF()), 1);
+        {   
+            this._pen = new Pen();
+            this._pen.Brush = new SolidColorBrush(color.ConvertToWPF());
+            this._pen.Thickness = 1;
         }
 
         public CanvasDrawingVisual(IDrawing drawing)
@@ -28,17 +30,9 @@ namespace CADPadDrawing.Visuals
 
         public void Open()
         {
-            Open(null);
+            thisDC = this.RenderOpen();            
         }
 
-        public void Open(CADPadDB.Colors.CADColor? drawingColor)
-        {
-            thisDC = this.RenderOpen();
-            if (drawingColor.HasValue)
-            {
-                SetColor(drawingColor.Value);
-            }
-        }
         public void Close()
         {
             thisDC.Close();
@@ -51,13 +45,15 @@ namespace CADPadDrawing.Visuals
             {
                 if (_pen == null)
                 {
-                    var b=new SolidColorBrush(Colors.White);
+                    var b = new SolidColorBrush(Colors.White);
            
-                        RenderOptions.SetCachingHint(b, CachingHint.Cache);
-                        b.Freeze();
-                        _pen = new Pen(b, 1);
+                        //RenderOptions.SetCachingHint(b, CachingHint.Cache);
+                        //b.Freeze();
+                        _pen = new Pen();
+                        _pen.Brush = b;
+                        _pen.Thickness = 1;
                         //critical for good performance
-                        _pen.Freeze();
+                        //_pen.Freeze();
                 }
                 return _pen;
             }

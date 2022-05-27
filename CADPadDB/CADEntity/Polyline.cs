@@ -35,7 +35,8 @@ namespace CADPadDB.CADEntity
             if (gd == null)
                 return;
 
-            gd.Open(Color);
+            gd.Open();
+            gd.SetColor(Color);
             int numOfVertices = NumberOfVertices;
             for (int i = 0; i < numOfVertices - 1; ++i)
             {

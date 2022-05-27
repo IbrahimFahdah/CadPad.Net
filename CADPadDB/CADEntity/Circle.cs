@@ -60,7 +60,8 @@ namespace CADPadDB.CADEntity
             if (gd == null)
                 return;
 
-            gd.Open(Color);
+            gd.Open();
+            gd.SetColor(Color);
             gd.DrawCircle(_center, _radius);
             gd.Close();
         }

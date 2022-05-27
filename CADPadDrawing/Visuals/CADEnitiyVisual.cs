@@ -9,7 +9,7 @@ namespace CADPadDrawing.Visuals
 {
     public class CADEnitiyVisual : CanvasDrawingVisual, ICADEnitiyVisual
     {
-        private Pen _spen, _pen;
+        private Pen _spen;//, _pen;
         private bool selected;
       
         public CADEnitiyVisual(IDrawing owner) : base(owner)
@@ -53,11 +53,11 @@ namespace CADPadDrawing.Visuals
                 {
                     var b = new SolidColorBrush(Colors.White);
 
-                    RenderOptions.SetCachingHint(b, CachingHint.Cache);
-                    b.Freeze();
+                    //RenderOptions.SetCachingHint(b, CachingHint.Cache);
+                    //b.Freeze();
                     _pen = new Pen(b, 1);
                     //critical for good performance
-                    _pen.Freeze();
+                    //_pen.Freeze();
                 }
                 return _pen;
             }

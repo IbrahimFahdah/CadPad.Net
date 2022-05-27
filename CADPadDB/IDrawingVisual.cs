@@ -6,7 +6,6 @@ namespace CADPadDB
     {
 
         void Open();
-        void Open(Colors.CADColor? drawingColor);
         void Close();
 
         void DrawCircle(CADPoint center, double radius, bool mdoelToCanvas = true);
@@ -18,5 +17,7 @@ namespace CADPadDB
         void DrawRay(CADPoint basePoint, CADVector direction, bool mdoelToCanvas = true);
         void DrawArc(CADPoint center, double radius, double startAngle, double endAngle, bool mdoelToCanvas = true);
         void DrawEllipse(CADPoint center, double radiusX, double radiusY, bool mdoelToCanvas = true);
+
+        void SetColor(Colors.CADColor color);
     }
 }
