@@ -165,7 +165,7 @@ namespace netDxf.IO
             if (version < DxfVersion.AutoCad2007)
             {
 
-#if !NET45
+#if !NET462
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 #endif
 
@@ -185,13 +185,13 @@ namespace netDxf.IO
                         }
                         catch
                         {
-                            encoding = Encoding.GetEncoding(Encoding.ASCII.WindowsCodePage);
+                            encoding = Encoding.Default;
                             Debug.Assert(false, "Invalid or not compatible code page defined in the DXF.");
                         }
                     }
                     else
                     {
-                        encoding = Encoding.GetEncoding(Encoding.ASCII.WindowsCodePage);
+                        encoding = Encoding.Default;
                         Debug.Assert(false, "Invalid code page defined in the DXF.");
                     }
                 }

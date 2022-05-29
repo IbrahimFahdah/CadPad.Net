@@ -309,7 +309,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="200" />
             </Grid.ColumnDefinitions>
             <canvas:CADPadCanvas x:Name="sCAD"
                                  Grid.Row="1"
@@ -328,7 +328,11 @@
                           Width="5"
                           HorizontalAlignment="Stretch" />
             <controlpanelviews:ControlPanel Grid.Column="2">
+                <StackPanel Grid.Column="2">
+                    <Label Content="Layers" />
+                </StackPanel>
             </controlpanelviews:ControlPanel>
+            
         </Grid>
        
 
