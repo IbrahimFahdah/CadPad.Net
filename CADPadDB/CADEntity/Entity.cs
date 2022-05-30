@@ -87,6 +87,7 @@ namespace CADPadDB.CADEntity
 
         public virtual void Draw()
         {
+            //if (!(this.parent.database.layerTable[Layer] as Layer).Visible) return;
             Draw(DrawingVisual);
         }
 

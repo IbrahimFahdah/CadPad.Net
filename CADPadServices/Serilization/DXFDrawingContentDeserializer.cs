@@ -65,6 +65,7 @@ namespace CADPadServices.Serilization
                 tabLayer.name = layer.Name;
                 tabLayer.color = MapDxfColor(layer.Color);
                 tabLayer.lineWeight = MapDxfLineWeight(layer.Lineweight);
+                tabLayer.Visible = layer.IsVisible;
                 layersTable.Add(tabLayer);
             }
         }

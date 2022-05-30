@@ -58,8 +58,14 @@ namespace CADPadDrawing.Visuals
 
         public void Draw(IGridLayer grid)
         {
-
             Open();
+            
+            if (grid.GridStyle == CADPadServices.Enums.GridStyle.None)
+            {
+                Close();
+                return;
+            }
+
             CADPoint leftpoint = _drawing.CanvasToModel(new CADPoint(0, 0));
             CADPoint rightpoint = _drawing.CanvasToModel(new CADPoint(((CADPadCanvas)_drawing.Canvas).ActualWidth, ((CADPadCanvas)_drawing.Canvas).ActualHeight));
             double gridX = grid.SpacingX;

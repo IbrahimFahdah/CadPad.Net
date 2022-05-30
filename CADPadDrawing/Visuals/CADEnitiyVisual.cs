@@ -9,7 +9,7 @@ namespace CADPadDrawing.Visuals
 {
     public class CADEnitiyVisual : CanvasDrawingVisual, ICADEnitiyVisual
     {
-        private Pen _spen;//, _pen;
+        private Pen _spen;
         private bool selected;
       
         public CADEnitiyVisual(IDrawing owner) : base(owner)
@@ -53,11 +53,11 @@ namespace CADPadDrawing.Visuals
                 {
                     var b = new SolidColorBrush(Colors.White);
 
-                    //RenderOptions.SetCachingHint(b, CachingHint.Cache);
-                    //b.Freeze();
+                    RenderOptions.SetCachingHint(b, CachingHint.Cache);
+                    b.Freeze();
                     _pen = new Pen(b, 1);
                     //critical for good performance
-                    //_pen.Freeze();
+                    _pen.Freeze();
                 }
                 return _pen;
             }
@@ -65,16 +65,12 @@ namespace CADPadDrawing.Visuals
             {
                 _pen = value;
             }
-        }
-
-        //public override void DrawLine(CADPoint startPoint, CADPoint endPoint, bool mdoelToCanvas = true)
-        //{
-        //    DrawLine(_drawing, thisDC, Selected ? SelectPen : Pen, startPoint, endPoint);
-        //}
+        }        
 
         public virtual void Draw()
         {
-            Entity?.Draw(this);
+            if (Entity == null) return;            
+            Entity.Draw(this);
         }
     }
 }

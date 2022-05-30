@@ -31,7 +31,6 @@ namespace CADPadDB.Table
             }
         }
 
-
         public override DBTable dbtable
         {
             get { return this; }

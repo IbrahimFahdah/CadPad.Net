@@ -492,8 +492,7 @@ namespace CADPadDrawing.Canvas
             foreach (Visual g in Geometries)
             {
                 RemoveVisualChild(g);
-                RemoveLogicalChild(g);
-       
+                RemoveLogicalChild(g);       
             }
         }
     }

@@ -5,7 +5,8 @@ namespace CADPadDB.TableRecord
 
     public class Layer : DBTableRecord
     {
-        
+        public bool Visible { get; set; } = true;
+
         public override string ClassName
         {
             get { return "Layer"; }
@@ -57,7 +58,7 @@ namespace CADPadDB.TableRecord
             Layer layer = base.Clone() as Layer;
             layer._color = _color;
             layer._lineWeight = _lineWeight;
-
+            
             return layer;
         }
 

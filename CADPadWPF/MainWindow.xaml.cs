@@ -31,7 +31,6 @@ namespace CADPadWPF
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-      
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -52,7 +51,7 @@ namespace CADPadWPF
                      var cmd = new UndoCmd();
                      Drawing.OnCommand(cmd);
                  },
-                (object sender, CanExecuteRoutedEventArgs e) => { e.CanExecute = Drawing.CanUndo;}));
+                (object sender, CanExecuteRoutedEventArgs e) => { e.CanExecute = Drawing.CanUndo; }));
 
             this.CommandBindings.Add(new CommandBinding(RedoCommand,
                (object sender, ExecutedRoutedEventArgs e) =>
@@ -77,7 +76,15 @@ namespace CADPadWPF
             DataContext = this;
         }
 
-        public Drawing Drawing { get; set; }
+        private Drawing _drawing;
+        public Drawing Drawing {
+            get => _drawing;
+            set {
+                _drawing = value;
+                NotifyPropertyChanged("Drawing");
+            }            
+        }
+
         public WindowTitle WindowTitle { get; set; } = new WindowTitle();
         public FileMenuCommands FileMenuCommands { get; set; }
         public DrawingCommands DrawingCommands { get; set; }
@@ -96,10 +103,10 @@ namespace CADPadWPF
 
         private void MainWindow_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            sCAD.OnKeyUp2(e);
+            sCAD.OnKeyUp2(e);            
         }
 
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -146,11 +153,36 @@ namespace CADPadWPF
             Drawing.OnCommand(cmd);
         }
 
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            var checkbox = (CheckBox)sender;
+            
+            System.Diagnostics.Trace.WriteLine($"Layer {checkbox.Content} visibility set to {checkbox.IsChecked}");
+            if (!checkbox.IsChecked??false) 
+            {
+                this.Drawing.CurrentBlock.Where(a => a.Layer == checkbox.Content.ToString()).ToList().ForEach(a => Drawing.Canvas.RemoveVisual(a.DrawingVisual));
+            }
+            else
+            {
+                this.Drawing.CurrentBlock.Where(a => a.Layer == checkbox.Content.ToString()).ToList().ForEach(a => Drawing.Canvas.AddVisual(a.DrawingVisual));
+            }
+            Drawing.Canvas.Redraw();
+        }
 
-
-      
-
-    
+        private void GridCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            var checkbox = (CheckBox)sender;
+            if (!checkbox.IsChecked ?? false)
+            {
+                Drawing.Canvas?.Clear();
+                Drawing.GridLayer.GridStyle = CADPadServices.Enums.GridStyle.None;                
+            }            
+            else
+            {
+                Drawing.GridLayer.GridStyle = CADPadServices.Enums.GridStyle.Lines;
+            }
+            Drawing.Canvas?.Redraw();
+        }
     }
 
 

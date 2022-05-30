@@ -49,6 +49,8 @@ namespace CADPadServices
         public Selections selections => Document.Selections;
         public IGridLayer GridLayer { get; set; }
 
+        public bool GridVisible { get; set; } = true;
+
         protected CommandsMgr _cmdsMgr = null;
 
         public CADColor AxesColor { get; set; }
@@ -270,7 +272,6 @@ namespace CADPadServices
 
                 drawingVisual.Entity = entity;
                 entity.DrawingVisual = drawingVisual;
-
             }
 
             if (entity.DrawingVisual != null)
@@ -309,8 +310,7 @@ namespace CADPadServices
         {
             Canvas.ClearVisualGrips(entity.DrawingVisual);
             Canvas.RemoveVisual(entity.DrawingVisual);
-            entity.Erase();
-         
+            entity.Erase();         
         }
 
         public void OnCommand(ICommand cmd)

@@ -327,19 +327,35 @@
             <GridSplitter Grid.Column="1"
                           Width="5"
                           HorizontalAlignment="Stretch" />
-            <controlpanelviews:ControlPanel Grid.Column="2">
-                <StackPanel Grid.Column="2">
-                    <Label Content="Layers" />
-                </StackPanel>
-            </controlpanelviews:ControlPanel>
-            
+            <StackPanel Grid.Column="2">
+                <CheckBox x:Name="GridCheckBox"
+                    Content="Grid" 
+                    IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing.GridVisible}"
+                    Checked="GridCheckBox_Checked"
+                    Unchecked="GridCheckBox_Checked"     
+                    />
+                <Label Content="Layers" />
+                <ListBox x:Name="LayerListBox" ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing.Document.Database.layerTable.Layers}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox 
+                                    Grid.Column="1" 
+                                    Content="{Binding Path=name}"
+                                    IsChecked="{Binding Path=Visible}"
+                                    Checked="CheckBox_Checked"
+                                    Unchecked="CheckBox_Checked"
+                                    ></CheckBox>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
         </Grid>
-       
-
-
     </DockPanel>
-
-
 
 </Window>
 

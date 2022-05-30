@@ -1,4 +1,6 @@
-﻿using System.Xml;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Xml;
 using CADPadDB.TableRecord;
 
 namespace CADPadDB.Table
@@ -30,6 +32,13 @@ namespace CADPadDB.Table
             _layerZeroId = layerZero.id;
         }
 
+        public List<Layer> Layers
+        {
+            get
+            {
+                return _items.Select(a => a as Layer).ToList();
+            }
+        }
 
         public override void XmlIn(Filer.XmlFiler filer)
         {

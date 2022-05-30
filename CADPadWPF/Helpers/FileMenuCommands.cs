@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using CADPadServices.Serilization;
 namespace CADPadWPF.Helpers
@@ -17,15 +19,11 @@ namespace CADPadWPF.Helpers
             OpenFileCommand = new CADPadDrawingCommand(OpenFileCommand_Executed);
             NewFileCommand = new CADPadDrawingCommand(NewFileCommand_Executed);
 
-         
-
             _win.CommandBindings.Add(new CommandBinding(ExitCommand,
              (object sender, ExecutedRoutedEventArgs e) =>
              {
                  ShutDown();
              }, null));
-
-            
         }
 
         public RoutedCommand ExitCommand { get; set; } = new RoutedCommand();
@@ -129,7 +127,7 @@ namespace CADPadWPF.Helpers
             if (result == false) return;
 
             _win.WindowTitle.FileName = dialog.FileName;
-
+            _win.Drawing.Clear();
             OpenFile(_win.WindowTitle.FileName);
         }
         private void OpenFile(string fileName)
@@ -147,6 +145,7 @@ namespace CADPadWPF.Helpers
                     deserializer.Read(_win.Drawing);
                 }
                 _win.Drawing.Rebuild();
+                _win.NotifyPropertyChanged("Drawing");
             }
         }
         #endregion
