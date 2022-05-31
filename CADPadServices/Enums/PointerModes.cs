@@ -24,6 +24,10 @@
         /// Dragging
         /// </summary>
         Drag = 3,
+        /// <summary>
+        /// Pointer disabled
+        /// </summary>
+        Disabled = 4
     }
 
    

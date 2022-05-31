@@ -31,7 +31,6 @@ namespace CADPadWPF
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public MainWindow()
@@ -73,6 +72,11 @@ namespace CADPadWPF
 
             FileMenuCommands = new FileMenuCommands(this);
             DrawingCommands = new DrawingCommands(this);
+            CenterAndZoomCommand = new CADPadDrawingCommand(() =>
+            {
+                FileMenuCommands.CenterAndZoomDrawing(150);
+            });
+
             DataContext = this;
         }
 
@@ -93,17 +97,18 @@ namespace CADPadWPF
         public RoutedCommand UndoCommand { get; set; } = new RoutedCommand();
         public RoutedCommand RedoCommand { get; set; } = new RoutedCommand();
         public RoutedCommand AboutDialogCommand { get; set; } = new RoutedCommand();
+        public CADPadDrawingCommand CenterAndZoomCommand { get; set; }
 
         #endregion
 
         private void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            sCAD.OnKeyDown2(e);
+            canvas.OnKeyDown2(e);
         }
 
         private void MainWindow_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            sCAD.OnKeyUp2(e);            
+            canvas.OnKeyUp2(e);            
         }
 
         public void NotifyPropertyChanged([CallerMemberName] String propertyName = "")

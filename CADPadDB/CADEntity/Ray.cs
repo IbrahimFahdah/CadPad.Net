@@ -86,7 +86,7 @@ namespace CADPadDB.CADEntity
                 return;
 
             gd.Open();
-            gd.SetColor(Color);
+            gd.SetColor(ColorValue);
             gd.DrawRay(_basePoint, _direction);
             gd.Close();
         }

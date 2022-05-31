@@ -9,6 +9,7 @@ namespace CADPadDrawing.Visuals
 {
     internal class CADCursorVisual : CanvasDrawingVisual, ICursorVisual
     {
+        public const int DisabledCursorSize = 10;
         public CADCursorVisual(IDrawing drawing) : base(drawing)
         {
 
@@ -39,8 +40,18 @@ namespace CADPadDrawing.Visuals
                 p2 = new CADPoint(loc.X, loc.Y + Length / 2);
                 DrawLine(p1, p2, false);
             }
-            Close();
 
+            if (mode == PointerModes.Disabled)
+            {
+                var p1 = new CADPoint(loc.X - DisabledCursorSize / 2, loc.Y);
+                var p2 = new CADPoint(loc.X + DisabledCursorSize / 2 - 1, loc.Y);
+                DrawLine(p1, p2, false);
+                p1 = new CADPoint(loc.X, loc.Y - DisabledCursorSize / 2);
+                p2 = new CADPoint(loc.X, loc.Y + DisabledCursorSize / 2 - 1);
+                DrawLine(p1, p2, false);
+            }
+
+            Close();
         }
 
 

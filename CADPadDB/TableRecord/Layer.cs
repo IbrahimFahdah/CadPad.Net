@@ -38,14 +38,12 @@ namespace CADPadDB.TableRecord
             }
         }
 
-
         private LineWeight _lineWeight = LineWeight.ByLineWeightDefault;
         public LineWeight lineWeight
         {
             get { return _lineWeight; }
             set { _lineWeight = value; }
         }
-
 
         public Layer(string name = "")
         {

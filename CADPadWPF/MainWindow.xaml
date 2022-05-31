@@ -163,7 +163,7 @@
                 </MenuItem>
 
                 <MenuItem Header="Help">
-                  <MenuItem Header="About..."
+                    <MenuItem Header="About..."
                             Command="{Binding AboutDialogCommand}" />
                 </MenuItem>
             </Menu>
@@ -236,11 +236,11 @@
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
             <StatusBarItem>
-                <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
+                <Label Content="{Binding ElementName=canvas, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
             </StatusBarItem>
             <Separator Grid.Column="1" />
             <!--<StatusBarItem Grid.Column="2">
-                <Label Content="{Binding ElementName=sCAD, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
+                <Label Content="{Binding ElementName=canvas, Path=MousePoint, Mode=OneWay, Converter={StaticResource PointToStringConverter}}" />
             </StatusBarItem>
             <Separator Grid.Column="3" />-->
         </StatusBar>
@@ -311,7 +311,7 @@
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="200" />
             </Grid.ColumnDefinitions>
-            <canvas:CADPadCanvas x:Name="sCAD"
+            <canvas:CADPadCanvas x:Name="canvas"
                                  Grid.Row="1"
                                  Background="Black"
                                  VerticalAlignment="Stretch"
@@ -322,20 +322,33 @@
                                  GridColor="Gray"
                                  Drawing="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing}">
             </canvas:CADPadCanvas>
-           
+
 
             <GridSplitter Grid.Column="1"
                           Width="5"
                           HorizontalAlignment="Stretch" />
-            <StackPanel Grid.Column="2">
+            <StackPanel Grid.Column="2" HorizontalAlignment="Stretch" Background="#FFEAEAEA">
+                <Label Content="Options" Background="#FFC8C5C5" />
                 <CheckBox x:Name="GridCheckBox"
-                    Content="Grid" 
-                    IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing.GridVisible}"
+                    Content="Grid enabled" 
+                    IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing.GridEnabled}"
                     Checked="GridCheckBox_Checked"
                     Unchecked="GridCheckBox_Checked"     
                     />
-                <Label Content="Layers" />
-                <ListBox x:Name="LayerListBox" ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing.Document.Database.layerTable.Layers}">
+                <CheckBox x:Name="ZoomCheckBox"
+                    Content="Zoom enabled" 
+                    IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing.ZoomEnabled}"
+                    />
+                <CheckBox x:Name="SelectionCheckBox"
+                    Content="Select enabled" 
+                    IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing.PointerEnabled}"
+                    />
+                <Button Content="Center + Zoom" Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CenterAndZoomCommand}"/>
+                <Label Content="Layers" Background="#FFC8C5C5" />
+                <ListBox 
+                    x:Name="LayerListBox" 
+                    ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=Drawing.Document.Database.layerTable.Layers}" Background="{x:Null}" BorderBrush="{x:Null}"                    
+                    >
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>

@@ -4,9 +4,7 @@ namespace CADPadDB.Colors
 {
     public struct CADColor
     {
-
-      
-
+        public static ColorMethod GlobalColorMethod { get; set; } = ColorMethod.None;
         public ColorMethod colorMethod { get; private set; }
 
         public byte r { get; private set; }

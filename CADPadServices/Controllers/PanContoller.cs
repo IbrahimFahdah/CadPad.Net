@@ -83,5 +83,34 @@ namespace CADPadServices.Controllers
         {
             return _drawing.Origin + _tempOffsetVector;
         }
+
+        public void MoveTo(CADVector vector)
+        {
+            _tempOffsetVector.X = vector.X;
+            _tempOffsetVector.Y = vector.Y;
+        }
+
+        public void MoveBy(CADVector vector)
+        {
+            _tempOffsetVector += vector;
+        }        
+
+        public void MoveTo(CADPoint point)
+        {
+            _tempOffsetVector.X = point.X;
+            _tempOffsetVector.Y = point.Y;
+        }
+
+        public void MoveBy(CADPoint point)
+        {
+            _tempOffsetVector.X += point.X;
+            _tempOffsetVector.Y += point.Y;
+        }
+
+        public void Reset()
+        {
+            _tempOffsetVector.X = 0;
+            _tempOffsetVector.Y = 0;
+        }
     }
 }

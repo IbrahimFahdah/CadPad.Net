@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -128,7 +129,9 @@ namespace CADPadWPF.Helpers
 
             _win.WindowTitle.FileName = dialog.FileName;
             _win.Drawing.Clear();
+
             OpenFile(_win.WindowTitle.FileName);
+            CenterAndZoomDrawing(150);
         }
         private void OpenFile(string fileName)
         {
@@ -190,6 +193,19 @@ namespace CADPadWPF.Helpers
 
             if (Application.Current != null)
                 Application.Current.Shutdown();
+        }
+
+        public void CenterAndZoomDrawing(double margin = 0)
+        {
+            var bounding = _win.Drawing.GetBounding(_win.Drawing.CurrentBlock.Where(a => a.Visible ?? false).ToList());
+            bounding.GrowBy(margin);
+
+            _win.Drawing.ZoomToFit(
+                _win.canvas.RenderSize.Width,
+                _win.canvas.RenderSize.Height,
+                bounding);
+
+            _win.Drawing.CenterInView(bounding);
         }
     }
 }

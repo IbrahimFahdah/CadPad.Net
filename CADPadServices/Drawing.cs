@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CADPadDB;
 using CADPadDB.CADEntity;
@@ -20,6 +21,8 @@ namespace CADPadServices
         {
             Document = doc;
             doc.Selections.changed += this.OnSelectionChanged;
+
+            ColorMethod = ColorMethod.ByLayer;
 
             Pointer = new PointerContoller(this);
             PanContoller = new PanContoller(this);
@@ -49,7 +52,11 @@ namespace CADPadServices
         public Selections selections => Document.Selections;
         public IGridLayer GridLayer { get; set; }
 
-        public bool GridVisible { get; set; } = true;
+        public bool GridEnabled { get; set; } = false;
+        public bool ZoomEnabled { get; set; } = true;
+        public bool PointerEnabled { get; set; } = false;
+
+        public ColorMethod ColorMethod { get => CADColor.GlobalColorMethod; set => CADColor.GlobalColorMethod = value; }
 
         protected CommandsMgr _cmdsMgr = null;
 
@@ -392,6 +399,44 @@ namespace CADPadServices
             {
                 RemoveEntity(item);
             }
+        }
+
+        public void CenterInView(Bounding bounding)
+        {
+            Canvas.CenterCanvasToModelPoint(new CADPoint(-bounding.center.X, -bounding.center.Y));
+        }
+
+        public void ZoomToFit(double windowWidth, double windowHeight, Bounding bounding)
+        {
+            ZoomContoller.Scale = Math.Min(windowWidth / bounding.width, windowHeight / bounding.height);
+        }
+
+        public Bounding GetBounding(List<Entity> entities) 
+        {
+            CADPoint topLeft = new CADPoint();
+            CADPoint bottomRight = new CADPoint();
+
+            if (entities == null || entities.Count == 0)
+            {
+                return new Bounding();
+            }
+
+            topLeft.X = entities[0].Bounding.left;
+            topLeft.Y = entities[0].Bounding.top;
+            bottomRight.X = entities[0].Bounding.right;
+            bottomRight.Y = entities[0].Bounding.bottom;
+
+            entities.ForEach(a =>
+            {
+                var bounding = a.Bounding;
+                topLeft.X = Math.Min(topLeft.X, bounding.left);
+                topLeft.Y = Math.Max(topLeft.Y, bounding.top);
+
+                bottomRight.X = Math.Max(bottomRight.X, bounding.right);
+                bottomRight.Y = Math.Min(bottomRight.Y, bounding.bottom);
+            });
+
+            return new Bounding(topLeft, bottomRight);
         }
     }
 }

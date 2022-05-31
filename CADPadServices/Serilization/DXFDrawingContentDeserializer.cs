@@ -8,7 +8,8 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace CADPadServices.Serilization
-{    
+{
+    //TODO: MKI - implement SPLINE reading/writing/drawing
     public class DXFDrawingContentDeserializer : DrawingContentDeserializer
     {
         private IDrawing _currentDrawing;
@@ -107,7 +108,6 @@ namespace CADPadServices.Serilization
 
             AssignEntityLayer(l, line.Layer.Name);
             l.Color = MapDxfColor(line.Color);
-
             return l;
         }
 

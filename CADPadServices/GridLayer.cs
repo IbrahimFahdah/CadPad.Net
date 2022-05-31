@@ -24,7 +24,7 @@ namespace CADPadServices
             CrossSize = 10;
             SpacingX = SpacingY = 10;
             MinSize = 15;
-            GridStyle = GridStyle.Lines;
+            GridStyle = ((Drawing)_drawing).GridEnabled ? GridStyle.Lines : GridStyle.None;
             Color = CADColor.FromArgb(255, 0, 0);
         }
 

@@ -61,7 +61,7 @@ namespace CADPadDB.CADEntity
                 return;
 
             gd.Open();
-            gd.SetColor(Color);
+            gd.SetColor(ColorValue);
             gd.DrawCircle(_center, _radius);
             gd.Close();
         }
