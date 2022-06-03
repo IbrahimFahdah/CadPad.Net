@@ -129,9 +129,9 @@ namespace CADPadServices.Serilization
             Polyline poly = new Polyline();
             for (int i = 0; i < vertices.Count; i++)
             {
-                netDxf.Entities.Polyline2DVertex vertex =vertices[i];
-                var point = new CADPoint(vertex.Position.X + x, vertex.Position.Y + y);
-                poly.AddVertexAt(i, point);
+                netDxf.Entities.Polyline2DVertex vertex = vertices[i];
+                var newVertex = new CADPolyLine2DVertex(vertex.Position.X, vertex.Position.Y, vertex.Bulge, vertex.StartWidth, vertex.EndWidth);
+                poly.AddVertexAt(i, newVertex);
             }
             if (isClosed)
             {
@@ -175,7 +175,7 @@ namespace CADPadServices.Serilization
         }
 
         /// <summary>
-        /// TODO. take rotation into account
+        /// TODO: take rotation into account
         /// </summary>
         /// <param name="ellipse"></param>
         /// <param name="x"></param>

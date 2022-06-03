@@ -189,7 +189,4 @@ namespace CADPadWPF
             Drawing.Canvas?.Redraw();
         }
     }
-
-
-
 }
