@@ -52,7 +52,6 @@ namespace CADPadDB.CADEntity
                 }
                 else
                 {
-                    //TODO: MKI - implement conversion
                     var arc = Utils.BulgeToArc(vertex.Point, GetVertexAt(i + 1).Point, vertex.Bulge);
                     gd.DrawArc(arc.center, arc.radius, arc.startAngle, arc.endAngle);
                 }                
@@ -241,7 +240,6 @@ namespace CADPadDB.CADEntity
 
         public override void XmlOut(Filer.XmlFiler filer)
         {
-            //TODO: MKI - refactor to use foreach (CADPolyLine2DVertex vertex in _vertices) 
             base.XmlOut(filer);
             
             //
@@ -249,13 +247,13 @@ namespace CADPadDB.CADEntity
             //
             string strVertices = "";
             int i = 0;
-            foreach (CADPoint vertex in _verticesAsPoints)
+            foreach (CADPolyLine2DVertex vertex in _vertices)
             {
                 if (++i > 1)
                 {
                     strVertices += "|";
                 }
-                strVertices += vertex.X.ToString() + ";" + vertex.Y.ToString();
+                strVertices += $"{vertex.Point.X};{vertex.Point.Y};{vertex.Bulge}";
             }
             filer.Write("vertices", strVertices);
         }
@@ -272,24 +270,28 @@ namespace CADPadDB.CADEntity
             string[] vts = strVertices.Split('|');
             double x = 0;
             double y = 0;
-            string[] xy = null;
+            double bulge = 0;
+            string[] xyb = null;
             foreach (string vtx in vts)
             {
-                xy = vtx.Split(';');
-                if (xy.Length != 2)
+                xyb = vtx.Split(';');
+                if (xyb.Length != 3)
                 {
                     continue;
                 }
-                if (!double.TryParse(xy[0], out x))
+                if (!double.TryParse(xyb[0], out x))
                 {
                     continue;
                 }
-                if (!double.TryParse(xy[1], out y))
+                if (!double.TryParse(xyb[1], out y))
                 {
                     continue;
                 }
-
-                _vertices.Add(new CADPolyLine2DVertex(x, y));
+                if (!double.TryParse(xyb[2], out bulge))
+                {
+                    continue;
+                }
+                _vertices.Add(new CADPolyLine2DVertex(x, y, bulge));
             }
         }
     }
