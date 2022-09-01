@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -70,31 +73,44 @@ namespace netDxf
         /// <param name="value">XData value.</param>
         public XDataRecord(XDataCode code, object value)
         {
-            if(value == null)
+            if (value == null)
+            {
                 throw new ArgumentNullException(nameof(value));
+            }
 
             switch (code)
             {
                 case XDataCode.AppReg:
                     throw new ArgumentException("An application registry cannot be an extended data record.", nameof(value));
                 case XDataCode.BinaryData:
-                    if (!(value is byte[]))
+                    if (!(value is byte[] bytes))
+                    {
                         throw new ArgumentException("The value of a XDataCode.BinaryData must be a byte array.", nameof(value));
+                    }
+                    if (bytes.Length > 127)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(value), value, "The maximum length of a XDataCode.BinaryData is 127, if larger divide the data into multiple XDataCode.BinaryData records.");
+                    }
                     break;
                 case XDataCode.ControlString:
-                    string v = value as string;
-                    if (string.IsNullOrEmpty(v))
+                    if (!(value is string v))
+                    {
                         throw new ArgumentException("The value of a XDataCode.ControlString must be a string.", nameof(value));
+                    }
                     if (!string.Equals(v, "{") && !string.Equals(v, "}"))
+                    {
                         throw new ArgumentException("The only valid values of a XDataCode.ControlString are { or }.", nameof(value));
+                    }
                     break;
                 case XDataCode.DatabaseHandle:
-                    if (!(value is string))
+                    if (!(value is string handle))
+                    {
                         throw new ArgumentException("The value of a XDataCode.DatabaseHandle must be an hexadecimal number.", nameof(value));
-                    long test;
-                    if (!long.TryParse((string) value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out test))
+                    }
+                    if (!long.TryParse(handle, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long _))
+                    {
                         throw new ArgumentException("The value of a XDataCode.DatabaseHandle must be an hexadecimal number.", nameof(value));
-                    value = test.ToString("X");
+                    }
                     break;
                 case XDataCode.Distance:
                 case XDataCode.Real:
@@ -112,20 +128,33 @@ namespace netDxf
                 case XDataCode.WorldSpaceDisplacementY:
                 case XDataCode.WorldSpaceDisplacementZ:
                     if (!(value is double))
+                    {
                         throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (double)), nameof(value));
+                    }
                     break;
                 case XDataCode.Int16:
                     if (!(value is short))
+                    {
                         throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (short)), nameof(value));
+                    }
                     break;
                 case XDataCode.Int32:
                     if (!(value is int))
+                    {
                         throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be an {1}.", code, typeof (int)), nameof(value));
+                    }
                     break;
                 case XDataCode.LayerName:
                 case XDataCode.String:
-                    if (!(value is string))
+                    if (!(value is string text))
+                    {
                         throw new ArgumentException(string.Format("The value of a XDataCode.{0} must be a {1}.", code, typeof (string)), nameof(value));
+                    }
+                    if (text.Length > 255)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(value), value, "The maximum length of a XDataCode.String is 255, if larger divide the data into multiple XDataCode.String records.");
+                    }
+
                     break;
             }
             this.code = code;
@@ -137,7 +166,7 @@ namespace netDxf
         #region public properties
 
         /// <summary>
-        /// Gets or set the XData code.
+        /// Gets the XData code.
         /// </summary>
         /// <remarks>The only valid values are the ones defined in the <see cref="XDataCode">XDataCode</see> class.</remarks>
         public XDataCode Code
@@ -146,7 +175,7 @@ namespace netDxf
         }
 
         /// <summary>
-        /// Gets or sets the XData value.
+        /// Gets the XData value.
         /// </summary>
         public object Value
         {

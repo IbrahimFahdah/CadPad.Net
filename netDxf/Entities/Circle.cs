@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -60,7 +63,9 @@ namespace netDxf.Entities
         {
             this.center = center;
             if (radius <= 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(radius), radius, "The circle radius must be greater than zero.");
+            }
             this.radius = radius;
             this.thickness = 0.0;
         }
@@ -97,7 +102,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The circle radius must be greater than zero.");
+                }
                 this.radius = value;
             }
         }
@@ -122,34 +129,36 @@ namespace netDxf.Entities
         /// <returns>A list vertexes that represents the circle expressed in object coordinate system.</returns>
         public List<Vector2> PolygonalVertexes(int precision)
         {
-            if (precision < 3)
-                throw new ArgumentOutOfRangeException(nameof(precision), precision, "The circle precision must be greater or equal to three");
+            if (precision < 2)
+            {
+                throw new ArgumentOutOfRangeException(nameof(precision), precision, "The precision must be equal or greater than two.");
+            }
 
             List<Vector2> ocsVertexes = new List<Vector2>();
 
-            double delta = MathHelper.TwoPI/precision;
+            double delta = MathHelper.TwoPI / precision;
 
             for (int i = 0; i < precision; i++)
             {
-                double angle = delta*i;
-                double sine = this.radius*Math.Sin(angle);
-                double cosine = this.radius*Math.Cos(angle);
+                double angle = delta * i;
+                double sine = this.radius * Math.Sin(angle);
+                double cosine = this.radius * Math.Cos(angle);
                 ocsVertexes.Add(new Vector2(cosine, sine));
             }
             return ocsVertexes;
         }
 
         /// <summary>
-        /// Converts the circle in a Polyline.
+        /// Converts the circle in a Polyline2D.
         /// </summary>
         /// <param name="precision">Number of vertexes generated.</param>
-        /// <returns>A new instance of <see cref="LwPolyline">LightWeightPolyline</see> that represents the circle.</returns>
-        public LwPolyline ToPolyline(int precision)
+        /// <returns>A new instance of <see cref="Polyline2D">Polyline2D</see> that represents the circle.</returns>
+        public Polyline2D ToPolyline2D(int precision)
         {
             IEnumerable<Vector2> vertexes = this.PolygonalVertexes(precision);
             Vector3 ocsCenter = MathHelper.Transform(this.Center, this.Normal, CoordinateSystem.World, CoordinateSystem.Object);
 
-            LwPolyline poly = new LwPolyline
+            Polyline2D poly = new Polyline2D
             {
                 Layer = (Layer) this.Layer.Clone(),
                 Linetype = (Linetype) this.Linetype.Clone(),
@@ -164,7 +173,7 @@ namespace netDxf.Entities
             };
             foreach (Vector2 v in vertexes)
             {
-                poly.Vertexes.Add(new LwPolylineVertex(v.X + ocsCenter.X, v.Y + ocsCenter.Y));
+                poly.Vertexes.Add(new Polyline2DVertex(v.X + ocsCenter.X, v.Y + ocsCenter.Y));
             }
             return poly;
         }
@@ -186,7 +195,10 @@ namespace netDxf.Entities
         {
             Vector3 newCenter = transformation * this.Center + translation;
             Vector3 newNormal = transformation * this.Normal;
-            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
 
             Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
@@ -196,7 +208,10 @@ namespace netDxf.Entities
             axis = transWO * axis;
             Vector2 axisPoint = new Vector2(axis.X, axis.Y);
             double newRadius = axisPoint.Modulus();
-            if (MathHelper.IsZero(newRadius)) newRadius = MathHelper.Epsilon;
+            if (MathHelper.IsZero(newRadius))
+            {
+                newRadius = MathHelper.Epsilon;
+            }
 
             this.Normal = newNormal;
             this.Center = newCenter;
@@ -227,7 +242,9 @@ namespace netDxf.Entities
             };
 
             foreach (XData data in this.XData.Values)
+            {
                 entity.XData.Add((XData) data.Clone());
+            }
 
             return entity;
         }

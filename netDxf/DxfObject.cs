@@ -1,24 +1,30 @@
-﻿#region netDxf library, Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
+
+using netDxf.Collections;
+using netDxf.Tables;
 
 namespace netDxf
 {
@@ -27,11 +33,38 @@ namespace netDxf
     /// </summary>
     public abstract class DxfObject
     {
+        #region delegates and events
+
+        public delegate void XDataAddAppRegEventHandler(DxfObject sender, ObservableCollectionEventArgs<ApplicationRegistry> e);
+        public event XDataAddAppRegEventHandler XDataAddAppReg;
+        protected virtual void OnXDataAddAppRegEvent(ApplicationRegistry item)
+        {
+            XDataAddAppRegEventHandler ae = this.XDataAddAppReg;
+            if (ae != null)
+            {
+                ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
+            }
+        }
+
+        public delegate void XDataRemoveAppRegEventHandler(DxfObject sender, ObservableCollectionEventArgs<ApplicationRegistry> e);
+        public event XDataRemoveAppRegEventHandler XDataRemoveAppReg;
+        protected virtual void OnXDataRemoveAppRegEvent(ApplicationRegistry item)
+        {
+            XDataRemoveAppRegEventHandler ae = this.XDataRemoveAppReg;
+            if (ae != null)
+            {
+                ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
+            }
+        }
+
+        #endregion
+
         #region private fields
 
         private string codename;
         private string handle;
         private DxfObject owner;
+        private readonly XDataDictionary xData;
 
         #endregion
 
@@ -46,6 +79,9 @@ namespace netDxf
             this.codename = codename;
             this.handle = null;
             this.owner = null;
+            this.xData = new XDataDictionary();
+            this.xData.AddAppReg += this.XData_AddAppReg;
+            this.xData.RemoveAppReg += this.XData_RemoveAppReg;
         }
 
         #endregion
@@ -65,7 +101,7 @@ namespace netDxf
         /// Gets the handle assigned to the DXF object.
         /// </summary>
         /// <remarks>
-        /// The handle is a unique hexadecimal number assigned automatically to every dxf object,
+        /// The handle is a unique hexadecimal number assigned automatically to every DXF object,
         /// that has been added to a <see cref="DxfDocument">DxfDocument</see>.
         /// </remarks>
         public string Handle
@@ -83,6 +119,14 @@ namespace netDxf
             internal set { this.owner = value; }
         }
 
+        /// <summary>
+        /// Gets the entity <see cref="XDataDictionary">extended data</see>.
+        /// </summary>
+        public XDataDictionary XData
+        {
+            get { return this.xData; }
+        }
+
         #endregion
 
         #region internal methods
@@ -93,10 +137,10 @@ namespace netDxf
         /// <param name="entityNumber">Number to assign to the actual object.</param>
         /// <returns>Next available entity number.</returns>
         /// <remarks>
-        /// Some objects might consume more than one, is, for example, the case of polylines that will assign
+        /// Some objects might consume more than one, this is the case, for example, of polylines that will assign
         /// automatically a handle to its vertexes. The entity number will be converted to an hexadecimal number.
         /// </remarks>
-        internal virtual long AsignHandle(long entityNumber)
+        internal virtual long AssignHandle(long entityNumber)
         {
             this.handle = entityNumber.ToString("X");
             return entityNumber + 1;
@@ -113,6 +157,20 @@ namespace netDxf
         public override string ToString()
         {
             return this.codename;
+        }
+
+        #endregion
+
+        #region XData events
+
+        private void XData_AddAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
+        {
+            this.OnXDataAddAppRegEvent(e.Item);
+        }
+
+        private void XData_RemoveAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
+        {
+            this.OnXDataRemoveAppRegEvent(e.Item);
         }
 
         #endregion

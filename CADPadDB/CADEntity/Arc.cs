@@ -167,8 +167,9 @@ namespace CADPadDB.CADEntity
         {
             if (gd == null)
                 return;
-
+                        
             gd.Open();
+            gd.SetColor(ColorValue);
             gd.DrawArc(_center, _radius, _startAngle, _endAngle);
             gd.Close();
         }

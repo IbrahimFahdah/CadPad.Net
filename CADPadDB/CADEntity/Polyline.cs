@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using CADPadDB.Maths;
 
 namespace CADPadDB.CADEntity
@@ -12,7 +14,10 @@ namespace CADPadDB.CADEntity
             get { return "Polyline"; }
         }
 
-        private List<CADPoint> _vertices = new List<CADPoint>();
+        private List<CADPolyLine2DVertex> _vertices = new List<CADPolyLine2DVertex>();
+
+        private List<CADPoint> _verticesAsPoints { get => _vertices.Select(a => a.Point).ToList(); }
+
         private bool _closed = false;
 
         public int NumberOfVertices
@@ -36,23 +41,38 @@ namespace CADPadDB.CADEntity
                 return;
 
             gd.Open();
+            gd.SetColor(ColorValue);
             int numOfVertices = NumberOfVertices;
             for (int i = 0; i < numOfVertices - 1; ++i)
             {
-                gd.DrawLine(GetPointAt(i), GetPointAt(i + 1));
+                var vertex = GetVertexAt(i);
+                if (vertex.Bulge == 0)
+                {
+                    gd.DrawLine(vertex.Point, GetVertexAt(i + 1).Point);
+                }
+                else
+                {
+                    var arc = Utils.BulgeToArc(vertex.Point, GetVertexAt(i + 1).Point, vertex.Bulge);
+                    gd.DrawArc(arc.center, arc.radius, arc.startAngle, arc.endAngle);
+                }                
             }
 
             if (closed
                 && numOfVertices > 2)
             {
-                gd.DrawLine(GetPointAt(numOfVertices - 1), GetPointAt(0));
+                gd.DrawLine(GetVertexAt(numOfVertices - 1).Point, GetVertexAt(0).Point);
             }
             gd.Close();
         }
 
+        public void AddVertexAt(int index, CADPolyLine2DVertex vertex)
+        {
+            _vertices.Insert(index, vertex);
+        }
+
         public void AddVertexAt(int index, CADPoint point)
         {
-            _vertices.Insert(index, point);
+            _vertices.Insert(index, new CADPolyLine2DVertex(point));
         }
 
         public void RemoveVertexAt(int index)
@@ -60,18 +80,29 @@ namespace CADPadDB.CADEntity
             _vertices.RemoveAt(index);
         }
 
-        public CADPoint GetPointAt(int index)
+        public CADPolyLine2DVertex GetVertexAt(int index)
         {
             return _vertices[index];
         }
 
+        public void SetVertexAt(int index, CADPolyLine2DVertex vertex)
+        {
+            _vertices[index] = vertex;
+        }
+
         public void SetPointAt(int index, CADPoint point)
         {
-            _vertices[index] = point;
+            _vertices[index].Point = point; 
+        }
+
+        public CADPoint GetPointAt(int index)
+        {
+            return _vertices[index].Point;
         }
 
         public override Bounding Bounding
         {
+            //TODO: MKI - refactor respect arc boundigs (center+radius)
             get
             {
                 if (_vertices.Count > 0)
@@ -81,7 +112,7 @@ namespace CADPadDB.CADEntity
                     double maxX = double.MinValue;
                     double maxY = double.MinValue;
 
-                    foreach (CADPoint point in _vertices)
+                    foreach (CADPoint point in _verticesAsPoints)
                     {
                         minX = point.X < minX ? point.X : minX;
                         minY = point.Y < minY ? point.Y : minY;
@@ -117,15 +148,15 @@ namespace CADPadDB.CADEntity
         {
             for (int i = 0; i < this.NumberOfVertices; ++i)
             {
-                _vertices[i] += translation;
+                _vertices[i].Point += translation;
             }
         }
 
         public override void TransformBy(Matrix3 transform)
         {
             for (int i = 0; i < this.NumberOfVertices; ++i)
-            {
-                _vertices[i] = transform * _vertices[i];
+            {                
+                _vertices[i].Point = transform * _vertices[i].Point;
             }
         }
 
@@ -153,18 +184,18 @@ namespace CADPadDB.CADEntity
             int numOfVertices = NumberOfVertices;
             for (int i = 0; i < numOfVertices; ++i)
             {
-                gripPnts.Add(new GripPoint(GripPointType.End, _vertices[i]));
+                gripPnts.Add(new GripPoint(GripPointType.End, _verticesAsPoints[i]));
             }
             for (int i = 0; i < numOfVertices - 1; ++i)
             {
-                GripPoint midGripPnt = new GripPoint(GripPointType.Mid, (_vertices[i] + _vertices[i+1]) / 2);
-                midGripPnt.xData1 = _vertices[i];
-                midGripPnt.xData2 = _vertices[i + 1];
+                GripPoint midGripPnt = new GripPoint(GripPointType.Mid, (_vertices[i].Point + _vertices[i+1].Point) / 2);
+                midGripPnt.xData1 = _vertices[i].Point;
+                midGripPnt.xData2 = _vertices[i + 1].Point;
                 gripPnts.Add(midGripPnt);
             }
             if (_closed && numOfVertices > 2)
             {
-                GripPoint midGripPnt = new GripPoint(GripPointType.Mid, (_vertices[0] + _vertices[numOfVertices - 1]) / 2);
+                GripPoint midGripPnt = new GripPoint(GripPointType.Mid, (_vertices[0].Point + _vertices[numOfVertices - 1].Point) / 2);
                 midGripPnt.xData1 = _vertices[0];
                 midGripPnt.xData2 = _vertices[numOfVertices - 1];
                 gripPnts.Add(midGripPnt);
@@ -210,19 +241,19 @@ namespace CADPadDB.CADEntity
         public override void XmlOut(Filer.XmlFiler filer)
         {
             base.XmlOut(filer);
-
+            
             //
             filer.Write("closed", _closed);
             //
             string strVertices = "";
             int i = 0;
-            foreach (CADPoint vertex in _vertices)
+            foreach (CADPolyLine2DVertex vertex in _vertices)
             {
                 if (++i > 1)
                 {
                     strVertices += "|";
                 }
-                strVertices += vertex.X.ToString() + ";" + vertex.Y.ToString();
+                strVertices += $"{vertex.Point.X};{vertex.Point.Y};{vertex.Bulge}";
             }
             filer.Write("vertices", strVertices);
         }
@@ -239,24 +270,28 @@ namespace CADPadDB.CADEntity
             string[] vts = strVertices.Split('|');
             double x = 0;
             double y = 0;
-            string[] xy = null;
+            double bulge = 0;
+            string[] xyb = null;
             foreach (string vtx in vts)
             {
-                xy = vtx.Split(';');
-                if (xy.Length != 2)
+                xyb = vtx.Split(';');
+                if (xyb.Length != 3)
                 {
                     continue;
                 }
-                if (!double.TryParse(xy[0], out x))
+                if (!double.TryParse(xyb[0], out x))
                 {
                     continue;
                 }
-                if (!double.TryParse(xy[1], out y))
+                if (!double.TryParse(xyb[1], out y))
                 {
                     continue;
                 }
-
-                _vertices.Add(new CADPoint(x, y));
+                if (!double.TryParse(xyb[2], out bulge))
+                {
+                    continue;
+                }
+                _vertices.Add(new CADPolyLine2DVertex(x, y, bulge));
             }
         }
     }

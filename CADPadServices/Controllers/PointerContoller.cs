@@ -92,6 +92,13 @@ namespace CADPadServices.Controllers
             _pos.X = e.X;
             _pos.Y = e.Y;
             Command cmd = null;
+
+            if (!((Drawing)_drawing).PointerEnabled)
+            {
+                Draw();
+                return new EventResult() { data = cmd };
+            }
+
             switch (mode)
             {
                 case PointerModes.Default:
@@ -189,6 +196,12 @@ namespace CADPadServices.Controllers
 
         public IEventResult OnMouseUp(IMouseButtonEventArgs e)
         {
+            if (!((Drawing)_drawing).PointerEnabled)
+            {
+                Draw();
+                return null;
+            }
+
             if (e.ChangedButton == MouseButton.Left && e.ButtonState == MouseButtonState.Released)
             {
                 if (SelRect.Active)
@@ -220,6 +233,13 @@ namespace CADPadServices.Controllers
             _pos.X = e.X;
             _pos.Y = e.Y;
             _loc = _drawing.CanvasToModel(_pos);
+
+            if (!((Drawing)_drawing).PointerEnabled) 
+            {
+                Draw();
+                return null;
+            } 
+
             switch (mode)
             {
                 case PointerModes.Default:
@@ -264,6 +284,12 @@ namespace CADPadServices.Controllers
 
         private void Draw()
         {
+            if (!((Drawing)_drawing).PointerEnabled) 
+            {
+                _cursor.Draw(PointerModes.Disabled, _loc, 0, true);
+                return;
+            } 
+
             _cursor.Draw(mode, _loc, _pickupBox.side, !SelRect.Active);
 
             SelRect.Draw();
@@ -272,6 +298,8 @@ namespace CADPadServices.Controllers
 
         public IEventResult OnMouseDoubleClick(IMouseEventArgs e)
         {
+            if (!((Drawing)_drawing).PointerEnabled) return null;
+
             switch (mode)
             {
                 case PointerModes.Default:

@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -89,8 +92,10 @@ namespace netDxf
             get { return epsilon; }
             set
             {
-                if(value<=0.0)
+                if (value <= 0.0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The epsilon value must be a positive number greater than zero.");
+                }
                 epsilon = value;
             }
         }
@@ -106,8 +111,9 @@ namespace netDxf
         /// </param>
         /// <returns>
         /// A number that indicates the sign of value.
-        /// Return value Meaning -1 value is less than zero.
-        /// 0 value is equal to zero.
+        /// Return value, meaning:<br />
+        /// -1 value is less than zero.<br />
+        /// 0 value is equal to zero.<br />
         /// 1 value is greater than zero.
         /// </returns>
         /// <remarks>This method will test for values of numbers very close to zero.</remarks>
@@ -119,13 +125,13 @@ namespace netDxf
         /// <summary>
         /// Returns a value indicating the sign of a double-precision floating-point number.
         /// </summary>
-        /// <param name="number">Double precision number.
+        /// <param name="number">Double precision number.</param>
         /// <param name="threshold">Tolerance.</param>
-        /// </param>
         /// <returns>
         /// A number that indicates the sign of value.
-        /// Return value Meaning -1 value is less than zero.
-        /// 0 value is equal to zero.
+        /// Return value, meaning:<br />
+        /// -1 value is less than zero.<br />
+        /// 0 value is equal to zero.<br />
         /// 1 value is greater than zero.
         /// </returns>
         /// <remarks>This method will test for values of numbers very close to zero.</remarks>
@@ -211,19 +217,21 @@ namespace netDxf
         {
             // if the rotation is 0 no transformation is needed the transformation matrix is the identity
             if (IsZero(rotation))
+            {
                 return point;
+            }
 
             double sin = Math.Sin(rotation);
             double cos = Math.Cos(rotation);
-            if (from == CoordinateSystem.World && to == CoordinateSystem.Object)
+            switch (from)
             {
-                return new Vector2(point.X*cos + point.Y*sin, -point.X*sin + point.Y*cos);
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
+                    return new Vector2(point.X*cos + point.Y*sin, -point.X*sin + point.Y*cos);
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                    return new Vector2(point.X*cos - point.Y*sin, point.X*sin + point.Y*cos);
+                default:
+                    return point;
             }
-            if (from == CoordinateSystem.Object && to == CoordinateSystem.World)
-            {
-                return new Vector2(point.X*cos - point.Y*sin, point.X*sin + point.Y*cos);
-            }
-            return point;
         }
 
         /// <summary>
@@ -237,35 +245,43 @@ namespace netDxf
         public static List<Vector2> Transform(IEnumerable<Vector2> points, double rotation, CoordinateSystem from, CoordinateSystem to)
         {
             if (points == null)
+            {
                 throw new ArgumentNullException(nameof(points));
+            }
 
             // if the rotation is 0 no transformation is needed the transformation matrix is the identity
             if (IsZero(rotation))
+            {
                 return new List<Vector2>(points);
+            }
 
             double sin = Math.Sin(rotation);
             double cos = Math.Cos(rotation);
 
             List<Vector2> transPoints;
-            if (from == CoordinateSystem.World && to == CoordinateSystem.Object)
+            switch (from)
             {
-                transPoints = new List<Vector2>();
-                foreach (Vector2 p in points)
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
                 {
-                    transPoints.Add(new Vector2(p.X*cos + p.Y*sin, -p.X*sin + p.Y*cos));
+                    transPoints = new List<Vector2>();
+                    foreach (Vector2 p in points)
+                    {
+                        transPoints.Add(new Vector2(p.X * cos + p.Y * sin, -p.X * sin + p.Y * cos));
+                    }
+                    return transPoints;
                 }
-                return transPoints;
-            }
-            if (from == CoordinateSystem.Object && to == CoordinateSystem.World)
-            {
-                transPoints = new List<Vector2>();
-                foreach (Vector2 p in points)
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
                 {
-                    transPoints.Add(new Vector2(p.X*cos - p.Y*sin, p.X*sin + p.Y*cos));
+                    transPoints = new List<Vector2>();
+                    foreach (Vector2 p in points)
+                    {
+                        transPoints.Add(new Vector2(p.X * cos - p.Y * sin, p.X * sin + p.Y * cos));
+                    }
+                    return transPoints;
                 }
-                return transPoints;
+                default:
+                    return new List<Vector2>(points);
             }
-            return new List<Vector2>(points);
         }
 
         /// <summary>
@@ -278,21 +294,17 @@ namespace netDxf
         /// <returns>Transformed point.</returns>
         public static Vector3 Transform(Vector3 point, Vector3 zAxis, CoordinateSystem from, CoordinateSystem to)
         {
-            // if the normal is (0,0,1) no transformation is needed the transformation matrix is the identity
-            if (zAxis.Equals(Vector3.UnitZ))
-                return point;
-
             Matrix3 trans = ArbitraryAxis(zAxis);
-            if (from == CoordinateSystem.World && to == CoordinateSystem.Object)
+            switch (from)
             {
-                trans = trans.Transpose();
-                return trans*point;
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
+                    trans = trans.Transpose();
+                    return trans * point;
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                    return trans * point;
+                default:
+                    return point;
             }
-            if (from == CoordinateSystem.Object && to == CoordinateSystem.World)
-            {
-                return trans*point;
-            }
-            return point;
         }
 
         /// <summary>
@@ -306,33 +318,115 @@ namespace netDxf
         public static List<Vector3> Transform(IEnumerable<Vector3> points, Vector3 zAxis, CoordinateSystem from, CoordinateSystem to)
         {
             if (points == null)
+            {
                 throw new ArgumentNullException(nameof(points));
-
-            if (zAxis.Equals(Vector3.UnitZ))
-                return new List<Vector3>(points);
+            }
 
             Matrix3 trans = ArbitraryAxis(zAxis);
             List<Vector3> transPoints;
-            if (from == CoordinateSystem.World && to == CoordinateSystem.Object)
+            switch (from)
             {
-                transPoints = new List<Vector3>();
-                trans = trans.Transpose();
-                foreach (Vector3 p in points)
+                case CoordinateSystem.World when to == CoordinateSystem.Object:
                 {
-                    transPoints.Add(trans*p);
+                    transPoints = new List<Vector3>();
+                    trans = trans.Transpose();
+                    foreach (Vector3 p in points)
+                    {
+                        transPoints.Add(trans * p);
+                    }
+                    return transPoints;
                 }
-                return transPoints;
+                case CoordinateSystem.Object when to == CoordinateSystem.World:
+                {
+                    transPoints = new List<Vector3>();
+                    foreach (Vector3 p in points)
+                    {
+                        transPoints.Add(trans * p);
+                    }
+                    return transPoints;
+                }
+                default:
+                    return new List<Vector3>(points);
             }
-            if (from == CoordinateSystem.Object && to == CoordinateSystem.World)
+        }
+
+        /// <summary>
+        /// Transform a 2d point from object coordinates to world coordinates.
+        /// </summary>
+        /// <param name="point">Points to transform.</param>
+        /// <param name="zAxis">Object normal vector.</param>
+        /// <param name="elevation">Object elevation.</param>
+        /// <returns>Transformed point.</returns>
+        public static Vector3 Transform(Vector2 point, Vector3 zAxis, double elevation)
+        {
+            Matrix3 trans = ArbitraryAxis(zAxis);
+            return trans * new Vector3(point.X, point.Y, elevation);
+        }
+
+        /// <summary>
+        /// Transform a 2d point list from object coordinates to world coordinates.
+        /// </summary>
+        /// <param name="points">Point to transform.</param>
+        /// <param name="zAxis">Object normal vector.</param>
+        /// <param name="elevation">Object elevation.</param>
+        /// <returns>Transformed points.</returns>
+        public static List<Vector3> Transform(IEnumerable<Vector2> points, Vector3 zAxis, double elevation)
+        {
+            if (points == null)
             {
-                transPoints = new List<Vector3>();
-                foreach (Vector3 p in points)
-                {
-                    transPoints.Add(trans*p);
-                }
-                return transPoints;
+                throw new ArgumentNullException(nameof(points));
             }
-            return new List<Vector3>(points);
+
+            List<Vector3> transPoints = new List<Vector3>();
+            Matrix3 trans = ArbitraryAxis(zAxis);
+            foreach (Vector2 p in points)
+            {
+                transPoints.Add(trans * new Vector3(p.X, p.Y, elevation));
+            }
+            return transPoints;
+        }
+
+        /// <summary>
+        /// Transform a 3d point from world coordinates to object coordinates.
+        /// </summary>
+        /// <param name="point">Point to transform.</param>
+        /// <param name="zAxis">Object normal vector.</param>
+        /// <param name="elevation">Z axis value of the transformed point.</param>
+        /// <returns>Transformed point.</returns>
+        public static Vector2 Transform(Vector3 point, Vector3 zAxis, out double elevation)
+        {
+            Matrix3 trans = ArbitraryAxis(zAxis).Transpose();
+            Vector3 p = trans * point;
+            elevation = point.Z;
+            return new Vector2(point.X, point.Y);
+        }
+
+        /// <summary>
+        /// Transform a 3d point list from world coordinates to object coordinates.
+        /// </summary>
+        /// <param name="points">Points to transform.</param>
+        /// <param name="zAxis">Object normal vector.</param>
+        /// <param name="elevation">Average Z axis value of the transformed points.</param>
+        /// <returns>Transformed points.</returns>
+        public static List<Vector2> Transform(IEnumerable<Vector3> points, Vector3 zAxis, out double elevation)
+        {
+            if (points == null)
+            {
+                throw new ArgumentNullException(nameof(points));
+            }
+
+            List<Vector2> transPoints = new List<Vector2>();
+            Matrix3 trans = ArbitraryAxis(zAxis).Transpose();
+            elevation = 0.0;
+            foreach (Vector3 point in points)
+            {
+                Vector3 p = trans * point;
+                elevation += p.Z;
+                transPoints.Add(new Vector2(p.X, p.Y));
+            }
+
+            elevation /= transPoints.Count;
+            return transPoints;
         }
 
         /// <summary>
@@ -344,7 +438,10 @@ namespace netDxf
         {
             zAxis.Normalize();
 
-            if (zAxis.Equals(Vector3.UnitZ)) return Matrix3.Identity;
+            if (zAxis.Equals(Vector3.UnitZ))
+            {
+                return Matrix3.Identity;
+            }
 
             Vector3 wY = Vector3.UnitY;
             Vector3 wZ = Vector3.UnitZ;
@@ -485,12 +582,14 @@ namespace netDxf
         {
             // test for parallelism.
             if (Vector2.AreParallel(dir0, dir1, threshold))
-                return new Vector2(double.NaN, double.NaN);
+            {
+                return Vector2.NaN;
+            }
 
             // lines are not parallel
-            Vector2 vect = point1 - point0;
+            Vector2 v = point1 - point0;
             double cross = Vector2.CrossProduct(dir0, dir1);
-            double s = (vect.X*dir1.Y - vect.Y*dir1.X)/cross;
+            double s = (v.X * dir1.Y - v.Y * dir1.X) / cross;
             return point0 + s*dir0;
         }
 
@@ -502,8 +601,17 @@ namespace netDxf
         /// <remarks>Negative angles will be converted to its positive equivalent.</remarks>
         public static double NormalizeAngle(double angle)
         {
-            double normalized = angle%360.0;
-            if (normalized < 0) return 360.0 + normalized;
+            double normalized = angle % 360.0;
+            if (IsZero(normalized) || IsEqual(Math.Abs(normalized), 360.0))
+            {
+                return 0.0;
+            }
+
+            if (normalized < 0)
+            {
+                return 360.0 + normalized;
+            }
+
             return normalized;
         }
 
@@ -533,17 +641,17 @@ namespace netDxf
             double cos = Math.Cos(angle);
             double sin = Math.Sin(angle);
 
-            q.X += (cos + (1 - cos)*axis.X*axis.X)*v.X;
-            q.X += ((1 - cos)*axis.X*axis.Y - axis.Z*sin)*v.Y;
-            q.X += ((1 - cos)*axis.X*axis.Z + axis.Y*sin)*v.Z;
+            q.X += (cos + (1 - cos) * axis.X * axis.X) * v.X;
+            q.X += ((1 - cos) * axis.X * axis.Y - axis.Z * sin) * v.Y;
+            q.X += ((1 - cos) * axis.X * axis.Z + axis.Y * sin) * v.Z;
 
-            q.Y += ((1 - cos)*axis.X*axis.Y + axis.Z*sin)*v.X;
-            q.Y += (cos + (1 - cos)*axis.Y*axis.Y)*v.Y;
-            q.Y += ((1 - cos)*axis.Y*axis.Z - axis.X*sin)*v.Z;
+            q.Y += ((1 - cos) * axis.X * axis.Y + axis.Z * sin) * v.X;
+            q.Y += (cos + (1 - cos) * axis.Y * axis.Y) * v.Y;
+            q.Y += ((1 - cos) * axis.Y * axis.Z - axis.X * sin) * v.Z;
 
-            q.Z += ((1 - cos)*axis.X*axis.Z - axis.Y*sin)*v.X;
-            q.Z += ((1 - cos)*axis.Y*axis.Z + axis.X*sin)*v.Y;
-            q.Z += (cos + (1 - cos)*axis.Z*axis.Z)*v.Z;
+            q.Z += ((1 - cos) * axis.X * axis.Z - axis.Y * sin) * v.X;
+            q.Z += ((1 - cos) * axis.Y * axis.Z + axis.X * sin) * v.Y;
+            q.Z += (cos + (1 - cos) * axis.Z * axis.Z) * v.Z;
 
             return q;
         }

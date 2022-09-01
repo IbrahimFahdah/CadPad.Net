@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using CADPadServices.Serilization;
 namespace CADPadWPF.Helpers
@@ -17,15 +20,11 @@ namespace CADPadWPF.Helpers
             OpenFileCommand = new CADPadDrawingCommand(OpenFileCommand_Executed);
             NewFileCommand = new CADPadDrawingCommand(NewFileCommand_Executed);
 
-         
-
             _win.CommandBindings.Add(new CommandBinding(ExitCommand,
              (object sender, ExecutedRoutedEventArgs e) =>
              {
                  ShutDown();
              }, null));
-
-            
         }
 
         public RoutedCommand ExitCommand { get; set; } = new RoutedCommand();
@@ -52,7 +51,8 @@ namespace CADPadWPF.Helpers
             // If no filename was specified, prompt the user for one.
             if (fileName == null)
             {
-                _win.WindowTitle.FileName = RequestFileName();
+                 fileName = RequestFileName();
+                _win.WindowTitle.FileName = fileName;
             }
 
             // Save the document to the specified file.
@@ -128,8 +128,10 @@ namespace CADPadWPF.Helpers
             if (result == false) return;
 
             _win.WindowTitle.FileName = dialog.FileName;
+            _win.Drawing.Clear();
 
             OpenFile(_win.WindowTitle.FileName);
+            CenterAndZoomDrawing(150);
         }
         private void OpenFile(string fileName)
         {
@@ -146,6 +148,7 @@ namespace CADPadWPF.Helpers
                     deserializer.Read(_win.Drawing);
                 }
                 _win.Drawing.Rebuild();
+                _win.NotifyPropertyChanged("Drawing");
             }
         }
         #endregion
@@ -190,6 +193,19 @@ namespace CADPadWPF.Helpers
 
             if (Application.Current != null)
                 Application.Current.Shutdown();
+        }
+
+        public void CenterAndZoomDrawing(double margin = 0)
+        {
+            var bounding = _win.Drawing.GetBounding(_win.Drawing.CurrentBlock.Where(a => a.Visible ?? false).ToList());
+            bounding.GrowBy(margin);
+
+            _win.Drawing.ZoomToFit(
+                _win.canvas.RenderSize.Width,
+                _win.canvas.RenderSize.Height,
+                bounding);
+
+            _win.Drawing.CenterInView(bounding);
         }
     }
 }

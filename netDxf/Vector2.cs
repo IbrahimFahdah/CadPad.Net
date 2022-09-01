@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -42,7 +45,7 @@ namespace netDxf
         #region constructors
 
         /// <summary>
-        /// Initializes a new instance of Vector3.
+        /// Initializes a new instance of Vector2.
         /// </summary>
         /// <param name="value">X, Y component.</param>
         public Vector2(double value)
@@ -71,10 +74,15 @@ namespace netDxf
         public Vector2(double[] array)
         {
             if (array == null)
+            {
                 throw new ArgumentNullException(nameof(array));
+            }
 
             if (array.Length != 2)
-                throw new ArgumentOutOfRangeException(nameof(array), array.Length, "The dimension of the array must be two");
+            {
+                throw new ArgumentOutOfRangeException(nameof(array), array.Length, "The dimension of the array must be two.");
+            }
+
             this.x = array[0];
             this.y = array[1];
             this.isNormalized = false;
@@ -89,7 +97,7 @@ namespace netDxf
         /// </summary>
         public static Vector2 Zero
         {
-            get { return new Vector2(0, 0); }
+            get { return new Vector2(0.0, 0.0); }
         }
 
         /// <summary>
@@ -97,7 +105,7 @@ namespace netDxf
         /// </summary>
         public static Vector2 UnitX
         {
-            get { return new Vector2(1, 0) {isNormalized = true}; }
+            get { return new Vector2(1.0, 0.0) {isNormalized = true}; }
         }
 
         /// <summary>
@@ -105,7 +113,7 @@ namespace netDxf
         /// </summary>
         public static Vector2 UnitY
         {
-            get { return new Vector2(0, 1) {isNormalized = true}; }
+            get { return new Vector2(0.0, 1.0) {isNormalized = true}; }
         }
 
         /// <summary>
@@ -211,7 +219,7 @@ namespace netDxf
         /// <returns>The dot product.</returns>
         public static double DotProduct(Vector2 u, Vector2 v)
         {
-            return u.X*v.X + u.Y*v.Y;
+            return u.X * v.X + u.Y * v.Y;
         }
 
         /// <summary>
@@ -222,7 +230,7 @@ namespace netDxf
         /// <returns>Vector2.</returns>
         public static double CrossProduct(Vector2 u, Vector2 v)
         {
-            return u.X*v.Y - u.Y*v.X;
+            return u.X * v.Y - u.Y * v.X;
         }
 
         /// <summary>
@@ -243,11 +251,9 @@ namespace netDxf
         /// <returns></returns>
         public static Vector2 Rotate(Vector2 u, double angle)
         {
-            if (MathHelper.IsZero(angle))
-                return u;
             double sin = Math.Sin(angle);
             double cos = Math.Cos(angle);
-            return new Vector2(u.X * cos - u.Y * sin, u.X * sin + u.Y * cos) { isNormalized = u.IsNormalized };
+            return new Vector2(u.X * cos - u.Y * sin, u.X * sin + u.Y * cos) {isNormalized = u.IsNormalized};
         }
 
         /// <summary>
@@ -260,7 +266,7 @@ namespace netDxf
         public static Vector2 Polar(Vector2 u, double distance, double angle)
         {
             Vector2 dir = new Vector2(Math.Cos(angle), Math.Sin(angle));
-            return u + dir*distance;
+            return u + dir * distance;
         }
 
         /// <summary>
@@ -271,7 +277,7 @@ namespace netDxf
         /// <returns>Square distance.</returns>
         public static double SquareDistance(Vector2 u, Vector2 v)
         {
-            return (u.X - v.X)*(u.X - v.X) + (u.Y - v.Y)*(u.Y - v.Y);
+            return (u.X - v.X) * (u.X - v.X) + (u.Y - v.Y) * (u.Y - v.Y);
         }
 
         /// <summary>
@@ -294,7 +300,10 @@ namespace netDxf
         {
             double angle = Math.Atan2(u.Y, u.X);
             if (angle < 0)
+            {
                 return MathHelper.TwoPI + angle;
+            }
+
             return angle;
         }
 
@@ -318,11 +327,16 @@ namespace netDxf
         /// <returns>Angle in radians.</returns>
         public static double AngleBetween(Vector2 u, Vector2 v)
         {
-            double cos = DotProduct(u, v)/(u.Modulus()*v.Modulus());
+            double cos = DotProduct(u, v) / (u.Modulus() * v.Modulus());
             if (cos >= 1.0)
+            {
                 return 0.0;
+            }
+
             if (cos <= -1.0)
+            {
                 return Math.PI;
+            }
 
             return Math.Acos(cos);
         }
@@ -335,7 +349,7 @@ namespace netDxf
         /// <returns>Vector2.</returns>
         public static Vector2 MidPoint(Vector2 u, Vector2 v)
         {
-            return new Vector2((v.X + u.X)*0.5, (v.Y + u.Y)*0.5);
+            return new Vector2((v.X + u.X) * 0.5, (v.Y + u.Y) * 0.5);
         }
 
         /// <summary>
@@ -402,13 +416,19 @@ namespace netDxf
         /// <returns>A normalized vector.</returns>
         public static Vector2 Normalize(Vector2 u)
         {
-            if (u.isNormalized) return u;
+            if (u.isNormalized)
+            {
+                return u;
+            }
 
             double mod = u.Modulus();
             if (MathHelper.IsZero(mod))
+            {
                 return NaN;
-            double modInv = 1/mod;
-            return new Vector2(u.x*modInv, u.y*modInv) {isNormalized = true};
+            }
+
+            double modInv = 1 / mod;
+            return new Vector2(u.x * modInv, u.y * modInv) {isNormalized = true};
         }
 
         #endregion
@@ -488,7 +508,7 @@ namespace netDxf
         /// <returns>The negative vector of u.</returns>
         public static Vector2 operator -(Vector2 u)
         {
-            return new Vector2(-u.X, -u.Y) { isNormalized = u.IsNormalized };
+            return new Vector2(-u.X, -u.Y) {isNormalized = u.IsNormalized};
         }
 
         /// <summary>
@@ -509,7 +529,7 @@ namespace netDxf
         /// <returns>The multiplication of u times a.</returns>
         public static Vector2 operator *(Vector2 u, double a)
         {
-            return new Vector2(u.X*a, u.Y*a);
+            return new Vector2(u.X * a, u.Y * a);
         }
 
         /// <summary>
@@ -520,7 +540,7 @@ namespace netDxf
         /// <returns>The multiplication of u times a.</returns>
         public static Vector2 Multiply(Vector2 u, double a)
         {
-            return new Vector2(u.X*a, u.Y*a);
+            return new Vector2(u.X * a, u.Y * a);
         }
 
         /// <summary>
@@ -531,7 +551,7 @@ namespace netDxf
         /// <returns>The multiplication of u times a.</returns>
         public static Vector2 operator *(double a, Vector2 u)
         {
-            return new Vector2(u.X*a, u.Y*a);
+            return new Vector2(u.X * a, u.Y * a);
         }
 
         /// <summary>
@@ -542,7 +562,7 @@ namespace netDxf
         /// <returns>The multiplication of u times a.</returns>
         public static Vector2 Multiply(double a, Vector2 u)
         {
-            return new Vector2(u.X*a, u.Y*a);
+            return new Vector2(u.X * a, u.Y * a);
         }
 
         /// <summary>
@@ -575,8 +595,8 @@ namespace netDxf
         /// <returns>The division of u times a.</returns>
         public static Vector2 operator /(Vector2 u, double a)
         {
-            double invEscalar = 1/a;
-            return new Vector2(u.X*invEscalar, u.Y*invEscalar);
+            double invScalar = 1 / a;
+            return new Vector2(u.X * invScalar, u.Y * invScalar);
         }
 
         /// <summary>
@@ -587,8 +607,8 @@ namespace netDxf
         /// <returns>The division of u times a.</returns>
         public static Vector2 Divide(Vector2 u, double a)
         {
-            double invEscalar = 1/a;
-            return new Vector2(u.X*invEscalar, u.Y*invEscalar);
+            double invScalar = 1 / a;
+            return new Vector2(u.X * invScalar, u.Y * invScalar);
         }
 
         /// <summary>
@@ -622,17 +642,23 @@ namespace netDxf
         /// </summary>
         public void Normalize()
         {
-            if (this.isNormalized) return;
+            if (this.isNormalized)
+            {
+                return;
+            }
 
             double mod = this.Modulus();
             if (MathHelper.IsZero(mod))
+            {
                 this = NaN;
+            }
             else
             {
-                double modInv = 1/mod;
+                double modInv = 1 / mod;
                 this.x *= modInv;
                 this.y *= modInv;
             }
+
             this.isNormalized = true;
         }
 
@@ -642,9 +668,7 @@ namespace netDxf
         /// <returns>Vector modulus.</returns>
         public double Modulus()
         {
-            if (this.isNormalized) return 1.0;
-
-            return Math.Sqrt(DotProduct(this, this));
+            return this.isNormalized ? 1.0 : Math.Sqrt(DotProduct(this, this));
         }
 
         /// <summary>
@@ -711,8 +735,11 @@ namespace netDxf
         /// <returns>True if obj and this instance are the same type and represent the same value; otherwise, false.</returns>
         public override bool Equals(object other)
         {
-            if (other is Vector2)
-                return this.Equals((Vector2) other);
+            if (other is Vector2 vector)
+            {
+                return this.Equals(vector);
+            }
+
             return false;
         }
 

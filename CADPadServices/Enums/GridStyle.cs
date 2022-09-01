@@ -2,6 +2,7 @@
 {
     public enum GridStyle
     {
+        None = -1,
         Dots,
         Lines,
         Crossp,     //RGI006

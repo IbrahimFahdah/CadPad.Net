@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -35,9 +38,7 @@ namespace netDxf.Entities
         #region delegates and events
 
         public delegate void TextStyleChangedEventHandler(Text sender, TableObjectChangedEventArgs<TextStyle> e);
-
         public event TextStyleChangedEventHandler TextStyleChanged;
-
         protected virtual TextStyle OnTextStyleChangedEvent(TextStyle oldTextStyle, TextStyle newTextStyle)
         {
             TextStyleChangedEventHandler ae = this.TextStyleChanged;
@@ -136,11 +137,11 @@ namespace netDxf.Entities
             this.position = position;
             this.alignment = TextAlignment.BaselineLeft;
             this.Normal = Vector3.UnitZ;
-            if (style == null)
-                throw new ArgumentNullException(nameof(style));
-            this.style = style;
+            this.style = style ?? throw new ArgumentNullException(nameof(style));
             if (height <= 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(height), this.text, "The Text height must be greater than zero.");
+            }
             this.height = height;
             this.width = 1.0;
             this.widthFactor = style.WidthFactor;
@@ -194,7 +195,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Text height must be greater than zero.");
+                }
                 this.height = value;
             }
         }
@@ -209,7 +212,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Text width must be greater than zero.");
+                }
                 this.width = value;
             }
         }
@@ -227,7 +232,9 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0.01 || value > 100.0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Text width factor valid values range from 0.01 to 100.");
+                }
                 this.widthFactor = value;
             }
         }
@@ -242,7 +249,9 @@ namespace netDxf.Entities
             set
             {
                 if (value < -85.0 || value > 85.0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The Text oblique angle valid values range from -85 to 85.");
+                }
                 this.obliqueAngle = value;
             }
         }
@@ -265,7 +274,9 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.style = this.OnTextStyleChangedEvent(this.style, value);
             }
         }
@@ -319,7 +330,10 @@ namespace netDxf.Entities
 
             Vector3 newPosition = transformation * this.Position + translation;
             Vector3 newNormal = transformation * this.Normal;
-            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
 
             Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
 
@@ -431,26 +445,37 @@ namespace netDxf.Entities
                 }
             }
 
-            // the oblique angle is defined between -85 nad 85 degrees
+            // the oblique angle is defined between -85 and 85 degrees
             //if (newObliqueAngle >= 360) newObliqueAngle -= 360;
             newObliqueAngle = MathHelper.NormalizeAngle(newObliqueAngle);
             if (newObliqueAngle > 180)
+            {
                 newObliqueAngle = 180 - newObliqueAngle;
+            }
+
             if (newObliqueAngle < -85)
+            {
                 newObliqueAngle = -85;
+            }
             else if (newObliqueAngle > 85)
+            {
                 newObliqueAngle = 85;
+            }
 
             // the height must be greater than zero, the cos is always positive between -85 and 85
             double newHeight = newVvector.Modulus() * Math.Cos(newObliqueAngle * MathHelper.DegToRad);
             newHeight = MathHelper.IsZero(newHeight) ? MathHelper.Epsilon : newHeight;
 
-            // the width factor is defined between 0.01 nad 100
+            // the width factor is defined between 0.01 and 100
             double newWidthFactor = newUvector.Modulus() / newHeight;
-            if(newWidthFactor<0.01)
+            if (newWidthFactor < 0.01)
+            {
                 newWidthFactor = 0.01;
+            }
             else if (newWidthFactor > 100)
+            {
                 newWidthFactor = 100;
+            }
 
             this.Position = newPosition;
             this.Normal = newNormal;
@@ -492,7 +517,9 @@ namespace netDxf.Entities
             };
 
             foreach (XData data in this.XData.Values)
+            {
                 entity.XData.Add((XData) data.Clone());
+            }
 
             return entity;
         }

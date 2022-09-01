@@ -9,8 +9,11 @@ using System.IO;
 
 namespace CADPadServices.Serilization
 {
+    //TODO: MKI - implement SPLINE reading/writing/drawing
     public class DXFDrawingContentDeserializer : DrawingContentDeserializer
     {
+        private IDrawing _currentDrawing;
+
         private Stream _stream;
         public DXFDrawingContentDeserializer(Stream stream)
         {
@@ -20,9 +23,13 @@ namespace CADPadServices.Serilization
         public override void Read(IDrawing drawing)
         {
             try
-            {
-
+            {                
                 DxfDocument dxf = DxfDocument.Load(_stream);
+                
+                _currentDrawing = drawing;
+
+                ReadLayers(dxf);
+
                 var entities = new List<Entity>();
                 entities.AddRange(ReadLines(dxf));
                 entities.AddRange(ReadPolylines(dxf));
@@ -39,7 +46,6 @@ namespace CADPadServices.Serilization
                 {
                     drawing.CurrentBlock.AppendEntity(item);
                 }
-
             }
             finally
             {
@@ -48,10 +54,45 @@ namespace CADPadServices.Serilization
             }
         }
 
+        void ReadLayers(DxfDocument doc)
+        {
+            var layersTable = _currentDrawing.Document.Database.layerTable;
+            
+            foreach (var layer in doc.Layers)
+            {
+                if (layersTable.Has(layer.Name)) continue;
+
+                var tabLayer = new CADPadDB.TableRecord.Layer(layer.Name);
+                tabLayer.name = layer.Name;
+                tabLayer.color = MapDxfColor(layer.Color);
+                tabLayer.lineWeight = MapDxfLineWeight(layer.Lineweight);
+                tabLayer.Visible = layer.IsVisible;
+                layersTable.Add(tabLayer);
+            }
+        }
+
+        void AssignEntityLayer(Entity entity, string layerName)
+        {
+            if (_currentDrawing.Document.Database.layerTable.Has(layerName))
+            {
+                entity.LayerId = _currentDrawing.Document.Database.layerTable[layerName].id;
+            }
+        }
+
+        CADPadDB.LineWeight MapDxfLineWeight(Lineweight lineWeight)
+        {
+            return (CADPadDB.LineWeight)lineWeight;
+        }
+
+        CADPadDB.Colors.CADColor MapDxfColor(AciColor aciColor)
+        {
+            return CADPadDB.Colors.CADColor.FromArgb(aciColor.R, aciColor.G, aciColor.B);
+        }
+
         List<Entity> ReadLines(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var line in doc.Lines)
+            foreach (var line in doc.Entities.Lines)
             {
                 entities.Add(ReadLine(line, 0, 0));
             }
@@ -65,41 +106,44 @@ namespace CADPadServices.Serilization
             l.startPoint = new CADPoint(line.StartPoint.X + x, line.StartPoint.Y + y);
             l.endPoint = new CADPoint(line.EndPoint.X + x, line.EndPoint.Y + y);
 
+            AssignEntityLayer(l, line.Layer.Name);
+            l.Color = MapDxfColor(line.Color);
             return l;
         }
 
         List<Entity> ReadPolylines(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var item in doc.LwPolylines)
+            foreach (var item in doc.Entities.Polylines2D)
             {
-                entities.Add(ReadPolyline(item.Vertexes, item.IsClosed, 0, 0));
+                var poly = ReadPolyline(item.Vertexes, item.IsClosed, 0, 0);
+                AssignEntityLayer(poly, item.Layer.Name);
+                poly.Color = MapDxfColor(item.Color);
+                entities.Add(poly);
             }
             return entities;
         }
 
-        Polyline ReadPolyline(List<netDxf.Entities.LwPolylineVertex> vertices, bool isClosed, double x, double y)
+        Polyline ReadPolyline(List<netDxf.Entities.Polyline2DVertex> vertices, bool isClosed, double x, double y)
         {
             Polyline poly = new Polyline();
             for (int i = 0; i < vertices.Count; i++)
             {
-                netDxf.Entities.LwPolylineVertex vertex =vertices[i];
-                var point = new CADPoint(vertex.Position.X + x, vertex.Position.Y + y);
-                poly.AddVertexAt(i, point);
-
+                netDxf.Entities.Polyline2DVertex vertex = vertices[i];
+                var newVertex = new CADPolyLine2DVertex(vertex.Position.X, vertex.Position.Y, vertex.Bulge, vertex.StartWidth, vertex.EndWidth);
+                poly.AddVertexAt(i, newVertex);
             }
             if (isClosed)
             {
                 poly.closed = true;
             }
-
             return poly;
         }
 
         List<Entity> ReadCircles(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var item in doc.Circles)
+            foreach (var item in doc.Entities.Circles)
             {
                 entities.Add(ReadCircle(item, 0, 0));
             }
@@ -113,13 +157,16 @@ namespace CADPadServices.Serilization
             c.center = new CADPoint(circle.Center.X + x, circle.Center.Y + y);
             c.radius = circle.Radius;
 
+            AssignEntityLayer(c, circle.Layer.Name);
+            c.Color = MapDxfColor(circle.Color);
+
             return c;
         }
 
         List<Entity> ReadEllipses(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var item in doc.Ellipses)
+            foreach (var item in doc.Entities.Ellipses)
             {
                 entities.Add(ReadEllipse(item, 0, 0));
             }
@@ -128,7 +175,7 @@ namespace CADPadServices.Serilization
         }
 
         /// <summary>
-        /// TODO. take rotation into account
+        /// TODO: take rotation into account
         /// </summary>
         /// <param name="ellipse"></param>
         /// <param name="x"></param>
@@ -141,13 +188,16 @@ namespace CADPadServices.Serilization
             c.RadiusX = ellipse.MajorAxis;
             c.RadiusY = ellipse.MinorAxis;
 
+            AssignEntityLayer(c, ellipse.Layer.Name);
+            c.Color = MapDxfColor(ellipse.Color);
+
             return c;
         }
 
         List<Entity> ReadArcs(DxfDocument doc)
         {
             var entities = new List<Entity>();
-            foreach (var item in doc.Arcs)
+            foreach (var item in doc.Entities.Arcs)
             {
                 entities.Add(ReadArc(item, 0, 0));
             }
@@ -160,8 +210,11 @@ namespace CADPadServices.Serilization
             Arc c = new Arc();
             c.center = new CADPoint(arc.Center.X + x, arc.Center.Y + y);
             c.radius = arc.Radius;
-            c.startAngle = arc.StartAngle ;
-            c.endAngle = arc.EndAngle;
+            c.startAngle = Utils.DegreeToRadian(arc.StartAngle);
+            c.endAngle = Utils.DegreeToRadian(arc.EndAngle);
+
+            AssignEntityLayer(c, arc.Layer.Name);
+            c.Color = MapDxfColor(arc.Color);
 
             return c;
         }

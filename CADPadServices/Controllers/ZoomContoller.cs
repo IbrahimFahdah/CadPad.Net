@@ -68,6 +68,8 @@ namespace CADPadServices.Controllers
 
         private void Zoom(IMouseWheelEventArgs e)
         {
+            if (!_drawing.ZoomEnabled) return;
+
             CADPoint globalPnt_UnderMouse = _drawing.CanvasToModel(new CADPoint(e.X, e.Y));
             CADPoint localPnt_UnderMouse = new CADPoint(e.X, e.Y);
             //

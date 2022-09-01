@@ -6,7 +6,7 @@ using CADPadDB.TableRecord;
 namespace CADPadDB.CADEntity
 {
     public abstract class Entity : DBObject
-    {
+    {        
         public override string ClassName { get; } = "Entity";
 
         public ICADEnitiyVisual DrawingVisual { get; set; }
@@ -15,13 +15,17 @@ namespace CADPadDB.CADEntity
             get;
         }
 
+        public bool? Visible { get => ((Layer)this.database.layerTable[Layer])?.Visible; }
+
         public CADColor Color { get; set; } = CADColor.ByLayer;
 
         public CADColor ColorValue
         {
             get
             {
-                switch (Color.colorMethod)
+                ColorMethod colorMethod = CADColor.GlobalColorMethod != ColorMethod.None ? CADColor.GlobalColorMethod : Color.colorMethod; 
+
+                switch (colorMethod)
                 {
                     case ColorMethod.ByBlock:
                         if (this.parent != null

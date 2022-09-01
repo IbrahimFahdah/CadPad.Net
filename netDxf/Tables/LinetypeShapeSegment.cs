@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -50,8 +53,8 @@ namespace netDxf.Tables
         /// <param name="style">File where the shape of the linetype segment is defined.</param>
         /// <remarks>
         /// The shape must be defined in the .shx shape definitions file.<br />
-        /// The dxf instead of saving the shape name, as the Shape entity or the shape linetype segments definition in a .lin file,
-        /// it stores the shape number. Therefore when saving a dxf file the shape number will be obtained reading the .shp file.<br />
+        /// The DXF instead of saving the shape name, as the Shape entity or the shape linetype segments definition in a .lin file,
+        /// it stores the shape number. Therefore when saving a DXF file the shape number will be obtained reading the .shp file.<br />
         /// It is required that the equivalent .shp file to be also present in the same folder or one of the support folders defined in the DxfDocument.
         /// </remarks>
         public LinetypeShapeSegment(string name, ShapeStyle style) : this(name, style, 0.0, Vector2.Zero, LinetypeSegmentRotationType.Relative, 0.0, 1.0)
@@ -66,8 +69,8 @@ namespace netDxf.Tables
         /// <param name="length">Dash, dot, or space length of the linetype segment.</param>
         /// <remarks>
         /// The shape must be defined in the .shx shape definitions file.<br />
-        /// The dxf instead of saving the shape name, as the Shape entity or the shape linetype segments definition in a .lin file,
-        /// it stores the shape number. Therefore when saving a dxf file the shape number will be obtained reading the .shp file.<br />
+        /// The DXF instead of saving the shape name, as the Shape entity or the shape linetype segments definition in a .lin file,
+        /// it stores the shape number. Therefore when saving a DXF file the shape number will be obtained reading the .shp file.<br />
         /// It is required that the equivalent .shp file to be also present in the same folder or one of the support folders defined in the DxfDocument.
         /// </remarks>
         public LinetypeShapeSegment(string name, ShapeStyle style, double length) : this(name, style, length, Vector2.Zero, LinetypeSegmentRotationType.Relative, 0.0, 1.0)
@@ -86,23 +89,21 @@ namespace netDxf.Tables
         /// <param name="scale">Scale of the shape.</param>
         /// <remarks>
         /// The shape must be defined in the .shx shape definitions file.<br />
-        /// The dxf instead of saving the shape name, as the Shape entity or the shape linetype segments definition in a .lin file,
-        /// it stores the shape number. Therefore when saving a dxf file the shape number will be obtained reading the .shp file.<br />
+        /// The DXF instead of saving the shape name, as the Shape entity or the shape linetype segments definition in a .lin file,
+        /// it stores the shape number. Therefore when saving a DXF file the shape number will be obtained reading the .shp file.<br />
         /// It is required that the equivalent .shp file to be also present in the same folder or one of the support folders defined in the DxfDocument.
         /// </remarks>
         public LinetypeShapeSegment(string name, ShapeStyle style, double length, Vector2 offset, LinetypeSegmentRotationType rotationType, double rotation, double scale) : base(LinetypeSegmentType.Shape, length)
         {
             if (string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name), "The linetype shape name should be at least one character long.");
+            }
             this.name = name;
-            if (style == null)
-                throw new ArgumentNullException(nameof(style));
-            this.style = style;
+            this.style = style ?? throw new ArgumentNullException(nameof(style));
             this.offset = offset;
             this.rotationType = rotationType;
             this.rotation = MathHelper.NormalizeAngle(rotation);
-            if (scale <= 0)
-                throw new ArgumentOutOfRangeException(nameof(scale), scale, "The LinetypeShepeSegment scale must be greater than zero.");
             this.scale = scale;
         }
 
@@ -124,7 +125,9 @@ namespace netDxf.Tables
             internal set
             {
                 if (string.IsNullOrEmpty(value))
+                {
                     throw new ArgumentNullException(nameof(value), "The linetype shape name should be at least one character long.");
+                }
                 this.name = value;
             }
         }
@@ -140,9 +143,7 @@ namespace netDxf.Tables
             get { return this.style; }
             internal set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.style = value;
+                this.style = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

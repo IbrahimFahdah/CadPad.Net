@@ -1,27 +1,31 @@
-﻿#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using System.Collections.Generic;
+using netDxf.Collections;
 using netDxf.Tables;
 
 namespace netDxf.Entities
@@ -82,7 +86,7 @@ namespace netDxf.Entities
         private double twistAngle;
         private short circleZoomPercent;
         private ViewportStatusFlags status;
-        private readonly List<Layer> frozenLayers;
+        private readonly ObservableCollection<Layer> frozenLayers;
         private Vector3 ucsOrigin;
         private Vector3 ucsXAxis;
         private Vector3 ucsYAxis;
@@ -150,7 +154,8 @@ namespace netDxf.Entities
                           ViewportStatusFlags.CurrentlyAlwaysEnabled |
                           ViewportStatusFlags.UcsIconVisibility |
                           ViewportStatusFlags.GridMode;
-            this.frozenLayers = new List<Layer>();
+            this.frozenLayers = new ObservableCollection<Layer>();
+            this.frozenLayers.BeforeAddItem += this.FrozenLayers_BeforeAddItem;
             this.ucsOrigin = Vector3.Zero;
             this.ucsXAxis = Vector3.UnitX;
             this.ucsYAxis = Vector3.UnitY;
@@ -202,7 +207,9 @@ namespace netDxf.Entities
             set
             {
                 if (value < -1)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), "The stacking value must be greater than -1.");
+                }
                 this.stacking = value;
             }
         }
@@ -336,7 +343,11 @@ namespace netDxf.Entities
         /// <summary>
         /// Gets the list of layers that are frozen in this viewport.
         /// </summary>
-        public List<Layer> FrozenLayers
+        /// <remarks>
+        /// The FrozenLayers list cannot contain null items and layers that belong to different documents.
+        /// Even if duplicate items should not cause any problems, it is not allowed to have two layers with the same name in the list.
+        /// </remarks>
+        public ObservableCollection<Layer> FrozenLayers
         {
             get { return this.frozenLayers; }
         }
@@ -393,7 +404,7 @@ namespace netDxf.Entities
         /// AutoCad does not allow the creation of viewports from open shapes such as LwPolylines, Polylines, or ellipse arcs;
         /// but if they are edited afterward, making them open, it will not complain, and they will work without problems.
         /// So, it is possible to use open shapes as clipping boundaries, even if it is not recommended.
-        /// It might not be supported by all programs that read dxf files and a redraw of the layout might be required to show them correctly inside AutoCad.<br />
+        /// It might not be supported by all programs that read DXF files and a redraw of the layout might be required to show them correctly inside AutoCad.<br />
         /// Only X and Y coordinates will be used the entity normal will be considered as UnitZ.<br />
         /// When the viewport is added to the document this entity will be added too.
         /// </remarks>
@@ -415,25 +426,25 @@ namespace netDxf.Entities
                             Ellipse ellipse = (Ellipse) value;
                             abbr = new BoundingRectangle(new Vector2(ellipse.Center.X, ellipse.Center.Y), ellipse.MajorAxis, ellipse.MinorAxis, ellipse.Rotation);
                             break;
-                        case EntityType.LwPolyline:
-                            LwPolyline lwPol = (LwPolyline) value;
-                            abbr = new BoundingRectangle(lwPol.PolygonalVertexes(6, MathHelper.Epsilon, MathHelper.Epsilon));
+                        case EntityType.Polyline2D:
+                            Polyline2D poly2D = (Polyline2D) value;
+                            abbr = new BoundingRectangle(poly2D.PolygonalVertexes(6, MathHelper.Epsilon, MathHelper.Epsilon));
                             break;
-                        case EntityType.Polyline:
-                            Polyline pol = (Polyline) value;
+                        case EntityType.Polyline3D:
+                            Polyline3D poly3D = (Polyline3D) value;
                             List<Vector2> pPoints = new List<Vector2>();
-                            foreach (PolylineVertex point in pol.Vertexes)
+                            foreach (Vector3 point in poly3D.Vertexes)
                             {
-                                pPoints.Add(new Vector2(point.Position.X, point.Position.Y));
+                                pPoints.Add(new Vector2(point.X, point.Y));
                             }
                             abbr = new BoundingRectangle(pPoints);
                             break;
                         case EntityType.Spline:
                             Spline spline = (Spline) value;
                             List<Vector2> sPoints = new List<Vector2>();
-                            foreach (SplineVertex point in spline.ControlPoints)
+                            foreach (Vector3 point in spline.ControlPoints)
                             {
-                                sPoints.Add(new Vector2(point.Position.X, point.Position.Y));
+                                sPoints.Add(new Vector2(point.X, point.Y));
                             }
                             abbr = new BoundingRectangle(sPoints);
                             break;
@@ -486,7 +497,10 @@ namespace netDxf.Entities
         public override void TransformBy(Matrix3 transformation, Vector3 translation)
         {
             Vector3 newNormal = transformation * this.Normal;
-            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
             this.Normal = newNormal;
 
             EntityObject clippingEntity = this.ClippingBoundary;
@@ -498,15 +512,15 @@ namespace netDxf.Entities
                     return;
                 }
 
-                // when a view port is transformed a LwPolyline will be generated
-                List<LwPolylineVertex> vertexes = new List<LwPolylineVertex>
+                // when a view port is transformed a Polyline2D will be generated
+                List<Polyline2DVertex> vertexes = new List<Polyline2DVertex>
                 {
-                    new LwPolylineVertex(this.center.X - this.width * 0.5, this.center.Y - this.height * 0.5),
-                    new LwPolylineVertex(this.center.X + this.width * 0.5, this.center.Y - this.height * 0.5),
-                    new LwPolylineVertex(this.center.X + this.width * 0.5, this.center.Y + this.height * 0.5),
-                    new LwPolylineVertex(this.center.X - this.width * 0.5, this.center.Y + this.height * 0.5)
+                    new Polyline2DVertex(this.center.X - this.width * 0.5, this.center.Y - this.height * 0.5),
+                    new Polyline2DVertex(this.center.X + this.width * 0.5, this.center.Y - this.height * 0.5),
+                    new Polyline2DVertex(this.center.X + this.width * 0.5, this.center.Y + this.height * 0.5),
+                    new Polyline2DVertex(this.center.X - this.width * 0.5, this.center.Y + this.height * 0.5)
                 };
-                clippingEntity = new LwPolyline(vertexes, true);
+                clippingEntity = new Polyline2D(vertexes, true);
             }
 
             clippingEntity.TransformBy(transformation, translation);
@@ -564,6 +578,42 @@ namespace netDxf.Entities
                 viewport.XData.Add((XData) data.Clone());
 
             return viewport;
+        }
+
+        #endregion
+
+        #region FrozenLayers events
+
+        private void FrozenLayers_BeforeAddItem(ObservableCollection<Layer> sender, ObservableCollectionEventArgs<Layer> e)
+        {
+            if (e.Item == null)
+            {
+                // the frozen layer list cannot contain null items
+                e.Cancel = true; 
+            }
+            else if (this.Owner != null && e.Item.Owner == null)
+            {
+                // the frozen layer and the viewport must belong to the same document
+                e.Cancel = true;
+            }
+            else if (this.Owner == null && e.Item.Owner != null)
+            {
+                // the frozen layer and the viewport must belong to the same document
+                e.Cancel = true;
+            }
+            else if (this.Owner != null && e.Item.Owner != null)
+            {
+               // the frozen layer and the viewport must belong to the same document
+               if (!ReferenceEquals(this.Owner.Owner.Owner.Owner, e.Item.Owner.Owner))
+               {
+                   e.Cancel = true;
+               }
+            }
+            else if (this.frozenLayers.Contains(e.Item))
+            {
+                // the frozen layer list cannot contain duplicates
+                e.Cancel = true;
+            }
         }
 
         #endregion

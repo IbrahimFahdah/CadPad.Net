@@ -1,29 +1,31 @@
-﻿#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using System.Collections.Generic;
 using netDxf.Blocks;
-using netDxf.Collections;
 using netDxf.Tables;
 
 namespace netDxf.Entities
@@ -33,7 +35,6 @@ namespace netDxf.Entities
     /// </summary>
     public abstract class EntityObject :
         DxfObject,
-        IHasXData,
         ICloneable
     {
         #region delegates and events
@@ -66,22 +67,6 @@ namespace netDxf.Entities
             return newLinetype;
         }
 
-        public event XDataAddAppRegEventHandler XDataAddAppReg;
-        protected virtual void OnXDataAddAppRegEvent(ApplicationRegistry item)
-        {
-            XDataAddAppRegEventHandler ae = this.XDataAddAppReg;
-            if (ae != null)
-                ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
-        }
-
-        public event XDataRemoveAppRegEventHandler XDataRemoveAppReg;
-        protected virtual void OnXDataRemoveAppRegEvent(ApplicationRegistry item)
-        {
-            XDataRemoveAppRegEventHandler ae = this.XDataRemoveAppReg;
-            if (ae != null)
-                ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
-        }
-
         #endregion
 
         #region private fields
@@ -95,7 +80,6 @@ namespace netDxf.Entities
         private double linetypeScale;
         private bool isVisible;
         private Vector3 normal;
-        private readonly XDataDictionary xData;
         private readonly List<DxfObject> reactors;
 
         #endregion
@@ -115,9 +99,6 @@ namespace netDxf.Entities
             this.isVisible = true;
             this.normal = Vector3.UnitZ;
             this.reactors = new List<DxfObject>();
-            this.xData = new XDataDictionary();
-            this.xData.AddAppReg += this.XData_AddAppReg;
-            this.xData.RemoveAppReg += this.XData_RemoveAppReg;
         }
 
         #endregion
@@ -125,7 +106,7 @@ namespace netDxf.Entities
         #region public properties
 
         /// <summary>
-        /// Gets the list of dxf objects that has been attached to this entity.
+        /// Gets the list of DXF objects that has been attached to this entity.
         /// </summary>
         public IReadOnlyList<DxfObject> Reactors
         {
@@ -148,9 +129,7 @@ namespace netDxf.Entities
             get { return this.color; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.color = value;
+                this.color = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -163,7 +142,9 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.layer = this.OnLayerChangedEvent(this.layer, value);
             }
         }
@@ -177,7 +158,9 @@ namespace netDxf.Entities
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -199,9 +182,7 @@ namespace netDxf.Entities
             get { return this.transparency; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.transparency = value;
+                this.transparency = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -214,7 +195,9 @@ namespace netDxf.Entities
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "The line type scale must be greater than zero.");
+                }
                 this.linetypeScale = value;
             }
         }
@@ -236,27 +219,21 @@ namespace netDxf.Entities
             get { return this.normal; }
             set
             {
-                if(Vector3.Equals(Vector3.Zero, value))
+                if (Vector3.Equals(Vector3.Zero, value))
+                {
                     throw new ArgumentException("The normal can not be the zero vector.", nameof(value));
+                }
                 this.normal = Vector3.Normalize(value);
             }
         }
 
         /// <summary>
-        /// Gets the owner of the actual dxf object.
+        /// Gets the owner of the actual DXF object.
         /// </summary>
         public new Block Owner
         {
             get { return (Block) base.Owner; }
             internal set { base.Owner = value; }
-        }
-
-        /// <summary>
-        /// Gets the entity <see cref="XDataDictionary">extended data</see>.
-        /// </summary>
-        public XDataDictionary XData
-        {
-            get { return this.xData; }
         }
 
         #endregion
@@ -322,20 +299,6 @@ namespace netDxf.Entities
         /// </summary>
         /// <returns>A new entity that is a copy of this instance.</returns>
         public abstract object Clone();
-
-        #endregion
-
-        #region XData events
-
-        private void XData_AddAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
-        {
-            this.OnXDataAddAppRegEvent(e.Item);
-        }
-
-        private void XData_RemoveAppReg(XDataDictionary sender, ObservableCollectionEventArgs<ApplicationRegistry> e)
-        {
-            this.OnXDataRemoveAppRegEvent(e.Item);
-        }
 
         #endregion
     }

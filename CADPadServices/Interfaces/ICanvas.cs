@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CADPadDB;
+using CADPadDB.Maths;
 
 namespace CADPadServices.Interfaces
 {
@@ -26,5 +27,8 @@ namespace CADPadServices.Interfaces
         void ClearVisualGrips(IDrawingVisual associatedVisual);
 
         void Clear();
+
+        void CenterCanvas();
+        void CenterCanvasToModelPoint(CADPoint modelPoint);
     }
 }

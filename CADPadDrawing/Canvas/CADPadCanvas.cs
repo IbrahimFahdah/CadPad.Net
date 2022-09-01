@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using CADPadDB;
+using CADPadDB.Maths;
 using CADPadDrawing.Visuals;
 using CADPadServices.Interfaces;
 using Drawing = CADPadServices.Drawing;
@@ -158,8 +159,6 @@ namespace CADPadDrawing.Canvas
             if (Drawing == null)
                 return;
 
-
-
             m_axes = new CoordinateAxes();
             AddVisualChild(m_axes);
             AddLogicalChild(m_axes);
@@ -268,7 +267,16 @@ namespace CADPadDrawing.Canvas
                 return;
 
             InitialiseDrawing();
+            CenterCanvas();
+        }
 
+        public void CenterCanvas()
+        {
+            CenterCanvasToModelPoint(new CADPoint());
+        }
+
+        public void CenterCanvasToModelPoint(CADPoint modelPoint)
+        {
             // place (0, 0) point at center of SimpleCAD
             // You should do it on Loaded event, otherwise ActualHeight and ActualWidth will be 0.
             double rOffset_X = this.ActualWidth / 2;
@@ -277,12 +285,14 @@ namespace CADPadDrawing.Canvas
             ((Drawing)Drawing).Origin.X = -rOffset_X;
             ((Drawing)Drawing).Origin.Y = -rOffset_Y;
 
+            var offsetPoint = ((Drawing)Drawing).ModelToCanvas(modelPoint);
+            ((Drawing)Drawing).Origin.X += -offsetPoint.X + rOffset_X;
+            ((Drawing)Drawing).Origin.Y += -offsetPoint.Y - rOffset_Y;
+            
             // read comment in ModelToCanvas()
             ((Drawing)Drawing).Origin.Y *= -1;
 
-
             Redraw();
-
         }
 
         private void CADPadCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -492,8 +502,7 @@ namespace CADPadDrawing.Canvas
             foreach (Visual g in Geometries)
             {
                 RemoveVisualChild(g);
-                RemoveLogicalChild(g);
-       
+                RemoveLogicalChild(g);       
             }
         }
     }

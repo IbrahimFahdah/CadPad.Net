@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -36,9 +39,7 @@ namespace netDxf.Entities
         #region delegates and events
 
         public delegate void HatchBoundaryPathAddedEventHandler(Hatch sender, ObservableCollectionEventArgs<HatchBoundaryPath> e);
-
         public event HatchBoundaryPathAddedEventHandler HatchBoundaryPathAdded;
-
         protected virtual void OnHatchBoundaryPathAddedEvent(HatchBoundaryPath item)
         {
             HatchBoundaryPathAddedEventHandler ae = this.HatchBoundaryPathAdded;
@@ -49,9 +50,7 @@ namespace netDxf.Entities
         }
 
         public delegate void HatchBoundaryPathRemovedEventHandler(Hatch sender, ObservableCollectionEventArgs<HatchBoundaryPath> e);
-
         public event HatchBoundaryPathRemovedEventHandler HatchBoundaryPathRemoved;
-
         protected virtual void OnHatchBoundaryPathRemovedEvent(HatchBoundaryPath item)
         {
             HatchBoundaryPathRemovedEventHandler ae = this.HatchBoundaryPathRemoved;
@@ -89,11 +88,7 @@ namespace netDxf.Entities
         public Hatch(HatchPattern pattern, bool associative)
             : base(EntityType.Hatch, DxfObjectCode.Hatch)
         {
-            if (pattern == null)
-            {
-                throw new ArgumentNullException(nameof(pattern));
-            }
-            this.pattern = pattern;
+            this.pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
             this.boundaryPaths = new ObservableCollection<HatchBoundaryPath>();
             this.boundaryPaths.BeforeAddItem += this.BoundaryPaths_BeforeAddItem;
             this.boundaryPaths.AddItem += this.BoundaryPaths_AddItem;
@@ -116,11 +111,7 @@ namespace netDxf.Entities
         public Hatch(HatchPattern pattern, IEnumerable<HatchBoundaryPath> paths, bool associative)
             : base(EntityType.Hatch, DxfObjectCode.Hatch)
         {
-            if (pattern == null)
-            {
-                throw new ArgumentNullException(nameof(pattern));
-            }
-            this.pattern = pattern;
+            this.pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
 
             if (paths == null)
             {
@@ -155,11 +146,7 @@ namespace netDxf.Entities
             get { return this.pattern; }
             set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-                this.pattern = value;
+                this.pattern = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -225,7 +212,7 @@ namespace netDxf.Entities
         /// If the actual hatch is already associative, the old boundary entities will be unlinked, but not deleted from the hatch document.
         /// If linkBoundary is true, the new boundary entities will be added to the same layout and document as the hatch, in case it belongs to one,
         /// so, in this case, if you also try to add the return list to the document it will cause an error.<br/>
-        /// All entities are in world coordinates except the LwPolyline boundary path since by definition its vertexes are expressed in object coordinates.
+        /// All entities are in world coordinates except the Polyline2D boundary path since by definition its vertexes are expressed in object coordinates.
         /// </remarks>
         public List<EntityObject> CreateBoundary(bool linkBoundary)
         {
@@ -257,9 +244,9 @@ namespace netDxf.Entities
                         case EntityType.Line:
                             boundary.Add(ProcessLine((Line) entity, trans, pos));
                             break;
-                        case EntityType.LwPolyline:
+                        case EntityType.Polyline2D:
                             // LwPolylines need an special treatment since their vertexes are expressed in object coordinates.
-                            boundary.Add(ProcessLwPolyline((LwPolyline) entity, this.Normal, this.elevation));
+                            boundary.Add(ProcessLwPolyline((Polyline2D) entity, this.Normal, this.elevation));
                             break;
                         case EntityType.Spline:
                             boundary.Add(ProcessSpline((Spline) entity, trans, pos));
@@ -310,18 +297,18 @@ namespace netDxf.Entities
             return line;
         }
 
-        private static LwPolyline ProcessLwPolyline(LwPolyline polyline, Vector3 normal, double elevation)
+        private static Polyline2D ProcessLwPolyline(Polyline2D polyline2D, Vector3 normal, double elevation)
         {
-            polyline.Elevation = elevation;
-            polyline.Normal = normal;
-            return polyline;
+            polyline2D.Elevation = elevation;
+            polyline2D.Normal = normal;
+            return polyline2D;
         }
 
         private static Spline ProcessSpline(Spline spline, Matrix3 trans, Vector3 pos)
         {
-            foreach (SplineVertex vertex in spline.ControlPoints)
+            for (int i = 0; i < spline.ControlPoints.Length; i++)
             {
-                vertex.Position = trans * vertex.Position + pos;
+                spline.ControlPoints[i] = trans * spline.ControlPoints[i] + pos;
             }
             spline.Normal = trans * spline.Normal;
             return spline;
@@ -425,7 +412,10 @@ namespace netDxf.Entities
             }
 
             Vector3 newNormal = transformation * this.Normal;
-            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
 
             Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
             Matrix3 transWO = MathHelper.ArbitraryAxis(newNormal).Transpose();
@@ -456,8 +446,8 @@ namespace netDxf.Entities
                         case EntityType.Line:
                             entity = ProcessLine((Line) entity, transOW, position);
                             break;
-                        case EntityType.LwPolyline:
-                            entity = ProcessLwPolyline((LwPolyline) entity, this.Normal, this.Elevation);
+                        case EntityType.Polyline2D:
+                            entity = ProcessLwPolyline((Polyline2D) entity, this.Normal, this.Elevation);
                             break;
                         case EntityType.Spline:
                             entity = ProcessSpline((Spline) entity, transOW, position);
@@ -518,10 +508,14 @@ namespace netDxf.Entities
             };
 
             foreach (HatchBoundaryPath path in this.boundaryPaths)
+            {
                 entity.boundaryPaths.Add((HatchBoundaryPath) path.Clone());
+            }
 
             foreach (XData data in this.XData.Values)
+            {
                 entity.XData.Add((XData) data.Clone());
+            }
 
             return entity;
         }
@@ -534,7 +528,9 @@ namespace netDxf.Entities
         {
             // null items are not allowed in the list.
             if (e.Item == null)
+            {
                 e.Cancel = true;
+            }
             e.Cancel = false;
         }
 

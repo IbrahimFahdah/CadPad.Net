@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -33,6 +36,24 @@ namespace netDxf.Entities
     public class Underlay :
         EntityObject
     {
+        #region delegates and events
+
+        public delegate void UnderlayDefinitionChangedEventHandler(Underlay sender, TableObjectChangedEventArgs<UnderlayDefinition> e);
+        public event UnderlayDefinitionChangedEventHandler UnderlayDefinitionChanged;
+        protected virtual UnderlayDefinition OnUnderlayDefinitionChangedEvent(UnderlayDefinition oldUnderlayDefinition, UnderlayDefinition newUnderlayDefinition)
+        {
+            UnderlayDefinitionChangedEventHandler ae = this.UnderlayDefinitionChanged;
+            if (ae != null)
+            {
+                TableObjectChangedEventArgs<UnderlayDefinition> eventArgs = new TableObjectChangedEventArgs<UnderlayDefinition>(oldUnderlayDefinition, newUnderlayDefinition);
+                ae(this, eventArgs);
+                return eventArgs.NewValue;
+            }
+            return newUnderlayDefinition;
+        }
+
+        #endregion
+
         #region private fields
 
         private UnderlayDefinition definition;
@@ -81,12 +102,12 @@ namespace netDxf.Entities
         public Underlay(UnderlayDefinition definition, Vector3 position, double scale)
             : base(EntityType.Underlay, DxfObjectCode.Underlay)
         {
-            if (definition == null)
-                throw new ArgumentNullException(nameof(definition));
-            this.definition = definition;
+            this.definition = definition ?? throw new ArgumentNullException(nameof(definition));
             this.position = position;
             if (scale <= 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(scale), scale, "The Underlay scale must be greater than zero.");
+            }
             this.scale = new Vector2(scale);
             this.rotation = 0.0;
             this.contrast = 100;
@@ -116,8 +137,15 @@ namespace netDxf.Entities
         public UnderlayDefinition Definition
         {
             get { return this.definition; }
-            internal set
+            set
             {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
+
+                this.definition = this.OnUnderlayDefinitionChangedEvent(this.definition, value);
+
                 switch (value.Type)
                 {
                     case UnderlayType.DGN:
@@ -130,7 +158,6 @@ namespace netDxf.Entities
                         this.CodeName = DxfObjectCode.UnderlayPdf;
                         break;
                 }
-                this.definition = value;
             }
         }
 
@@ -149,7 +176,7 @@ namespace netDxf.Entities
         /// <remarks>
         /// Any of the vector scale components cannot be zero.<br />
         /// Even thought the DXF has a code for the Z scale it seems that it has no use.
-        /// The X and Y components multiplied by the original size of the pdf page represent the width and height of the final underlay.
+        /// The X and Y components multiplied by the original size of the PDF page represent the width and height of the final underlay.
         /// The Z component even thought it is present in the DXF it seems it has no use.
         /// </remarks>
         public Vector2 Scale
@@ -158,7 +185,9 @@ namespace netDxf.Entities
             set
             {
                 if (MathHelper.IsZero(value.X) || MathHelper.IsZero(value.Y))
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "Any of the vector scale components cannot be zero.");
+                }
                 this.scale = value;
             }
         }
@@ -182,7 +211,9 @@ namespace netDxf.Entities
             set
             {
                 if (value < 20 || value > 100)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted contrast values range from 20 to 100.");
+                }
                 this.contrast = value;
             }
         }
@@ -197,7 +228,9 @@ namespace netDxf.Entities
             set
             {
                 if (value < 0 || value > 80)
+                {
                     throw new ArgumentOutOfRangeException(nameof(value), value, "Accepted fade values range from 0 to 80.");
+                }
                 this.fade = value;
             }
         }
@@ -241,7 +274,10 @@ namespace netDxf.Entities
         {
             Vector3 newPosition = transformation * this.Position + translation;
             Vector3 newNormal = transformation * this.Normal;
-            if (Vector3.Equals(Vector3.Zero, newNormal)) newNormal = this.Normal;
+            if (Vector3.Equals(Vector3.Zero, newNormal))
+            {
+                newNormal = this.Normal;
+            }
 
             Matrix3 transOW = MathHelper.ArbitraryAxis(this.Normal);
 

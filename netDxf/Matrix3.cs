@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -94,9 +97,9 @@ namespace netDxf
         {
             get
             {
-                return new Matrix3(0, 0, 0,
-                                   0, 0, 0,
-                                   0, 0, 0);
+                return new Matrix3(0.0, 0.0, 0.0,
+                                   0.0, 0.0, 0.0,
+                                   0.0, 0.0, 0.0) {dirty = false, isIdentity = false};
             }
         }
 
@@ -107,9 +110,9 @@ namespace netDxf
         {
             get
             {
-                return new Matrix3(1, 0, 0,
-                                   0, 1, 0,
-                                   0, 0, 1) {dirty = false, isIdentity = true};
+                return new Matrix3(1.0, 0.0, 0.0,
+                                   0.0, 1.0, 0.0,
+                                   0.0, 0.0, 1.0) {dirty = false, isIdentity = true};
             }
         }
 
@@ -416,6 +419,7 @@ namespace netDxf
                     this.isIdentity = true;
                     return this.isIdentity;
                 }
+
                 return this.isIdentity;
 
                 //if (this.dirty)
@@ -501,8 +505,15 @@ namespace netDxf
         /// <returns>Matrix3.</returns>
         public static Matrix3 operator *(Matrix3 a, Matrix3 b)
         {
-            if (a.IsIdentity) return b;
-            if (b.IsIdentity) return a;
+            if (a.IsIdentity)
+            {
+                return b;
+            }
+
+            if (b.IsIdentity)
+            {
+                return a;
+            }
 
             return new Matrix3(a.M11*b.M11 + a.M12*b.M21 + a.M13*b.M31, a.M11*b.M12 + a.M12*b.M22 + a.M13*b.M32, a.M11*b.M13 + a.M12*b.M23 + a.M13*b.M33,
                                a.M21*b.M11 + a.M22*b.M21 + a.M23*b.M31, a.M21*b.M12 + a.M22*b.M22 + a.M23*b.M32, a.M21*b.M13 + a.M22*b.M23 + a.M23*b.M33,
@@ -517,12 +528,19 @@ namespace netDxf
         /// <returns>Matrix3.</returns>
         public static Matrix3 Multiply(Matrix3 a, Matrix3 b)
         {
-            if (a.IsIdentity) return b;
-            if (b.IsIdentity) return a;
+            if (a.IsIdentity)
+            {
+                return b;
+            }
 
-            return new Matrix3(a.M11*b.M11 + a.M12*b.M21 + a.M13*b.M31, a.M11*b.M12 + a.M12*b.M22 + a.M13*b.M32, a.M11*b.M13 + a.M12*b.M23 + a.M13*b.M33,
-                               a.M21*b.M11 + a.M22*b.M21 + a.M23*b.M31, a.M21*b.M12 + a.M22*b.M22 + a.M23*b.M32, a.M21*b.M13 + a.M22*b.M23 + a.M23*b.M33,
-                               a.M31*b.M11 + a.M32*b.M21 + a.M33*b.M31, a.M31*b.M12 + a.M32*b.M22 + a.M33*b.M32, a.M31*b.M13 + a.M32*b.M23 + a.M33*b.M33);
+            if (b.IsIdentity)
+            {
+                return a;
+            }
+
+            return new Matrix3(a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31, a.M11 * b.M12 + a.M12 * b.M22 + a.M13 * b.M32, a.M11 * b.M13 + a.M12 * b.M23 + a.M13 * b.M33,
+                               a.M21 * b.M11 + a.M22 * b.M21 + a.M23 * b.M31, a.M21 * b.M12 + a.M22 * b.M22 + a.M23 * b.M32, a.M21 * b.M13 + a.M22 * b.M23 + a.M23 * b.M33,
+                               a.M31 * b.M11 + a.M32 * b.M21 + a.M33 * b.M31, a.M31 * b.M12 + a.M32 * b.M22 + a.M33 * b.M32, a.M31 * b.M13 + a.M32 * b.M23 + a.M33 * b.M33);
         }
 
         /// <summary>
@@ -534,7 +552,9 @@ namespace netDxf
         /// <remarks>Matrix3 adopts the convention of using column vectors.</remarks>
         public static Vector3 operator *(Matrix3 a, Vector3 u)
         {
-            return a.IsIdentity ? u : new Vector3(a.M11*u.X + a.M12*u.Y + a.M13*u.Z, a.M21*u.X + a.M22*u.Y + a.M23*u.Z, a.M31*u.X + a.M32*u.Y + a.M33*u.Z);
+            return a.IsIdentity ? u : new Vector3(a.M11 * u.X + a.M12 * u.Y + a.M13 * u.Z,
+                                                  a.M21 * u.X + a.M22 * u.Y + a.M23 * u.Z,
+                                                  a.M31 * u.X + a.M32 * u.Y + a.M33 * u.Z);
         }
 
         /// <summary>
@@ -546,7 +566,9 @@ namespace netDxf
         /// <remarks>Matrix3 adopts the convention of using column vectors.</remarks>
         public static Vector3 Multiply(Matrix3 a, Vector3 u)
         {
-            return a.IsIdentity ? u : new Vector3(a.M11*u.X + a.M12*u.Y + a.M13*u.Z, a.M21*u.X + a.M22*u.Y + a.M23*u.Z, a.M31*u.X + a.M32*u.Y + a.M33*u.Z);
+            return a.IsIdentity ? u : new Vector3(a.M11 * u.X + a.M12 * u.Y + a.M13 * u.Z, 
+                                                  a.M21 * u.X + a.M22 * u.Y + a.M23 * u.Z, 
+                                                  a.M31 * u.X + a.M32 * u.Y + a.M33 * u.Z);
         }
 
         /// <summary>
@@ -557,9 +579,9 @@ namespace netDxf
         /// <returns>Matrix3.</returns>
         public static Matrix3 operator *(Matrix3 m, double a)
         {
-            return new Matrix3(m.M11*a, m.M12*a, m.M13*a,
-                               m.M21*a, m.M22*a, m.M23*a,
-                               m.M31*a, m.M32*a, m.M33*a);
+            return new Matrix3(m.M11 * a, m.M12 * a, m.M13 * a,
+                               m.M21 * a, m.M22 * a, m.M23 * a,
+                               m.M31 * a, m.M32 * a, m.M33 * a);
         }
 
         /// <summary>
@@ -570,9 +592,9 @@ namespace netDxf
         /// <returns>Matrix3.</returns>
         public static Matrix3 Multiply(Matrix3 m, double a)
         {
-            return new Matrix3(m.M11*a, m.M12*a, m.M13*a,
-                               m.M21*a, m.M22*a, m.M23*a,
-                               m.M31*a, m.M32*a, m.M33*a);
+            return new Matrix3(m.M11 * a, m.M12 * a, m.M13 * a,
+                               m.M21 * a, m.M22 * a, m.M23 * a,
+                               m.M31 * a, m.M32 * a, m.M33 * a);
         }
 
         /// <summary>
@@ -607,14 +629,17 @@ namespace netDxf
         /// <returns>Determinant.</returns>
         public double Determinant()
         {
-            if (this.IsIdentity) return 1.0;
+            if (this.IsIdentity)
+            {
+                return 1.0;
+            }
 
-            return this.m11*this.m22*this.m33 +
-                   this.m12*this.m23*this.m31 +
-                   this.m13*this.m21*this.m32 -
-                   this.m13*this.m22*this.m31 -
-                   this.m11*this.m23*this.m32 -
-                   this.m12*this.m21*this.m33;
+            return this.m11 * this.m22 * this.m33 +
+                   this.m12 * this.m23 * this.m31 +
+                   this.m13 * this.m21 * this.m32 -
+                   this.m13 * this.m22 * this.m31 -
+                   this.m11 * this.m23 * this.m32 -
+                   this.m12 * this.m21 * this.m33;
         }
 
         /// <summary>
@@ -623,24 +648,29 @@ namespace netDxf
         /// <returns>Inverse Matrix3.</returns>
         public Matrix3 Inverse()
         {
-            if (this.IsIdentity) return Identity;
+            if (this.IsIdentity)
+            {
+                return Identity;
+            }
 
             double det = this.Determinant();
             if (MathHelper.IsZero(det))
+            {
                 throw new ArithmeticException("The matrix is not invertible.");
+            }
 
-            det = 1/det;
+            det = 1 / det;
 
             return new Matrix3(
-                det*(this.m22*this.m33 - this.m23*this.m32),
-                det*(this.m13*this.m32 - this.m12*this.m33),
-                det*(this.m12*this.m23 - this.m13*this.m22),
-                det*(this.m23*this.m31 - this.m21*this.m33),
-                det*(this.m11*this.m33 - this.m13*this.m31),
-                det*(this.m13*this.m21 - this.m11*this.m23),
-                det*(this.m21*this.m32 - this.m22*this.m31),
-                det*(this.m12*this.m31 - this.m11*this.m32),
-                det*(this.m11*this.m22 - this.m12*this.m21));
+                det * (this.m22 * this.m33 - this.m23 * this.m32),
+                det * (this.m13 * this.m32 - this.m12 * this.m33),
+                det * (this.m12 * this.m23 - this.m13 * this.m22),
+                det * (this.m23 * this.m31 - this.m21 * this.m33),
+                det * (this.m11 * this.m33 - this.m13 * this.m31),
+                det * (this.m13 * this.m21 - this.m11 * this.m23),
+                det * (this.m21 * this.m32 - this.m22 * this.m31),
+                det * (this.m12 * this.m31 - this.m11 * this.m32),
+                det * (this.m11 * this.m22 - this.m12 * this.m21));
         }
 
         /// <summary>
@@ -669,9 +699,9 @@ namespace netDxf
         {
             double cos = Math.Cos(angle);
             double sin = Math.Sin(angle);
-            return new Matrix3(1, 0, 0,
-                               0, cos, -sin,
-                               0, sin, cos);
+            return new Matrix3(1.0, 0.0, 0.0,
+                               0.0, cos, -sin,
+                               0.0, sin, cos);
         }
 
         /// <summary>
@@ -684,9 +714,9 @@ namespace netDxf
         {
             double cos = Math.Cos(angle);
             double sin = Math.Sin(angle);
-            return new Matrix3(cos, 0, sin,
-                               0, 1, 0,
-                               -sin, 0, cos);
+            return new Matrix3(cos, 0.0, sin,
+                               0.0, 1.0, 0.0,
+                               -sin, 0.0, cos);
         }
 
         /// <summary>
@@ -699,9 +729,9 @@ namespace netDxf
         {
             double cos = Math.Cos(angle);
             double sin = Math.Sin(angle);
-            return new Matrix3(cos, -sin, 0,
-                               sin, cos, 0,
-                               0, 0, 1);
+            return new Matrix3(cos, -sin, 0.0,
+                               sin, cos, 0.0,
+                               0.0, 0.0, 1.0);
         }
 
         /// <summary>
@@ -733,9 +763,9 @@ namespace netDxf
         /// <returns>A scaling matrix.</returns>
         public static Matrix3 Scale(double x, double y, double z)
         {
-            return new Matrix3(x, 0, 0,
-                               0, y, 0,
-                               0, 0, z);
+            return new Matrix3(x, 0.0, 0.0,
+                               0.0, y, 0.0,
+                               0.0, 0.0, z);
         }
 
         #endregion
@@ -802,8 +832,10 @@ namespace netDxf
         /// <returns>True if obj and this instance are the same type and represent the same value; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            if (obj is Matrix3)
-                return this.Equals((Matrix3) obj);
+            if (obj is Matrix3 matrix)
+            {
+                return this.Equals(matrix);
+            }
             return false;
         }
 

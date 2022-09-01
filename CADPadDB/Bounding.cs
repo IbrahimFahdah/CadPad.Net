@@ -33,7 +33,6 @@ namespace CADPadDB
             //set { _height = value; }
         }
 
-
         private double _left;
         public double left
         {
@@ -99,6 +98,20 @@ namespace CADPadDB
             _width = _right - _left;
             _height = _top - _bottom;
         }
+
+        public Bounding GrowBy(double sizeIncrement)
+        {
+            this._left -= sizeIncrement;
+            this._top += sizeIncrement;
+            this._right += sizeIncrement;
+            this._bottom -= sizeIncrement;
+
+            _width = _right - _left;
+            _height = _top - _bottom;
+
+            return this;
+        }
+
 
         /// <summary>
         /// Check whether contains Bounding

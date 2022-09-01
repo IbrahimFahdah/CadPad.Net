@@ -4,7 +4,6 @@ namespace CADPadDB
 {
     public interface IDrawingVisual
     {
-       
 
         void Open();
         void Close();
@@ -18,5 +17,7 @@ namespace CADPadDB
         void DrawRay(CADPoint basePoint, CADVector direction, bool mdoelToCanvas = true);
         void DrawArc(CADPoint center, double radius, double startAngle, double endAngle, bool mdoelToCanvas = true);
         void DrawEllipse(CADPoint center, double radiusX, double radiusY, bool mdoelToCanvas = true);
+
+        void SetColor(Colors.CADColor color);
     }
 }

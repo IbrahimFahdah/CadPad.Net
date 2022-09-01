@@ -1,25 +1,29 @@
-﻿#region netDxf library, Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -124,9 +128,15 @@ namespace netDxf.Collections
                 KeyValuePair<TKey, TValue> add = new KeyValuePair<TKey, TValue>(key, value);
 
                 if (this.BeforeRemoveItemEvent(remove))
+                {
                     return;
+                }
+
                 if (this.BeforeAddItemEvent(add))
+                {
                     return;
+                }
+
                 this.innerDictionary[key] = value;
                 this.AddItemEvent(add);
                 this.RemoveItemEvent(remove);
@@ -161,7 +171,9 @@ namespace netDxf.Collections
         {
             KeyValuePair<TKey, TValue> add = new KeyValuePair<TKey, TValue>(key, value);
             if (this.BeforeAddItemEvent(add))
-                return;
+            {
+                throw new ArgumentException("The item cannot be added to the dictionary.", nameof(value));
+            }
             this.innerDictionary.Add(key, value);
             this.AddItemEvent(add);
         }
@@ -174,11 +186,16 @@ namespace netDxf.Collections
         public bool Remove(TKey key)
         {
             if (!this.innerDictionary.ContainsKey(key))
+            {
                 return false;
+            }
 
             KeyValuePair<TKey, TValue> remove = new KeyValuePair<TKey, TValue>(key, this.innerDictionary[key]);
             if (this.BeforeRemoveItemEvent(remove))
+            {
                 return false;
+            }
+
             this.innerDictionary.Remove(key);
             this.RemoveItemEvent(remove);
 
@@ -188,7 +205,10 @@ namespace netDxf.Collections
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
         {
             if (!ReferenceEquals(item.Value, this.innerDictionary[item.Key]))
+            {
                 return false;
+            }
+
             return this.Remove(item.Key);
         }
 

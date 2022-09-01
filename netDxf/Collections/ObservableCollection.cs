@@ -1,23 +1,26 @@
-﻿#region netDxf library, Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2016 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -52,7 +55,9 @@ namespace netDxf.Collections
         {
             AddItemEventHandler ae = this.AddItem;
             if (ae != null)
+            {
                 ae(this, new ObservableCollectionEventArgs<T>(item));
+            }
         }
 
         protected virtual bool OnBeforeAddItemEvent(T item)
@@ -83,7 +88,9 @@ namespace netDxf.Collections
         {
             RemoveItemEventHandler ae = this.RemoveItem;
             if (ae != null)
+            {
                 ae(this, new ObservableCollectionEventArgs<T>(item));
+            }
         }
 
         #endregion
@@ -111,7 +118,9 @@ namespace netDxf.Collections
         public ObservableCollection(int capacity)
         {
             if (capacity < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(capacity), "The collection capacity cannot be negative.");
+            }
             this.innerArray = new List<T>(capacity);
         }
 
@@ -133,9 +142,15 @@ namespace netDxf.Collections
                 T add = value;
 
                 if (this.OnBeforeRemoveItemEvent(remove))
+                {
                     return;
+                }
+
                 if (this.OnBeforeAddItemEvent(add))
+                {
                     return;
+                }
+
                 this.innerArray[index] = value;
                 this.OnAddItemEvent(add);
                 this.OnRemoveItemEvent(remove);
@@ -215,7 +230,9 @@ namespace netDxf.Collections
         public void Add(T item)
         {
             if (this.OnBeforeAddItemEvent(item))
+            {
                 throw new ArgumentException("The item cannot be added to the collection.", nameof(item));
+            }
             this.innerArray.Add(item);
             this.OnAddItemEvent(item);
         }
@@ -227,10 +244,14 @@ namespace netDxf.Collections
         public void AddRange(IEnumerable<T> collection)
         {
             if (collection == null)
+            {
                 throw new ArgumentNullException(nameof(collection));
+            }
 
             foreach (T item in collection)
+            {
                 this.Add(item);
+            }
         }
 
         /// <summary>
@@ -242,11 +263,20 @@ namespace netDxf.Collections
         public void Insert(int index, T item)
         {
             if (index < 0 || index >= this.innerArray.Count)
+            {
                 throw new ArgumentOutOfRangeException(string.Format("The parameter index {0} must be in between {1} and {2}.", index, 0, this.innerArray.Count));
+            }
+
             if (this.OnBeforeRemoveItemEvent(this.innerArray[index]))
+            {
                 return;
+            }
+
             if (this.OnBeforeAddItemEvent(item))
+            {
                 throw new ArgumentException("The item cannot be added to the collection.", nameof(item));
+            }
+
             this.OnRemoveItemEvent(this.innerArray[index]);
             this.innerArray.Insert(index, item);
             this.OnAddItemEvent(item);
@@ -260,9 +290,15 @@ namespace netDxf.Collections
         public bool Remove(T item)
         {
             if (!this.innerArray.Contains(item))
+            {
                 return false;
+            }
+
             if (this.OnBeforeRemoveItemEvent(item))
+            {
                 return false;
+            }
+
             this.innerArray.Remove(item);
             this.OnRemoveItemEvent(item);
             return true;
@@ -272,20 +308,16 @@ namespace netDxf.Collections
         /// Removes the first occurrence of a specific object from the collection
         /// </summary>
         /// <param name="items">The list of objects to remove from the collection.</param>
-        /// <returns>True if object is successfully removed; otherwise, false.</returns>
         public void Remove(IEnumerable<T> items)
         {
             if (items == null)
+            {
                 throw new ArgumentNullException(nameof(items));
+            }
 
             foreach (T item in items)
             {
-                if (!this.innerArray.Contains(item))
-                    return;
-                if (this.OnBeforeRemoveItemEvent(item))
-                    return;
-                this.innerArray.Remove(item);
-                this.OnRemoveItemEvent(item);
+                this.Remove(item);
             }
         }
 
@@ -296,10 +328,16 @@ namespace netDxf.Collections
         public void RemoveAt(int index)
         {
             if (index < 0 || index >= this.innerArray.Count)
+            {
                 throw new ArgumentOutOfRangeException(string.Format("The parameter index {0} must be in between {1} and {2}.", index, 0, this.innerArray.Count));
+            }
+
             T remove = this.innerArray[index];
             if (this.OnBeforeRemoveItemEvent(remove))
+            {
                 return;
+            }
+
             this.innerArray.RemoveAt(index);
             this.OnRemoveItemEvent(remove);
         }

@@ -9,7 +9,7 @@ namespace CADPadDrawing.Visuals
 {
     public class CADEnitiyVisual : CanvasDrawingVisual, ICADEnitiyVisual
     {
-        private Pen _spen, _pen;
+        private Pen _spen;
         private bool selected;
       
         public CADEnitiyVisual(IDrawing owner) : base(owner)
@@ -65,18 +65,12 @@ namespace CADPadDrawing.Visuals
             {
                 _pen = value;
             }
-        }
-
-        //public override void DrawLine(CADPoint startPoint, CADPoint endPoint, bool mdoelToCanvas = true)
-        //{
-        //    DrawLine(_drawing, thisDC, Selected ? SelectPen : Pen, startPoint, endPoint);
-        //}
+        }        
 
         public virtual void Draw()
         {
-            Entity?.Draw(this);
+            if (Entity == null) return;            
+            Entity.Draw(this);
         }
-
-
     }
 }

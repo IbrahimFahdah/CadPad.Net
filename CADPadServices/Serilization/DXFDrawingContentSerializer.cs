@@ -49,34 +49,37 @@ namespace CADPadServices.Serilization
 
         private void WriteLine(DxfDocument doc, Line line)
         {
-            doc.AddEntity(new netDxf.Entities.Line(new Vector2(line.startPoint.X, line.startPoint.Y),
+            doc.Entities.Add(new netDxf.Entities.Line(new Vector2(line.startPoint.X, line.startPoint.Y),
                 new Vector2(line.endPoint.X, line.endPoint.Y)));
         }
         private void WriteCircle(DxfDocument doc, Circle circle)
         {
-            doc.AddEntity(new netDxf.Entities.Circle(new Vector2(circle.center.X, circle.center.Y),
+            doc.Entities.Add(new netDxf.Entities.Circle(new Vector2(circle.center.X, circle.center.Y),
                circle.radius));
         }
         private void WriteEllipse(DxfDocument doc, Ellipse ellipse)
         {
             //Todo
-            doc.AddEntity(new netDxf.Entities.Ellipse(new Vector2(ellipse.center.X, ellipse.center.Y),
+            doc.Entities.Add(new netDxf.Entities.Ellipse(new Vector2(ellipse.center.X, ellipse.center.Y),
                ellipse.RadiusX, ellipse.RadiusY));
         }
         private void WriteArc(DxfDocument doc, Arc arc)
         {
             var radius = CADPoint.Distance(arc.center, arc.startPoint);
-            doc.AddEntity(new netDxf.Entities.Arc(new Vector2(arc.center.X, arc.center.Y),
-             radius, arc.startAngle, arc.endAngle));
+            doc.Entities.Add(new netDxf.Entities.Arc(
+                new Vector2(arc.center.X, arc.center.Y),
+                radius,  
+                Utils.RadianToDegree(arc.startAngle), 
+                Utils.RadianToDegree(arc.endAngle)));
         }
         private void WritePolyline(DxfDocument doc, Polyline polyline)
         {
-            var points = new List<netDxf.Entities.LwPolylineVertex>();
+            var points = new List<netDxf.Entities.Polyline2DVertex>();
             for (int i = 0; i < polyline.NumberOfVertices; i++)
             {
-                points.Add(new netDxf.Entities.LwPolylineVertex(polyline.GetPointAt(i).X, polyline.GetPointAt(i).Y));
+                points.Add(new netDxf.Entities.Polyline2DVertex(polyline.GetPointAt(i).X, polyline.GetPointAt(i).Y));
             }
-            doc.AddEntity(new netDxf.Entities.LwPolyline(points, polyline.closed));
+            doc.Entities.Add(new netDxf.Entities.Polyline2D(points, polyline.closed));
         }
     }
 }

@@ -1,29 +1,31 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
 using netDxf.Collections;
 using netDxf.Objects;
-using netDxf.Tables;
 using netDxf.Units;
 
 namespace netDxf.Blocks
@@ -32,35 +34,8 @@ namespace netDxf.Blocks
     /// Represent the record of a block in the tables section.
     /// </summary>
     public class BlockRecord :
-        DxfObject,
-        IHasXData
+        DxfObject
     {
-        #region delegates and events
-
-        //public delegate void XDataAddAppRegEventHandler(EntityObject sender, ObservableCollectionEventArgs<ApplicationRegistry> e);
-
-        public event XDataAddAppRegEventHandler XDataAddAppReg;
-
-        protected virtual void OnXDataAddAppRegEvent(ApplicationRegistry item)
-        {
-            XDataAddAppRegEventHandler ae = this.XDataAddAppReg;
-            if (ae != null)
-                ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
-        }
-
-        //public delegate void XDataRemoveAppRegEventHandler(EntityObject sender, ObservableCollectionEventArgs<ApplicationRegistry> e);
-
-        public event XDataRemoveAppRegEventHandler XDataRemoveAppReg;
-
-        protected virtual void OnXDataRemoveAppRegEvent(ApplicationRegistry item)
-        {
-            XDataRemoveAppRegEventHandler ae = this.XDataRemoveAppReg;
-            if (ae != null)
-                ae(this, new ObservableCollectionEventArgs<ApplicationRegistry>(item));
-        }
-
-        #endregion
-
         #region private fields
 
         private string name;
@@ -69,7 +44,6 @@ namespace netDxf.Blocks
         private DrawingUnits units;
         private bool allowExploding;
         private bool scaleUniformly;
-        private readonly XDataDictionary xData;
 
         #endregion
 
@@ -83,13 +57,14 @@ namespace netDxf.Blocks
             : base(DxfObjectCode.BlockRecord)
         {
             if (string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name));
+            }
             this.name = name;
             this.layout = null;
             this.units = DefaultUnits;
             this.allowExploding = true;
             this.scaleUniformly = false;
-            this.xData = new XDataDictionary();
         }
 
         #endregion
@@ -141,7 +116,7 @@ namespace netDxf.Blocks
         /// Gets or sets if the block can be exploded.
         /// </summary>
         /// <remarks>
-        /// This property is only compatible with dxf version AutoCad2007 and upwards.
+        /// This property is only compatible with DXF version AutoCad2007 and upwards.
         /// </remarks>
         public bool AllowExploding
         {
@@ -153,7 +128,7 @@ namespace netDxf.Blocks
         /// Gets or sets if the block must be scaled uniformly.
         /// </summary>
         /// <remarks>
-        /// This property is only compatible with dxf version AutoCad2007 and upwards.
+        /// This property is only compatible with DXF version AutoCad2007 and upwards.
         /// </remarks>
         public bool ScaleUniformly
         {
@@ -162,7 +137,7 @@ namespace netDxf.Blocks
         }
 
         /// <summary>
-        /// Gets the owner of the actual dxf object.
+        /// Gets the owner of the actual DXF object.
         /// </summary>
         public new BlockRecords Owner
         {
@@ -179,14 +154,6 @@ namespace netDxf.Blocks
         public bool IsForInternalUseOnly
         {
             get { return this.name.StartsWith("*"); }
-        }
-
-        /// <summary>
-        /// Gets the block record <see cref="XDataDictionary">extended data</see>.
-        /// </summary>
-        public XDataDictionary XData
-        {
-            get { return this.xData; }
         }
 
         #endregion

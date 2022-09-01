@@ -1,29 +1,32 @@
-﻿#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 namespace netDxf
 {
     /// <summary>
-    /// Dxf object subclass string markers (code 100).
+    /// DXF object subclass string markers (code 100).
     /// </summary>
     internal static class SubclassMarker
     {
@@ -55,7 +58,7 @@ namespace netDxf
         public const string Circle = "AcDbCircle";
         public const string Ellipse = "AcDbEllipse";
         public const string Spline = "AcDbSpline";
-        public const string Face3d = "AcDbFace";
+        public const string Face3D = "AcDbFace";
         public const string Helix = "AcDbHelix";
         public const string Insert = "AcDbBlockReference";
         public const string Line = "AcDbLine";
@@ -64,15 +67,17 @@ namespace netDxf
         public const string MLine = "AcDbMline";
         public const string Point = "AcDbPoint";
         public const string Vertex = "AcDbVertex";
-        public const string Polyline = "AcDb2dPolyline";
         public const string Leader = "AcDbLeader";
-        public const string LightWeightPolyline = "AcDbPolyline";
-        public const string PolylineVertex = "AcDb2dVertex ";
-        public const string Polyline3d = "AcDb3dPolyline";
-        public const string Polyline3dVertex = "AcDb3dPolylineVertex";
+        public const string Polyline = "AcDbPolyline";
+        public const string Polyline2D = "AcDb2dPolyline";
+        public const string Polyline2DVertex = "AcDb2dVertex";
+        public const string Polyline3D = "AcDb3dPolyline";
+        public const string Polyline3DVertex = "AcDb3dPolylineVertex";
         public const string PolyfaceMesh = "AcDbPolyFaceMesh";
         public const string PolyfaceMeshVertex = "AcDbPolyFaceMeshVertex";
         public const string PolyfaceMeshFace = "AcDbFaceRecord";
+        public const string PolygonMesh = "AcDbPolygonMesh";
+        public const string PolygonMeshVertex = "AcDbPolygonMeshVertex";
         public const string Shape = "AcDbShape";
         public const string Solid = "AcDbTrace";
         public const string Trace = "AcDbTrace";
@@ -88,6 +93,7 @@ namespace netDxf
         public const string Attribute = "AcDbAttribute";
         public const string AttributeDefinition = "AcDbAttributeDefinition";
         public const string Dictionary = "AcDbDictionary";
+        public const string XRecord = "AcDbXrecord";
         public const string RasterImage = "AcDbRasterImage";
         public const string RasterImageDef = "AcDbRasterImageDef";
         public const string RasterImageDefReactor = "AcDbRasterImageDefReactor";

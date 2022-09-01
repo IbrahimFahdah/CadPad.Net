@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2018 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -37,7 +40,6 @@ namespace netDxf.Collections
     {
         #region private fields
 
-        private int maxCapacity = int.MaxValue;
         protected readonly Dictionary<string, T> list;
         protected Dictionary<string, List<DxfObject>> references;
 
@@ -53,9 +55,13 @@ namespace netDxf.Collections
             this.Owner = document;
 
             if (string.IsNullOrEmpty(handle))
-                this.Owner.NumHandles = base.AsignHandle(this.Owner.NumHandles);
+            {
+                this.Owner.NumHandles = base.AssignHandle(this.Owner.NumHandles);
+            }
             else
+            {
                 this.Handle = handle;
+            }
 
             this.Owner.AddedObjects.Add(this.Handle, this);
         }
@@ -104,19 +110,7 @@ namespace netDxf.Collections
         }
 
         /// <summary>
-        /// Gets the maximum number of objects the collection can hold.
-        /// </summary>
-        /// <remarks>
-        /// This is an approximate value, the actual exact value is unknown. In any case is not recommended to get even close to this number for any practical use.
-        /// </remarks>
-        public int MaxCapacity
-        {
-            get { return this.maxCapacity; }
-            internal set { this.maxCapacity = value; }
-        }
-
-        /// <summary>
-        /// Gets the owner of the actual dxf object.
+        /// Gets the owner of the actual DXF object.
         /// </summary>
         public new DxfDocument Owner
         {
@@ -152,7 +146,10 @@ namespace netDxf.Collections
         public List<DxfObject> GetReferences(string name)
         {
             if (!this.Contains(name))
+            {
                 return new List<DxfObject>();
+            }
+
             return new List<DxfObject>(this.references[name]);
         }
 
@@ -168,7 +165,10 @@ namespace netDxf.Collections
         public List<DxfObject> GetReferences(T item)
         {
             if (item == null)
+            {
                 throw new ArgumentNullException(nameof(item));
+            }
+
             return this.GetReferences(item.Name);
         }
 
@@ -215,7 +215,10 @@ namespace netDxf.Collections
         public T Add(T item)
         {
             if (item == null)
+            {
                 throw new ArgumentNullException(nameof(item));
+            }
+
             return this.Add(item, true);
         }
 
@@ -245,7 +248,9 @@ namespace netDxf.Collections
             string[] names = new string[this.list.Count];
             this.list.Keys.CopyTo(names, 0);
             foreach (string o in names)
+            {
                 this.Remove(o);
+            }
         }
 
         #endregion

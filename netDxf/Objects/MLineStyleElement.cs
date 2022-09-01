@@ -1,23 +1,26 @@
-#region netDxf library, Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
-
-//                        netDxf library
-// Copyright (C) 2009-2019 Daniel Carvajal (haplokuon@gmail.com)
+#region netDxf library licensed under the MIT License
 // 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
+//                       netDxf library
+// Copyright (c) 2019-2021 Daniel Carvajal (haplokuon@gmail.com)
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
 #endregion
 
 using System;
@@ -35,9 +38,7 @@ namespace netDxf.Objects
         #region delegates and events
 
         public delegate void LinetypeChangedEventHandler(MLineStyleElement sender, TableObjectChangedEventArgs<Linetype> e);
-
         public event LinetypeChangedEventHandler LinetypeChanged;
-
         protected virtual Linetype OnLinetypeChangedEvent(Linetype oldLinetype, Linetype newLinetype)
         {
             LinetypeChangedEventHandler ae = this.LinetypeChanged;
@@ -101,16 +102,14 @@ namespace netDxf.Objects
         /// Gets or sets the element color.
         /// </summary>
         /// <remarks>
-        /// AutoCad2000 dxf version does not support true colors for MLineStyleElement color.
+        /// AutoCad2000 DXF version does not support true colors for MLineStyleElement color.
         /// </remarks>
         public AciColor Color
         {
             get { return this.color; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                this.color = value;
+                this.color = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -123,7 +122,9 @@ namespace netDxf.Objects
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException(nameof(value));
+                }
                 this.linetype = this.OnLinetypeChangedEvent(this.linetype, value);
             }
         }
@@ -145,7 +146,9 @@ namespace netDxf.Objects
         public int CompareTo(MLineStyleElement other)
         {
             if (other == null)
+            {
                 throw new ArgumentNullException(nameof(other));
+            }
 
             return -this.offset.CompareTo(other.offset);
         }
@@ -161,10 +164,14 @@ namespace netDxf.Objects
         public override bool Equals(object other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             if (this.GetType() != other.GetType())
+            {
                 return false;
+            }
 
             return this.Equals((MLineStyleElement) other);
         }
@@ -180,7 +187,9 @@ namespace netDxf.Objects
         public bool Equals(MLineStyleElement other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
             return MathHelper.IsEqual(this.offset, other.offset);
         }
