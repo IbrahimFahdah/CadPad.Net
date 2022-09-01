@@ -7,7 +7,14 @@
 - [x] copy and move objects.
 - [x] undo and redo actions.
 - [x] import and export to dxf using netdxf.
-- [x] layers
+- [x] layers (currently only read & visibility control) 
+
+# Planned future tasks:
+- [ ] adding layer editing
+- [ ] adding more drawing options
+- [ ] PolyLine2D (combination of lines and arcs)
+- [ ] Spline
+- [ ] ...some others
 
 # Disclaimer:
 Some core drawing functionalities were ported from other projects, notably https://github.com/wangyao1052/LitCAD

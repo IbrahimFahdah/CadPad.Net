@@ -27,7 +27,7 @@ namespace CADPadServices
             Pointer = new PointerContoller(this);
             PanContoller = new PanContoller(this);
             ZoomContoller = new ZoomContoller(this);
-            GridLayer =new GridLayer(this);
+            GridLayer = new GridLayer(this);
 
             _cmdsMgr = new CommandsMgr(this);
             _cmdsMgr.commandFinished += this.OnCommandFinished;
@@ -54,7 +54,7 @@ namespace CADPadServices
 
         public bool GridEnabled { get; set; } = false;
         public bool ZoomEnabled { get; set; } = true;
-        public bool PointerEnabled { get; set; } = false;
+        public bool PointerEnabled { get; set; } = true;
 
         public ColorMethod ColorMethod { get => CADColor.GlobalColorMethod; set => CADColor.GlobalColorMethod = value; }
 
@@ -153,14 +153,14 @@ namespace CADPadServices
         public IEventResult OnMouseDown(IMouseButtonEventArgs e)
         {
             PanContoller.OnMouseDown(e);
-            var res=Pointer.OnMouseDown(e);
+            var res = Pointer.OnMouseDown(e);
             if (_cmdsMgr.CurrentCmd != null)
             {
                 _cmdsMgr.OnMouseDown(e);
             }
             else
             {
-                if (res.data is Command cmd )
+                if (res.data is Command cmd)
                 {
                     _cmdsMgr.DoCommand(cmd);
                 }
@@ -266,7 +266,7 @@ namespace CADPadServices
             return null;
         }
 
-        public T AppendEntity<T>(T entity,  DBObjectState state = DBObjectState.Default, bool reUseVisual = false) where T : Entity
+        public T AppendEntity<T>(T entity, DBObjectState state = DBObjectState.Default, bool reUseVisual = false) where T : Entity
         {
             Block modelSpace = CurrentBlock;
             entity.State = state;
@@ -294,7 +294,7 @@ namespace CADPadServices
             Canvas.Clear();
             foreach (var entity in CurrentBlock)
             {
-               var drawingVisual = Canvas.CreateCADEnitiyVisual();
+                var drawingVisual = Canvas.CreateCADEnitiyVisual();
                 drawingVisual.Entity = entity;
                 entity.DrawingVisual = drawingVisual;
                 Canvas.AddVisual(drawingVisual);
@@ -305,7 +305,7 @@ namespace CADPadServices
         public void Clear()
         {
             var items = CurrentBlock.ToList();
-            
+
             foreach (var entity in items)
             {
                 RemoveEntity(entity);
@@ -317,7 +317,7 @@ namespace CADPadServices
         {
             Canvas.ClearVisualGrips(entity.DrawingVisual);
             Canvas.RemoveVisual(entity.DrawingVisual);
-            entity.Erase();         
+            entity.Erase();
         }
 
         public void OnCommand(ICommand cmd)
@@ -343,7 +343,7 @@ namespace CADPadServices
         public void OnSelectionChanged()
         {
             Pointer.OnSelectionChanged();
-            if(selections.Count==0)
+            if (selections.Count == 0)
             {
                 foreach (var g in Canvas.Geometries)
                 {
@@ -411,7 +411,7 @@ namespace CADPadServices
             ZoomContoller.Scale = Math.Min(windowWidth / bounding.width, windowHeight / bounding.height);
         }
 
-        public Bounding GetBounding(List<Entity> entities) 
+        public Bounding GetBounding(List<Entity> entities)
         {
             CADPoint topLeft = new CADPoint();
             CADPoint bottomRight = new CADPoint();
